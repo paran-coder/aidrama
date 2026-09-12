@@ -43,3 +43,6 @@ Supabase Auth remains the identity/session source. Public data is organized by r
 
 ## Release policy
 Semantic version: 1.1.0 (minor release because internal data behavior and admin capabilities expand while user product behavior is intentionally preserved).
+
+## v1.1.1 patch note
+The admin bootstrap command now explicitly loads `.env.local`. The previous command used plain Node, which does not inherit Next.js `.env.local` loading behavior. Real secret values remain local-only and are excluded by `.gitignore`.

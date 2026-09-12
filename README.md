@@ -1,9 +1,9 @@
-# AI Drama Challenge v1.1.0
+# AI Drama Challenge v1.1.1
 
 A 1000-day weekly AI-drama creator challenge web app built with Next.js, Vercel and Supabase.
 
-## What v1.1.0 changes
-v1.1.0 keeps the v1.0.1 user product intact and reorganizes the persistence layer for long-running operations. Submission attempts and official weekly outcomes are separated, unnecessary first-party analytics storage is removed, and meaningful administrator corrections are auditable and recoverable.
+## What v1.1.1 changes
+v1.1.1 keeps the v1.0.1 user product intact and includes the v1.1.0 persistence redesign and reorganizes the persistence layer for long-running operations. Submission attempts and official weekly outcomes are separated, unnecessary first-party analytics storage is removed, and meaningful administrator corrections are auditable and recoverable.
 
 ## User-facing compatibility
 Invitation-code signup, email/password login, onboarding, weekly submissions, streak/failure rules, owl growth, history, community, mypage and completion screens are intentionally unchanged from v1.0.1.
@@ -29,7 +29,7 @@ ADMIN_EMAIL=admin@example.com
 `SUPABASE_SERVICE_ROLE_KEY` must remain server-only and must never use a `NEXT_PUBLIC_` prefix.
 
 ## Fresh Supabase setup
-Use **this v1.1.0 repository's** `supabase/migrations/001_init.sql`. Do not mix it with the v1.0.x schema. If an older schema already contains real production data, migrate it deliberately instead of re-running this fresh initializer.
+Use **this v1.1.1 repository's** `supabase/migrations/001_init.sql`. Do not mix it with the v1.0.x schema. If an older schema already contains real production data, migrate it deliberately instead of re-running this fresh initializer.
 
 1. Create a Supabase project.
 2. Open Supabase SQL Editor.
@@ -39,6 +39,15 @@ Use **this v1.1.0 repository's** `supabase/migrations/001_init.sql`. Do not mix 
 6. Add `https://your-project.vercel.app/auth/callback` to allowed redirect URLs.
 7. Run the admin bootstrap script locally with production credentials or promote the intended first account to admin using the documented bootstrap flow.
 8. Redeploy the Vercel project after environment variables are saved.
+
+## One-time admin bootstrap
+Create a local `.env.local` from `.env.example`, fill in the production Supabase values and the `BOOTSTRAP_*` values, then run:
+
+```bash
+npm run bootstrap:admin
+```
+
+The npm script explicitly loads `.env.local`. After a successful bootstrap, remove `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD`, and `BOOTSTRAP_ADMIN_NAME` from your real `.env.local`. Keep the Supabase connection values only if you still use the local app or administration scripts. Never commit `.env.local`.
 
 ## Local commands
 ```bash

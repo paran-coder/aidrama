@@ -68,3 +68,9 @@
 - [ ] Fresh Supabase project successfully executes `supabase/migrations/001_init.sql`.
 - [ ] Vercel Production environment variables are configured and the deployment is redeployed.
 - [ ] Browser smoke test: invite signup → onboarding → dashboard → weekly submit → history → community → admin operations.
+
+## v1.1.1 patch
+- [x] Confirmed `.env`, `.env.local`, and `.env.*.local` are ignored by Git.
+- [x] Added a safe `.env.example` with no real secrets.
+- [x] Fixed `bootstrap:admin` so Node explicitly loads `.env.local` via `--env-file=.env.local`.
+- [x] Documented removal of one-time `BOOTSTRAP_*` values after admin creation.
