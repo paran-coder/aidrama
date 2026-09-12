@@ -1,4 +1,4 @@
-# AI Drama Challenge — v1.0.0
+# AI Drama Challenge — v1.0.1
 
 1000일 동안 매주 AI드라마 영상 1개 업로드를 이어가는 **초대형 크리에이터 챌린지 서비스**입니다.
 
@@ -115,7 +115,7 @@ https://YOUR_DOMAIN/auth/callback
 ```bash
 git init
 git add .
-git commit -m "feat: release ai-drama-challenge v1.0.0"
+git commit -m "fix: release ai-drama-challenge v1.0.1"
 git branch -M main
 git remote add origin <YOUR_GITHUB_REPOSITORY_URL>
 git push -u origin main
@@ -149,6 +149,14 @@ git push -u origin main
 - 3회 연속 실패: 알로 리셋, 경과일 유지
 - 다음 성공: 페널티 해제 및 경과일 기준 정상 성장단계 회복
 
+## v1.0.1 patch notes
+
+- Fixed Vercel TypeScript build error where Supabase nested relation inference resolved `submissions` as `never`.
+- Replaced nested `weekly_results -> submissions` selects with explicit `submission_id` lookups on submit/history screens.
+- Simplified the dashboard weekly-result query so it no longer depends on relationship inference.
+- Re-ran syntax/transpile validation across all 42 TS/TSX source files.
+
+
 ## Link verification in v1.0.0
 
 현재 자동 검증은 URL 형식과 알려진 SNS 호스트를 기준으로 합니다. YouTube, Instagram, TikTok 등은 `검증됨`, 정상 URL이지만 지원 목록 밖의 호스트는 제출을 인정한 뒤 `미검증`으로 저장합니다. 플랫폼 API 기반 게시물 실재 여부 검증은 후속 버전에서 교체할 수 있도록 검증 로직을 분리했습니다.
@@ -162,4 +170,4 @@ git push -u origin main
 
 ## Version
 
-`ai-drama-challenge-v1.0.0`
+`ai-drama-challenge-v1.0.1`

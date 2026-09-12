@@ -1,4 +1,4 @@
-# Context Notes — AI Drama Challenge v1.0.0
+# Context Notes — AI Drama Challenge v1.0.1
 
 ## Product
 초대형 AI드라마 크리에이터 커뮤니티를 위한 1000일·매주 1회 업로드 챌린지 서비스.

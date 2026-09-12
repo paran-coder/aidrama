@@ -1,4 +1,4 @@
-# Development Checklist — ai-drama-challenge-v1.0.0
+# Development Checklist — ai-drama-challenge-v1.0.1
 
 ## 0. Project foundation — 10/10
 - [x] Planning documents imported
@@ -66,9 +66,19 @@
 - [ ] Supabase live-project integration smoke test (requires project credentials)
 - [ ] Browser visual regression pass on deployed URL
 
-## v1.0.0 follow-up candidates
+## v1.0.1 follow-up candidates
 - Platform API/OEmbed based real post verification
 - Vercel Cron or Supabase scheduled job for proactive weekly settlement at scale
 - Share-card image generation
 - Reactions/comments
 - Notification reminders
+
+
+## v1.0.1 Vercel build hotfix
+
+- [x] Removed nested Supabase relationship selection from `app/dashboard/submit/page.tsx`.
+- [x] Removed the same relationship-inference dependency from dashboard/history queries.
+- [x] Added explicit local result/submission types for Vercel strict TypeScript builds.
+- [x] Verified no remaining `submissions(...)` nested selects in app/lib.
+- [x] TypeScript syntax/transpile validation passed for 42 TS/TSX files.
+- [ ] Full `next build` requires npm registry access; this execution environment currently returns DNS `EAI_AGAIN`.

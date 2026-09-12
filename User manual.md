@@ -1,4 +1,4 @@
-# User Manual — AI Drama Challenge v1.0.0
+# User Manual — AI Drama Challenge v1.0.1
 
 ## 참여자
 1. 관리자로부터 초대 코드를 받습니다.

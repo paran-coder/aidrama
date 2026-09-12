@@ -17,7 +17,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   if (!challenge) redirect("/onboarding");
   const admin = createAdminClient();
   const weekStart = currentChallengeWeek(challenge);
-  const { data: weeklyResult } = weekStart ? await admin.from("weekly_results").select("status, submissions(verification_status)").eq("challenge_id", challenge.id).eq("week_start", weekStart).maybeSingle() : { data: null };
+  const { data: weeklyResult } = weekStart ? await admin.from("weekly_results").select("id, status, submission_id").eq("challenge_id", challenge.id).eq("week_start", weekStart).maybeSingle() : { data: null };
   const progress = challengeProgress(challenge);
   const stage = effectiveStage(challenge);
   const q = await searchParams; const submitted = typeof q.submitted === "string" ? q.submitted : "";
