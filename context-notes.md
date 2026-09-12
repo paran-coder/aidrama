@@ -1,37 +1,45 @@
-# Context Notes — AI Drama Challenge v1.0.1
+# AI Drama Challenge v1.1.0 — Context Notes
 
-## Product
-초대형 AI드라마 크리에이터 커뮤니티를 위한 1000일·매주 1회 업로드 챌린지 서비스.
+## Release intent
+v1.1.0 is an operations-oriented data refactor. The user-facing product, routes, UI, invitation flow, challenge rules, owl growth experience, and completion experience are frozen to v1.0.1 unless a bug must be fixed to preserve existing behavior.
 
-## Deployment target
-- Source control: GitHub
-- Hosting: Vercel
-- Database/Auth: Supabase
-- Runtime: Node.js 22+
-- Framework: Next.js 16.3.4 App Router
-- Styling: Tailwind CSS 4
+## Non-negotiable compatibility contract
+- Invitation-code signup remains mandatory and one-time.
+- Email/password authentication remains Supabase Auth.
+- Onboarding and challenge start flow remain unchanged.
+- Challenge duration remains 1000 days.
+- Weekly judging remains Monday–Sunday in Asia/Seoul (KST).
+- The first judged week begins on the first Monday after challenge start.
+- Weekly submission, verification fallback, streak, consecutive-failure penalties, reset/recovery rules, owl growth, history, community, mypage, completion, and admin invite-code flows must retain v1.0.1 behavior.
+- Existing public routes remain stable.
 
-## Confirmed product rules
-- 가입은 관리자 발급 초대 코드가 반드시 필요하다.
-- 초대 코드는 1코드-1인, 1회 사용 후 만료된다.
-- 가입 후 온보딩에서 챌린지를 시작한다.
-- 경과일은 시작 즉시 0일차가 되며, 주간 판정은 가입 주를 제외한 다음 월요일부터 시작한다.
-- 주차는 월요일~일요일, 마감은 일요일 23:59 (Asia/Seoul 기준)이다.
-- 성공 시 스트릭 +1, 연속 실패는 0으로 초기화한다.
-- 1회 연속 실패: 성장단계 1단계 하락.
-- 2회 연속 실패: 대시보드 경고 노출.
-- 3회 연속 실패: 성장단계를 알로 리셋하되 1000일 경과는 유지한다.
-- 페널티로 하락/리셋된 성장단계는 다음 성공 시 정상 성장단계로 즉시 회복한다.
-- 링크 검증 실패는 제출 자체를 막지 않고 `미검증`으로 인정한다.
-- 관리자 권한은 1인 운영을 기본 전제로 한다.
+## v1.1.0 data architecture
+Supabase Auth remains the identity/session source. Public data is organized by responsibility:
+1. `profiles`: user-facing identity metadata and role.
+2. `challenges`: current challenge state/cache.
+3. `weekly_results`: authoritative weekly outcome history.
+4. `submissions`: immutable-ish submission attempts; re-submission history is possible.
+5. `invite_codes`: one-time signup authorization.
+6. `audit_logs`: important administrator/system corrections only.
 
-## Technical decisions
-- Supabase SSR 세션을 사용한다.
-- 초대 코드 가입은 서버 전용 service-role로 Auth 사용자 생성 + DB 초대 코드 claim을 처리한다.
-- 누락된 실패 주차는 사용자의 앱 접근 시 서버에서 소급 처리한다. 별도 크론 없이도 상태 일관성을 유지한다.
-- 성장 단계는 경과일 기반 기본 단계 + 페널티 override 방식으로 계산한다.
-- 커뮤니티는 로그인 사용자에게 공개하며 기본 정렬은 최장 스트릭순이다.
-- 관리자 접근은 `ADMIN_EMAIL` 환경변수 또는 profile.role=admin으로 판별한다.
+`analytics_events` and first-party page/click analytics storage are removed from the operational database.
 
-## Recommended owl visual direction
-실서비스 v1.0.0에 포함하되 컴포넌트 단위로 분리한다. 초기에는 코드 기반 SVG/shape 비주얼로 제공하고, 향후 동일 인터페이스에 PNG/WebP/영상 자산을 교체할 수 있도록 한다.
+## Source-of-truth rules
+- Authentication truth: Supabase Auth.
+- User metadata truth: `profiles`.
+- Historical challenge truth: `weekly_results` + `submissions`.
+- Current challenge summary/cache: `challenges`.
+- Signup authorization truth: `invite_codes`.
+- Administrative correction trace: `audit_logs`.
+- Derived values such as visual owl stage and challenge completion date should be calculated where practical rather than redundantly persisted.
+
+## Operational principles
+- A weekly official result is unique per `(challenge_id, week_start)`.
+- Submission attempts are separate from weekly official results so incorrect/replaced submissions can be traced.
+- Important state changes occur transactionally in database functions using row locks where needed.
+- Challenge summary values must be rebuildable from weekly history.
+- Client users have read access only where product behavior requires it; state-changing challenge operations are server/service-role only.
+- Audit logs do not collect routine page views or button clicks.
+
+## Release policy
+Semantic version: 1.1.0 (minor release because internal data behavior and admin capabilities expand while user product behavior is intentionally preserved).

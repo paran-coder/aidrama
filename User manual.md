@@ -1,27 +1,30 @@
-# User Manual — AI Drama Challenge v1.0.1
+# AI Drama Challenge v1.1.0 — User Manual
 
-## 참여자
-1. 관리자로부터 초대 코드를 받습니다.
-2. `/signup`에서 초대 코드, 이름, 이메일, 비밀번호를 입력합니다.
-3. 온보딩에서 챌린지 규칙을 확인하고 시작합니다.
-4. 가입한 주는 판정하지 않으며 다음 월요일부터 주간 챌린지가 시작됩니다.
-5. 매주 일요일 23:59 이전에 `/dashboard/submit`에서 SNS 업로드 링크를 제출합니다.
-6. 링크 형식이 검증되면 `검증됨`, 자동 검증이 불가능하면 제출은 인정되고 `미검증`으로 기록됩니다.
-7. 대시보드에서 경과일, 스트릭, 성장 단계와 이번 주 제출 여부를 확인합니다.
-8. `/dashboard/history`에서 성공·실패·리셋 이력을 확인합니다.
-9. `/community`에서 다른 참여자의 진행 상황을 볼 수 있습니다.
+## Participant
+1. Open the service and choose signup.
+2. Enter the one-time invitation code issued by the administrator, display name, email and password.
+3. Sign in and complete onboarding.
+4. Start the 1000-day challenge.
+5. From the first Monday after starting, submit one qualifying work link each week by the weekly deadline.
+6. Use Dashboard to see current progress, streak and owl growth.
+7. Use History to review weekly outcomes and accepted links.
+8. Use Community to view other participants' public challenge progress.
+9. At 1000 days, use the completion/archive screen.
 
-## 실패 규칙
-- 연속 1회 실패: 성장단계가 1단계 내려갑니다.
-- 연속 2회 실패: 대시보드에서 경고가 표시됩니다.
-- 연속 3회 실패: 부엉이가 알 단계로 리셋됩니다. 1000일 경과일은 유지됩니다.
-- 이후 1회 성공하면 페널티 단계가 해제되어 해당 시점의 정상 성장단계로 회복합니다.
+## Weekly rules
+- The service judges weeks Monday through Sunday in Asia/Seoul time.
+- The first judged week starts on the next Monday after challenge start.
+- A valid http/https link may be submitted; known-platform verification is attempted, and an unverified link can still be recorded under the existing product rule.
+- Missed closed weeks are processed as failures according to the challenge rules.
 
-## 관리자
-1. 최초 관리자 계정을 bootstrap합니다.
-2. `/admin`에서 초대 코드를 발급합니다.
-3. 초대 코드는 한 명이 가입하면 즉시 사용 완료됩니다.
-4. 코드 목록에서 사용 여부와 연결된 사용자 정보를 확인할 수 있습니다.
+## Administrator
+- `/admin` remains the operational entry point.
+- Issue invitation codes and copy them for participants.
+- v1.1.0 additionally supports operational inspection/correction workflows for weekly outcomes and submission history.
+- Corrections must include a reason and are written to the audit log.
+- Corrections rebuild the participant's current challenge summary so dashboard/community values stay consistent with official weekly history.
 
-## 계정 관리
-`/mypage`에서 표시 이름을 수정하고 비밀번호를 변경하거나 로그아웃할 수 있습니다.
+## Data and privacy
+- Authentication credentials are managed by Supabase Auth.
+- The app stores challenge metadata and submitted URLs; it does not upload or store the user's video file itself.
+- Routine page-view/click analytics are not stored in the operational database in v1.1.0.

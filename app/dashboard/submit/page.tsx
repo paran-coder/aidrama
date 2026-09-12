@@ -1,24 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AnalyticsEvent } from "@/components/analytics-event";
 import { AppShell } from "@/components/app-shell";
 import { StatusBadge } from "@/components/status-badge";
 import { challengeProgress, deadlineParts, weekDeadlineFromKey } from "@/lib/challenge";
 import { submitLinkAction } from "@/lib/actions/challenge";
-import { currentChallengeWeek, processMissedWeeks } from "@/lib/challenge-service";
+import { currentChallengeWeek, getWeeklyResultWithSubmission, processMissedWeeks } from "@/lib/challenge-service";
 import { getAppContext } from "@/lib/page-context";
-import { createAdminClient } from "@/lib/supabase/admin";
-
-type CurrentWeekResult = {
-  status: "success" | "failure";
-  submission_id: string | null;
-};
-
-type CurrentSubmission = {
-  url: string;
-  verification_status: "verified" | "unverified";
-  submitted_at: string;
-};
 
 export default async function SubmitPage({
   searchParams,
@@ -33,39 +20,13 @@ export default async function SubmitPage({
   const weekStart = currentChallengeWeek(challenge);
   const q = await searchParams;
   const error = typeof q.error === "string" ? q.error : "";
-  const admin = createAdminClient();
-
-  let result: CurrentWeekResult | null = null;
-  let submission: CurrentSubmission | null = null;
-
-  if (weekStart) {
-    const { data, error: resultError } = await admin
-      .from("weekly_results")
-      .select("status, submission_id")
-      .eq("challenge_id", challenge.id)
-      .eq("week_start", weekStart)
-      .maybeSingle();
-
-    if (resultError) throw resultError;
-    result = data as CurrentWeekResult | null;
-
-    if (result?.submission_id) {
-      const { data: submissionData, error: submissionError } = await admin
-        .from("submissions")
-        .select("url, verification_status, submitted_at")
-        .eq("id", result.submission_id)
-        .maybeSingle();
-
-      if (submissionError) throw submissionError;
-      submission = submissionData as CurrentSubmission | null;
-    }
-  }
-
+  const { result, submission } = weekStart
+    ? await getWeeklyResultWithSubmission(challenge.id, weekStart)
+    : { result: null, submission: null };
   const remaining = weekStart ? deadlineParts(weekDeadlineFromKey(weekStart)) : null;
 
   return (
     <AppShell displayName={profile.display_name} isAdmin={isAdmin}>
-      <AnalyticsEvent name="submit_attempt" />
       <div className="mx-auto max-w-2xl">
         <p className="eyebrow">Weekly proof</p>
         <h1 className="mt-3 text-4xl font-black tracking-[-.05em]">이번 주 작업을 기록하세요.</h1>
@@ -81,10 +42,7 @@ export default async function SubmitPage({
         )}
 
         {error && (
-          <div
-            role="alert"
-            className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-[var(--danger)]"
-          >
+          <div role="alert" className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-[var(--danger)]">
             {error}
           </div>
         )}
@@ -95,9 +53,7 @@ export default async function SubmitPage({
               <h2 className="text-xl font-black">이미 제출했습니다.</h2>
               {submission && <StatusBadge status={submission.verification_status} />}
             </div>
-            {submission?.url && (
-              <p className="mt-3 break-all text-sm leading-6 text-[var(--muted)]">{submission.url}</p>
-            )}
+            {submission?.url && <p className="mt-3 break-all text-sm leading-6 text-[var(--muted)]">{submission.url}</p>}
             <Link href="/dashboard" className="secondary-button mt-6 w-full">
               대시보드로 돌아가기
             </Link>
@@ -107,19 +63,10 @@ export default async function SubmitPage({
             <input type="hidden" name="weekStart" value={weekStart} />
             <label className="block text-sm font-extrabold">
               SNS 업로드 링크
-              <input
-                className="input-field mt-2"
-                name="url"
-                type="url"
-                inputMode="url"
-                placeholder="https://youtube.com/..."
-                aria-describedby="link-help"
-                required
-              />
+              <input className="input-field mt-2" name="url" type="url" inputMode="url" placeholder="https://youtube.com/..." aria-describedby="link-help" required />
             </label>
             <p id="link-help" className="mt-2 text-xs leading-5 text-[var(--muted)]">
-              YouTube, Instagram, TikTok 등 알려진 플랫폼은 형식 검증됩니다. 그 외 정상 URL도 제출은
-              인정되며 ‘미검증’으로 표시됩니다.
+              YouTube, Instagram, TikTok 등 알려진 플랫폼은 형식 검증됩니다. 그 외 정상 URL도 제출은 인정되며 ‘미검증’으로 표시됩니다.
             </p>
             <button className="primary-button mt-6 w-full" type="submit">
               링크 제출하기

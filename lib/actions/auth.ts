@@ -25,12 +25,12 @@ export async function signupAction(formData: FormData) {
   const admin = createAdminClient();
   const { data: invite } = await admin
     .from("invite_codes")
-    .select("code, used_by, expires_at")
+    .select("code, used_by, used_at, expires_at")
     .eq("code", inviteCode)
     .maybeSingle();
 
   if (!invite) redirect(authError("존재하지 않는 초대 코드입니다."));
-  if (invite.used_by) redirect(authError("이미 사용된 초대 코드입니다."));
+  if (invite.used_at) redirect(authError("이미 사용된 초대 코드입니다."));
   if (invite.expires_at && new Date(invite.expires_at) < new Date()) redirect(authError("만료된 초대 코드입니다."));
 
   const { data: created, error: createError } = await admin.auth.admin.createUser({
