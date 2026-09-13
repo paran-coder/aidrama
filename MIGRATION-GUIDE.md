@@ -1,7 +1,19 @@
-# Migration Guide — v1.3.0
+# OWL1000 v1.3.1 Migration Guide
 
-**DB 변경 없음.**
+## DB change: YES — function-only migration
 
-- `001`~`006` SQL을 다시 실행하지 마십시오.
-- `invite_codes` 테이블은 삭제하지 않습니다. 과거 호환/이력용으로 그대로 둡니다.
-- GitHub 코드를 v1.3.0으로 교체하고 Vercel에 배포하면 됩니다.
+Run **only** `supabase/migrations/007_v1_3_1_kst_day_alignment.sql` once in Supabase SQL Editor.
+
+Do **not** rerun `001` through `006`.
+
+`007` does not delete or reset participant data and does not add/drop tables or columns. It updates the milestone/missed-week helper functions so elapsed-day eligibility uses KST calendar dates, matching the web UI.
+
+## Recommended deployment order
+
+1. Supabase SQL Editor → run `007_v1_3_1_kst_day_alignment.sql` once.
+2. Confirm the query completes successfully.
+3. Replace the GitHub project files with v1.3.1 and deploy through Vercel.
+4. Open the participant dashboard and confirm the elapsed day changed as expected.
+5. Open Admin → participant → `제출 내역` and verify the already-submitted URL is visible.
+
+Existing URL submissions do not need to be submitted again.

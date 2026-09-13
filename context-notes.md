@@ -1,18 +1,14 @@
-# Context Notes — v1.3.0
+# OWL1000 v1.3.1 context notes
 
-## Goal
-Simplify participant signup for a private OWL1000 challenge community.
+## Scope
+- Fix elapsed-day/progress calculations to use KST calendar-day boundaries consistently.
+- Keep weekly streak semantics unchanged.
+- Align dashboard, community, admin, milestone eligibility and badge timing to the same KST day calculation.
+- Add admin visibility for participant-submitted URLs using existing submissions data.
+- No destructive data migration. Preserve all participant records.
 
-## Product decisions
-- Remove invite-code requirements from participant signup.
-- Remove invite-code issuance/history UI from admin operations.
-- Keep the existing `profiles.display_name` database field; present it as **톡방 닉네임** in participant-facing/admin UI.
-- Signup copy must say: `챌린지 톡방에서 사용 중인 닉네임을 정확히 입력해 주세요. 운영자가 참여자를 확인할 때 사용됩니다.`
-- Do not drop `invite_codes` or historical migrations. Legacy data remains untouched and unused by the normal signup/admin UI.
-- Admin account deletion may continue to anonymize any old invite-code history if such legacy rows exist.
-- No new SQL migration is expected for v1.3.0.
-
-## Safety / compatibility
-- Preserve all existing user/challenge/submission/badge data.
-- Preserve admin suspension/reactivation and permanent-delete controls.
-- Keep public unauthenticated landing/login/signup access behavior fixed in v1.2.12.
+## Product rules
+- Weekly proof window remains Monday 00:00–Sunday 23:59 KST.
+- Milestones remain 100/300/600/900/1000 days.
+- Badge awards still happen only on the next normal successful weekly verification after the milestone date is reached.
+- Submitted links are participant data and should be visible only in authenticated admin operations pages.

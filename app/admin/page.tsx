@@ -25,7 +25,7 @@ export default async function AdminPage({
         <div>
           <p className="eyebrow">Admin</p>
           <h1 className="mt-3 text-4xl font-black tracking-[-.05em]">운영 관리</h1>
-          <p className="copy-pretty mt-3 max-w-2xl text-sm font-bold leading-6 text-[var(--muted)]">참여자의 톡방 닉네임, 계정 상태와 진행 현황을 한곳에서 관리합니다. 가입은 참여자에게 공유한 사이트 주소에서 바로 진행됩니다.</p>
+          <p className="copy-pretty mt-3 max-w-2xl text-sm font-bold leading-6 text-[var(--muted)]">참여자의 톡방 닉네임, 계정 상태, 진행 현황과 제출 링크를 한곳에서 관리합니다. 가입은 참여자에게 공유한 사이트 주소에서 바로 진행됩니다.</p>
         </div>
 
         {warnings.length > 0 && (
@@ -43,7 +43,7 @@ export default async function AdminPage({
             <div>
               <p className="eyebrow">Participants</p>
               <h2 className="mt-2 text-2xl font-black">참여자 현황</h2>
-              <p className="copy-pretty mt-2 text-sm font-bold leading-6 text-[var(--muted)]">톡방 닉네임과 이메일로 참여자를 확인하고, 필요하면 접근 관리에서 계정을 정지·재활성화하거나 삭제할 수 있습니다.</p>
+              <p className="copy-pretty mt-2 text-sm font-bold leading-6 text-[var(--muted)]">톡방 닉네임과 이메일로 참여자를 확인하고, 제출 내역에서 실제 제출 URL을 열어보거나 접근 관리에서 계정을 정지·재활성화·삭제할 수 있습니다.</p>
             </div>
             <div className="flex items-center gap-3">
               <p className="text-sm font-bold text-[var(--muted)]">{participants.length}명</p>
@@ -68,7 +68,7 @@ export default async function AdminPage({
                         <td className="px-5 py-4 font-bold">{progress ? `${progress.day}일` : "시작 전"}</td>
                         <td className="px-5 py-4 font-bold">{challenge ? `${challenge.streak} / ${challenge.longest_streak}` : "—"}</td>
                         <td className="px-5 py-4 font-bold">{challenge ? `${challenge.success_count} / ${challenge.failure_count}` : "—"}</td>
-                        <td className="px-5 py-4"><Link className="secondary-button min-h-0 px-4 py-2 text-xs" href={`/admin/participants/${participant.id}#access`}>접근 관리</Link></td>
+                        <td className="px-5 py-4"><div className="flex flex-wrap gap-2">{challenge && <Link className="secondary-button min-h-0 px-4 py-2 text-xs" href={`/admin/participants/${participant.id}#submissions`}>제출 내역</Link>}<Link className="secondary-button min-h-0 px-4 py-2 text-xs" href={`/admin/participants/${participant.id}#access`}>접근 관리</Link></div></td>
                       </tr>
                     );
                   })}

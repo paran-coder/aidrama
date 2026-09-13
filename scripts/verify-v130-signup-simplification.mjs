@@ -17,7 +17,7 @@ const initialMigration = read("supabase/migrations/001_init.sql");
 const pkg = JSON.parse(read("package.json"));
 
 const checks = [
-  [pkg.version === "1.3.0", "package version is 1.3.0"],
+  [/^1\.3\./.test(pkg.version), "package version retains v1.3.x signup simplification"],
   [signup.includes("톡방 닉네임"), "signup labels display_name as chat-room nickname"],
   [signup.includes("챌린지 톡방에서 사용 중인 닉네임을 정확히 입력해 주세요."), "signup includes exact nickname guidance"],
   [!signup.includes("inviteCode") && !signup.includes("초대 코드"), "signup no longer asks for an invite code"],

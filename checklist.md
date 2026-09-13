@@ -1,18 +1,13 @@
-# v1.3.0 Checklist
+# OWL1000 v1.3.1 checklist
 
-- [x] Create v1.3.0 working copy and update version metadata.
-- [x] Remove invite-code field and validation from signup.
-- [x] Create participant profile directly after Auth user creation.
-- [x] Rename participant-facing `표시 이름` to `톡방 닉네임`.
-- [x] Add chat-room nickname guidance to signup.
-- [x] Remove invite-code issuance/history from admin UI.
-- [x] Stop admin overview from querying invite-code data.
-- [x] Remove unused invite-code issuance/revocation from active admin actions.
-- [x] Update landing/login copy to direct signup language.
-- [x] Update product/spec docs with v1.3.0 override decision.
-- [x] Add v1.3.0 regression checks.
-- [x] Run existing regression suite.
-- [x] Run TS/TSX syntax checks: 56 files, 0 errors.
-- [x] Confirm no DB migration is required.
-- [ ] Confirm Vercel production build succeeds.
-- [ ] Run one real new-participant signup after deployment.
+- [x] Create isolated v1.3.1 working copy
+- [x] Create/update context-notes.md, checklist.md, README.md, User manual.md before implementation
+- [x] Audit all elapsed-day calculations
+- [x] Introduce one KST calendar-day helper and reuse it everywhere
+- [x] Verify milestone/badge eligibility timing uses same day basis
+- [x] Add admin participant submission-link history
+- [x] Keep links admin-only; no public leakage
+- [x] Add v1.3.1 regression tests
+- [x] Run existing regression suite
+- [x] Run syntax/type/build checks available in environment
+- [x] Update release docs and package zip

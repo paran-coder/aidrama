@@ -51,6 +51,7 @@ export default async function AdminParticipantPage({
     list.push(submission);
     attemptsByWeek.set(submission.week_start, list);
   });
+  const officialSubmissionIds = new Set(results.flatMap((result) => result.final_submission_id ? [result.final_submission_id] : []));
 
   return (
     <AppShell displayName={adminProfile.display_name} isAdmin>
@@ -107,6 +108,30 @@ export default async function AdminParticipantPage({
               <p className="eyebrow">Creator growth</p>
               <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="mt-2 text-xl font-black">Lv.{level.level} · {level.label}</h2><p className="mt-1 text-sm text-[var(--muted)]">{level.subtitle}</p></div></div>
               <div className="mt-5"><MilestoneBadges badges={badges} currentDay={progress?.day ?? 0} /></div>
+            </section>
+
+            <section id="submissions" className="card mt-6 scroll-mt-24 rounded-[2rem] p-5 sm:p-7">
+              <div className="flex flex-wrap items-end justify-between gap-3">
+                <div><p className="eyebrow">Submission links</p><h2 className="mt-2 text-xl font-black">참여자 제출 링크</h2></div>
+                <p className="text-sm font-bold text-[var(--muted)]">총 {submissions.length}건</p>
+              </div>
+              <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">참여자가 제출한 원본 URL을 확인할 수 있습니다. 공식 주간 결과에 채택된 링크는 ‘공식 인정’으로 표시됩니다.</p>
+              {submissions.length === 0 ? (
+                <div className="mt-5 rounded-2xl bg-[var(--surface-2)] p-5 text-sm font-bold text-[var(--muted)]">아직 제출된 링크가 없습니다.</div>
+              ) : (
+                <div className="mt-5 space-y-3">
+                  {submissions.map((submission) => (
+                    <article key={submission.id} className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4">
+                      <div className="flex flex-wrap items-center justify-between gap-3">
+                        <div><p className="text-xs font-black text-[var(--muted)]">{submission.week_start} 주차</p><p className="mt-1 text-xs font-bold text-[var(--muted)]">{new Date(submission.submitted_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}</p></div>
+                        <div className="flex items-center gap-2"><StatusBadge status={submission.verification_status} />{officialSubmissionIds.has(submission.id) && <span className="ui-success rounded-full border px-2.5 py-1 text-xs font-extrabold">공식 인정</span>}</div>
+                      </div>
+                      <a className="copy-pretty mt-3 block break-all font-bold text-[var(--accent)] underline underline-offset-4" href={submission.url} target="_blank" rel="noreferrer">{submission.url}</a>
+                      {submission.platform_host && <p className="mt-2 text-xs font-bold text-[var(--muted)]">{submission.platform_host}</p>}
+                    </article>
+                  ))}
+                </div>
+              )}
             </section>
 
             <section className="card mt-6 rounded-[2rem] p-5 sm:p-7">

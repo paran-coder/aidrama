@@ -63,9 +63,15 @@ export function isWeekOpen(weekStart: string, now = new Date()) {
   return now >= start && now <= weekDeadlineFromKey(weekStart);
 }
 
+function kstCalendarDayOrdinal(date: Date): number {
+  const p = kstDateParts(date);
+  return Math.floor(Date.UTC(p.year, p.month, p.date) / DAY_MS);
+}
+
 export function elapsedDays(startedAt: string | Date, now = new Date()): number {
   const start = typeof startedAt === "string" ? new Date(startedAt) : startedAt;
-  return Math.min(1000, Math.max(0, Math.floor((now.getTime() - start.getTime()) / DAY_MS)));
+  const calendarDays = kstCalendarDayOrdinal(now) - kstCalendarDayOrdinal(start);
+  return Math.min(1000, Math.max(0, calendarDays));
 }
 
 export function challengeProgress(challenge: { started_at: string }, now = new Date()) {
