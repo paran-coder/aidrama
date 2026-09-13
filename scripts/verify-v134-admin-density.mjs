@@ -12,7 +12,7 @@ const checks = [
   ['v1.3.4+ density behavior retained', version.startsWith('1.3.') && pkg.version.startsWith('1.3.')],
   ['admin intro copy is larger', admin.includes('text-[15px] font-bold leading-7') && admin.includes('sm:text-base')],
   ['intro has semantic break before signup', admin.includes('가입은 참여자에게 공유한 사이트 주소에서 바로 진행됩니다.') && admin.includes('block xl:inline')],
-  ['table body is larger than text-sm', admin.includes('table-fixed text-left text-[15px]')],
+  ['table body is larger than text-sm', admin.includes('min-w-[1160px] text-left text-[15px]')],
   ['table secondary copy uses text-sm', admin.includes('truncate text-sm leading-5 text-[var(--muted)]')],
   ['rows use tighter vertical padding', admin.includes('py-3.5')],
   ['management actions are horizontal', admin.includes('flex items-center justify-center gap-3 whitespace-nowrap') || admin.includes('flex items-center justify-end gap-1.5 whitespace-nowrap')],

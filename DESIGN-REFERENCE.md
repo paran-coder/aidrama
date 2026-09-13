@@ -1,3 +1,3 @@
-# DESIGN REFERENCE — v1.3.5
+# DESIGN REFERENCE — v1.3.6
 
-관리자 표는 불필요한 내부 공백보다 정보 밀도와 읽기 흐름을 우선한다. 짧은 값 컬럼은 압축하고, 닉네임/이메일 및 관리 액션은 필요한 폭을 확보한다. 큰 화면에서는 표 자체를 과도하게 늘리지 않고 가운데 정렬해 좌우 여백을 만든다.
+Admin participant rows use a shared CSS grid with equal horizontal gaps. The first content edge and the final management edge use symmetric outer padding.

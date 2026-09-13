@@ -1,6 +1,6 @@
 {
   "name": "ai-drama-challenge",
-  "version": "1.3.5",
+  "version": "1.3.6",
   "private": true,
   "engines": {
     "node": ">=22"
@@ -28,7 +28,8 @@
     "test:v132": "node scripts/verify-v132-rolling-weeks.mjs",
     "test:v133": "node scripts/verify-v133-admin-table.mjs",
     "test:v134": "node scripts/verify-v134-admin-density.mjs",
-    "test:v135": "node scripts/verify-v135-admin-column-balance.mjs"
+    "test:v135": "node scripts/verify-v135-admin-column-balance.mjs",
+    "test:v136": "node scripts/verify-v136-admin-grid-spacing.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

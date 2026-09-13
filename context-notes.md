@@ -1,20 +1,11 @@
-# Context Notes — v1.3.5
+# OWL1000 v1.3.6 Context Notes
 
-## Goal
-관리자 참여자 현황 테이블에서 불필요하게 넓은 내부 공백을 줄이고, 표 자체는 데스크톱에서 가운데 정렬해 좌우 여백을 확보한다.
-
-## Applied
-- 참여자 섹션 `max-w-[1320px] mx-auto`
-- 테이블 fallback `min-w-[1160px]`
-- 컬럼 폭: 18 / 8 / 11 / 7 / 17 / 17 / 22%
-- 관리 헤더/액션 가운데 정렬
-- 관리 액션 `제출 내역 / 접근 관리` 한 줄 유지
-
-## Unchanged
-- 개인별 7일 인증 기간
-- 제출/스트릭/배지 계산
-- 관리자 권한/삭제 기능
-- DB schema 및 migrations
-
-## Migration
-새 SQL 없음. 001~008 재실행 금지.
+- Base: v1.3.5.
+- Admin participant list moved from percentage-based fixed table columns to one shared CSS Grid template.
+- Inter-column spacing is uniformly `gap-x-6` (24px).
+- Outer left/right spacing is uniformly `px-5` (20px).
+- Column widths are content-aware: identity/status/level/day/proof/proof-period/management.
+- Management actions remain horizontal.
+- Narrow screens retain horizontal overflow fallback.
+- No DB/auth/challenge behavior changes.
+- Rolling 7-day proof periods from v1.3.2 remain unchanged.

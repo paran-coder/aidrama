@@ -55,58 +55,52 @@ export default async function AdminPage({
           </div>
           <div className="mt-4 overflow-hidden rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)]">
             <div className="overflow-x-auto pb-1">
-              <table className="w-full min-w-[1160px] table-fixed text-left text-[15px]">
-                <colgroup>
-                  <col className="w-[18%]" />
-                  <col className="w-[8%]" />
-                  <col className="w-[11%]" />
-                  <col className="w-[7%]" />
-                  <col className="w-[17%]" />
-                  <col className="w-[17%]" />
-                  <col className="w-[22%]" />
-                </colgroup>
-                <thead className="bg-[var(--surface-2)] text-[13px] uppercase tracking-[.04em] text-[var(--muted)]">
-                  <tr>
-                    <th className="px-5 py-3.5">톡방 닉네임 / 이메일</th>
-                    <th className="px-4 py-3.5 whitespace-nowrap">계정 상태</th>
-                    <th className="px-4 py-3.5">레벨</th>
-                    <th className="px-4 py-3.5 whitespace-nowrap">경과일</th>
-                    <th className="px-4 py-3.5">인증 현황</th>
-                    <th className="px-4 py-3.5">인증 기간</th>
-                    <th className="px-4 py-3.5 pr-6 text-center">관리</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {participants.map(({ profile: participant, email, challenge, badges }) => {
-                    const progress = challenge ? challengeProgress(challenge) : null;
-                    const level = CREATOR_LEVELS[creatorLevelIndex(badges, progress?.day ?? 0)];
-                    const proofPeriod = challenge ? proofPeriodForAnchor(challenge.first_judgement_week_start) : null;
-                    return (
-                      <tr key={participant.id} className="border-t border-[var(--line)] align-middle">
-                        <td className="px-5 py-3.5">
-                          <p className="truncate font-black" title={participant.display_name}>{participant.display_name}</p>
-                          <p className="mt-1 truncate text-sm leading-5 text-[var(--muted)]" title={email ?? "이메일 없음"}>{email ?? "이메일 없음"}</p>
-                        </td>
-                        <td className="px-4 py-3.5 whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-[13px] font-extrabold ${participant.status === "active" ? "ui-success border" : "ui-danger border"}`}>{participant.status === "active" ? "활성" : "정지"}</span></td>
-                        <td className="px-4 py-3.5 font-bold leading-5">{challenge ? <><span className="whitespace-nowrap">Lv.{level.level}</span><span className="block text-sm leading-5 text-[var(--muted)]">{level.label}</span></> : "—"}</td>
-                        <td className="px-4 py-3.5 whitespace-nowrap font-bold">{progress ? `${progress.day}일` : "시작 전"}</td>
-                        <td className="px-4 py-3.5 font-bold leading-5">
-                          {challenge ? <><p><span className="text-[var(--muted)]">현재/최장</span> {challenge.streak} / {challenge.longest_streak}주</p><p className="mt-1 text-sm leading-5 text-[var(--muted)]">성공/실패 {challenge.success_count} / {challenge.failure_count}</p></> : "—"}
-                        </td>
-                        <td className="px-4 py-3.5 font-bold leading-5">
-                          {proofPeriod ? <><p className="whitespace-nowrap">{formatProofPeriod(proofPeriod.startKey)}</p><p className="mt-1 whitespace-nowrap text-sm leading-5 text-[var(--muted)]">마감 {formatShortKoreanDateKey(proofPeriod.endKey)} 23:59</p></> : "—"}
-                        </td>
-                        <td className="px-4 py-3.5 pr-6">
-                          <div className="flex items-center justify-center gap-3 whitespace-nowrap">
-                            {challenge && <Link className="admin-table-action" href={`/admin/participants/${participant.id}#submissions`}>제출 내역</Link>}
-                            <Link className="admin-table-action" href={`/admin/participants/${participant.id}#access`}>접근 관리</Link>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+              <div role="table" aria-label="참여자 현황" className="min-w-[1160px] text-left text-[15px]">
+                <div
+                  role="row"
+                  className="grid grid-cols-[minmax(190px,1.3fr)_96px_112px_76px_minmax(170px,1fr)_minmax(190px,1.1fr)_190px] items-center gap-x-6 bg-[var(--surface-2)] px-5 py-3.5 text-[13px] uppercase tracking-[.04em] text-[var(--muted)]"
+                >
+                  <div role="columnheader">톡방 닉네임 / 이메일</div>
+                  <div role="columnheader" className="whitespace-nowrap">계정 상태</div>
+                  <div role="columnheader">레벨</div>
+                  <div role="columnheader" className="whitespace-nowrap">경과일</div>
+                  <div role="columnheader">인증 현황</div>
+                  <div role="columnheader">인증 기간</div>
+                  <div role="columnheader" className="text-center">관리</div>
+                </div>
+                {participants.map(({ profile: participant, email, challenge, badges }) => {
+                  const progress = challenge ? challengeProgress(challenge) : null;
+                  const level = CREATOR_LEVELS[creatorLevelIndex(badges, progress?.day ?? 0)];
+                  const proofPeriod = challenge ? proofPeriodForAnchor(challenge.first_judgement_week_start) : null;
+                  return (
+                    <div
+                      role="row"
+                      key={participant.id}
+                      className="grid grid-cols-[minmax(190px,1.3fr)_96px_112px_76px_minmax(170px,1fr)_minmax(190px,1.1fr)_190px] items-center gap-x-6 border-t border-[var(--line)] px-5 py-3.5"
+                    >
+                      <div role="cell" className="min-w-0">
+                        <p className="truncate font-black" title={participant.display_name}>{participant.display_name}</p>
+                        <p className="mt-1 truncate text-sm leading-5 text-[var(--muted)]" title={email ?? "이메일 없음"}>{email ?? "이메일 없음"}</p>
+                      </div>
+                      <div role="cell" className="whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-[13px] font-extrabold ${participant.status === "active" ? "ui-success border" : "ui-danger border"}`}>{participant.status === "active" ? "활성" : "정지"}</span></div>
+                      <div role="cell" className="font-bold leading-5">{challenge ? <><span className="whitespace-nowrap">Lv.{level.level}</span><span className="block text-sm leading-5 text-[var(--muted)]">{level.label}</span></> : "—"}</div>
+                      <div role="cell" className="whitespace-nowrap font-bold">{progress ? `${progress.day}일` : "시작 전"}</div>
+                      <div role="cell" className="font-bold leading-5">
+                        {challenge ? <><p><span className="text-[var(--muted)]">현재/최장</span> {challenge.streak} / {challenge.longest_streak}주</p><p className="mt-1 text-sm leading-5 text-[var(--muted)]">성공/실패 {challenge.success_count} / {challenge.failure_count}</p></> : "—"}
+                      </div>
+                      <div role="cell" className="font-bold leading-5">
+                        {proofPeriod ? <><p className="whitespace-nowrap">{formatProofPeriod(proofPeriod.startKey)}</p><p className="mt-1 whitespace-nowrap text-sm leading-5 text-[var(--muted)]">마감 {formatShortKoreanDateKey(proofPeriod.endKey)} 23:59</p></> : "—"}
+                      </div>
+                      <div role="cell">
+                        <div className="flex items-center justify-center gap-3 whitespace-nowrap">
+                          {challenge && <Link className="admin-table-action" href={`/admin/participants/${participant.id}#submissions`}>제출 내역</Link>}
+                          <Link className="admin-table-action" href={`/admin/participants/${participant.id}#access`}>접근 관리</Link>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
             {participants.length === 0 && <p className="p-8 text-center font-bold text-[var(--muted)]">{health.profiles ? "가입한 참여자가 없습니다." : "참여자 정보를 불러오지 못했습니다. 잠시 후 진행상태 동기화를 다시 시도해 주세요."}</p>}
           </div>
