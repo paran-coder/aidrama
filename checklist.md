@@ -1,13 +1,10 @@
-# OWL1000 v1.3.1 checklist
+# Checklist — v1.3.5
 
-- [x] Create isolated v1.3.1 working copy
-- [x] Create/update context-notes.md, checklist.md, README.md, User manual.md before implementation
-- [x] Audit all elapsed-day calculations
-- [x] Introduce one KST calendar-day helper and reuse it everywhere
-- [x] Verify milestone/badge eligibility timing uses same day basis
-- [x] Add admin participant submission-link history
-- [x] Keep links admin-only; no public leakage
-- [x] Add v1.3.1 regression tests
-- [x] Run existing regression suite
-- [x] Run syntax/type/build checks available in environment
-- [x] Update release docs and package zip
+- [x] v1.3.4 기준 작업본 분리
+- [x] 필수 문서 선작성
+- [x] 관리자 표 폭/컬럼 재배분
+- [x] 관리 액션 한 줄 유지 확인
+- [x] 기존 전체 회귀 테스트 통과
+- [x] v1.3.5 전용 레이아웃 테스트 11/11 통과
+- [x] TS/TSX 56개 구문 검사 오류 0
+- [x] ZIP 패키징

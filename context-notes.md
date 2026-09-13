@@ -1,20 +1,20 @@
-# OWL1000 v1.3.3 Context Notes
+# Context Notes — v1.3.5
 
-## Implemented scope
-- Admin participant overview table layout is compacted so the right-side action column no longer appears clipped on common desktop widths.
-- Related metrics are grouped instead of forcing nine wide columns into the fixed admin content area.
-- Participant identity remains two lines: chat nickname first, email second.
-- Proof period and deadline are grouped into one column while preserving the same underlying rolling 7-day data.
-- Current/longest proof streak and success/failure counts are grouped into one compact status column.
-- Submission history and access management remain separate actions.
+## Goal
+관리자 참여자 현황 테이블에서 불필요하게 넓은 내부 공백을 줄이고, 표 자체는 데스크톱에서 가운데 정렬해 좌우 여백을 확보한다.
 
-## Non-goals
-- No database changes.
-- No authentication, submission, rolling-week, streak, badge, or account-management logic changes.
-- No change to participant data or historical submissions.
+## Applied
+- 참여자 섹션 `max-w-[1320px] mx-auto`
+- 테이블 fallback `min-w-[1160px]`
+- 컬럼 폭: 18 / 8 / 11 / 7 / 17 / 17 / 22%
+- 관리 헤더/액션 가운데 정렬
+- 관리 액션 `제출 내역 / 접근 관리` 한 줄 유지
 
-## UI rules
-- Admin shell can use a wider desktop content width than participant pages.
-- Participant table keeps a minimum width for smaller desktops and can horizontally scroll only when genuinely necessary.
-- Dates and action buttons do not wrap mid-label.
-- Last action cell has explicit right padding so controls do not visually collide with the rounded card edge.
+## Unchanged
+- 개인별 7일 인증 기간
+- 제출/스트릭/배지 계산
+- 관리자 권한/삭제 기능
+- DB schema 및 migrations
+
+## Migration
+새 SQL 없음. 001~008 재실행 금지.

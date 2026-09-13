@@ -41,7 +41,7 @@ export default async function AdminPage({
         {synced && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 font-bold">모든 참여자의 마감된 인증 기간 상태를 한 번 동기화했습니다.</div>}
         {deleted && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 font-bold">{deleted} 계정을 영구 삭제했습니다.</div>}
 
-        <section className="mt-9">
+        <section className="mx-auto mt-9 w-full max-w-[1320px]">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
               <p className="eyebrow">Participants</p>
@@ -55,15 +55,15 @@ export default async function AdminPage({
           </div>
           <div className="mt-4 overflow-hidden rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)]">
             <div className="overflow-x-auto pb-1">
-              <table className="w-full min-w-[1080px] table-fixed text-left text-[15px]">
+              <table className="w-full min-w-[1160px] table-fixed text-left text-[15px]">
                 <colgroup>
-                  <col className="w-[20%]" />
+                  <col className="w-[18%]" />
                   <col className="w-[8%]" />
-                  <col className="w-[12%]" />
+                  <col className="w-[11%]" />
                   <col className="w-[7%]" />
-                  <col className="w-[15%]" />
-                  <col className="w-[21%]" />
                   <col className="w-[17%]" />
+                  <col className="w-[17%]" />
+                  <col className="w-[22%]" />
                 </colgroup>
                 <thead className="bg-[var(--surface-2)] text-[13px] uppercase tracking-[.04em] text-[var(--muted)]">
                   <tr>
@@ -73,7 +73,7 @@ export default async function AdminPage({
                     <th className="px-4 py-3.5 whitespace-nowrap">경과일</th>
                     <th className="px-4 py-3.5">인증 현황</th>
                     <th className="px-4 py-3.5">인증 기간</th>
-                    <th className="px-4 py-3.5 pr-6">관리</th>
+                    <th className="px-4 py-3.5 pr-6 text-center">관리</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -97,7 +97,7 @@ export default async function AdminPage({
                           {proofPeriod ? <><p className="whitespace-nowrap">{formatProofPeriod(proofPeriod.startKey)}</p><p className="mt-1 whitespace-nowrap text-sm leading-5 text-[var(--muted)]">마감 {formatShortKoreanDateKey(proofPeriod.endKey)} 23:59</p></> : "—"}
                         </td>
                         <td className="px-4 py-3.5 pr-6">
-                          <div className="flex items-center justify-end gap-1.5 whitespace-nowrap">
+                          <div className="flex items-center justify-center gap-3 whitespace-nowrap">
                             {challenge && <Link className="admin-table-action" href={`/admin/participants/${participant.id}#submissions`}>제출 내역</Link>}
                             <Link className="admin-table-action" href={`/admin/participants/${participant.id}#access`}>접근 관리</Link>
                           </div>

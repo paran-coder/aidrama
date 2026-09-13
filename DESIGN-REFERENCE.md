@@ -1,10 +1,3 @@
-# OWL1000 v1.3.2 Design Reference
+# DESIGN REFERENCE — v1.3.5
 
-Keep the v1.3.1 visual system unchanged. This release is primarily a scheduling/clarity update.
-
-## UI priorities
-- Make the personal proof period visible as a compact high-signal date range.
-- Use existing OWL green/neutral semantic colors; no new palette.
-- Prefer labels such as `이번 인증 기간` and `다음 마감` over Monday-Sunday wording.
-- Preserve desktop-first layout and existing mobile wrapping behavior.
-- Avoid adding extra cards when the period/deadline can fit into existing schedule/status areas.
+관리자 표는 불필요한 내부 공백보다 정보 밀도와 읽기 흐름을 우선한다. 짧은 값 컬럼은 압축하고, 닉네임/이메일 및 관리 액션은 필요한 폭을 확보한다. 큰 화면에서는 표 자체를 과도하게 늘리지 않고 가운데 정렬해 좌우 여백을 만든다.
