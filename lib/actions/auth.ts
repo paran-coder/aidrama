@@ -13,27 +13,18 @@ function authError(message: string) {
 }
 
 export async function signupAction(formData: FormData) {
-  const inviteCode = text(formData, "inviteCode").toUpperCase();
   const displayName = text(formData, "displayName");
   const email = text(formData, "email").toLowerCase();
   const password = text(formData, "password");
 
-  if (!inviteCode || !displayName || !email || password.length < 8) {
-    redirect(authError("초대 코드, 이름, 이메일과 8자 이상의 비밀번호를 확인해 주세요."));
+  if (!displayName || !email || password.length < 8) {
+    redirect(authError("톡방 닉네임, 이메일과 8자 이상의 비밀번호를 확인해 주세요."));
+  }
+  if (displayName.length > 40) {
+    redirect(authError("톡방 닉네임은 1~40자로 입력해 주세요."));
   }
 
   const admin = createAdminClient();
-  const { data: invite } = await admin
-    .from("invite_codes")
-    .select("code, used_by, used_at, revoked_at, expires_at")
-    .eq("code", inviteCode)
-    .maybeSingle();
-
-  if (!invite) redirect(authError("존재하지 않는 초대 코드입니다."));
-  if (invite.used_at) redirect(authError("이미 사용된 초대 코드입니다."));
-  if (invite.revoked_at) redirect(authError("발급이 취소된 초대 코드입니다."));
-  if (invite.expires_at && new Date(invite.expires_at) < new Date()) redirect(authError("만료된 초대 코드입니다."));
-
   const { data: created, error: createError } = await admin.auth.admin.createUser({
     email,
     password,
@@ -48,21 +39,15 @@ export async function signupAction(formData: FormData) {
     redirect(authError(message));
   }
 
-  const { error: claimError } = await admin.rpc("claim_invite_code", {
-    p_code: inviteCode,
-    p_user_id: created.user.id,
-    p_display_name: displayName,
+  const { error: profileError } = await admin.from("profiles").insert({
+    id: created.user.id,
+    display_name: displayName,
+    email,
   });
 
-  if (claimError) {
+  if (profileError) {
     await admin.auth.admin.deleteUser(created.user.id);
-    const raw = claimError.message ?? "";
-    const message = raw.includes("ALREADY_USED")
-      ? "방금 다른 사용자가 사용한 초대 코드입니다."
-      : raw.includes("REVOKED")
-        ? "발급이 취소된 초대 코드입니다."
-        : "초대 코드를 사용할 수 없습니다.";
-    redirect(authError(message));
+    redirect(authError("참여자 프로필을 만들 수 없습니다. 잠시 후 다시 시도해 주세요."));
   }
 
   const supabase = await createClient();
@@ -89,7 +74,7 @@ export async function loginAction(formData: FormData) {
 
   if (!profile && !isAdmin) {
     await supabase.auth.signOut();
-    redirect(`/login?error=${encodeURIComponent("서비스에 등록되지 않은 계정입니다. 초대 코드로 가입해 주세요.")}`);
+    redirect(`/login?error=${encodeURIComponent("서비스에 등록되지 않은 계정입니다. 회원가입 후 다시 시도해 주세요.")}`);
   }
 
   if (profile?.status === "suspended" && !isAdmin) {

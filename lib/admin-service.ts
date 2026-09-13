@@ -1,32 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AuditLog, Challenge, ChallengeBadge, Profile, Submission, WeeklyResult } from "@/lib/types";
 
-type RawInviteCode = {
-  code: string;
-  created_at: string;
-  expires_at: string | null;
-  used_by: string | null;
-  used_at: string | null;
-  revoked_at: string | null;
-  revoked_by: string | null;
-  revoke_reason: string | null;
-  used_account_deleted_at: string | null;
-};
-
-export type InviteCodeRow = {
-  code: string;
-  created_at: string;
-  expires_at: string | null;
-  used_by: string | null;
-  used_at: string | null;
-  revoked_at: string | null;
-  revoked_by: string | null;
-  revoke_reason: string | null;
-  used_account_deleted_at: string | null;
-  used_display_name: string | null;
-  used_email: string | null;
-};
-
 export type AdminParticipantRow = {
   profile: Pick<Profile, "id" | "display_name" | "email" | "role" | "status" | "suspended_at" | "suspension_reason" | "created_at">;
   email: string | null;
@@ -49,7 +23,6 @@ const PROFILE_FIELDS_LEGACY = "id,display_name,role,status,suspended_at,suspensi
 
 type OverviewHealth = {
   profiles: boolean;
-  codes: boolean;
   challenges: boolean;
   badges: boolean;
   emailCompatibilityMode: boolean;
@@ -102,7 +75,7 @@ async function readProfiles(admin: ReturnType<typeof createAdminClient>) {
       // Email is supplementary. Keep the admin page usable even if Auth Admin lookup is temporarily unavailable.
     }
 
-    warnings.push("프로필 이메일 캐시 필드를 확인하지 못해 호환 모드로 표시하고 있습니다. 계정 관리와 초대코드 기능은 계속 사용할 수 있습니다.");
+    warnings.push("프로필 이메일 캐시 필드를 확인하지 못해 호환 모드로 표시하고 있습니다. 계정 관리 기능은 계속 사용할 수 있습니다.");
     return {
       profiles: baseProfiles.map((profile) => ({ ...profile, email: emailById.get(profile.id) ?? null })) as AdminParticipantRow["profile"][],
       ok: true,
@@ -112,19 +85,6 @@ async function readProfiles(admin: ReturnType<typeof createAdminClient>) {
   } catch {
     warnings.push(describeReadFailure("참여자"));
     return { profiles: [] as AdminParticipantRow["profile"][], ok: false, emailCompatibilityMode: false, warnings };
-  }
-}
-
-async function readInviteCodes(admin: ReturnType<typeof createAdminClient>) {
-  try {
-    const response = await admin
-      .from("invite_codes")
-      .select("code,created_at,expires_at,used_by,used_at,revoked_at,revoked_by,revoke_reason,used_account_deleted_at")
-      .order("created_at", { ascending: false });
-    if (response.error) return { rows: [] as RawInviteCode[], ok: false };
-    return { rows: (response.data ?? []) as RawInviteCode[], ok: true };
-  } catch {
-    return { rows: [] as RawInviteCode[], ok: false };
   }
 }
 
@@ -152,22 +112,19 @@ async function readBadges(admin: ReturnType<typeof createAdminClient>) {
 
 export async function getAdminOverview() {
   const admin = createAdminClient();
-  const [profileResult, codeResult, challengeResult, badgeResult] = await Promise.all([
+  const [profileResult, challengeResult, badgeResult] = await Promise.all([
     readProfiles(admin),
-    readInviteCodes(admin),
     readChallenges(admin),
     readBadges(admin),
   ]);
 
   const warnings = [...profileResult.warnings];
-  if (!codeResult.ok) warnings.push(describeReadFailure("초대 코드"));
   if (!challengeResult.ok) warnings.push(describeReadFailure("챌린지 진행 상태"));
   if (!badgeResult.ok) warnings.push(describeReadFailure("마일스톤 배지"));
 
   const typedProfiles = profileResult.profiles;
   const typedChallenges = challengeResult.rows;
   const challengeMap = new Map(typedChallenges.map((challenge) => [challenge.user_id, challenge]));
-  const profileMap = new Map(typedProfiles.map((profile) => [profile.id, profile]));
   const typedBadges = badgeResult.rows;
   const badgesByUser = new Map<string, ChallengeBadge[]>();
   for (const badge of typedBadges) {
@@ -183,24 +140,14 @@ export async function getAdminOverview() {
     badges: badgesByUser.get(profile.id) ?? [],
   }));
 
-  const codes: InviteCodeRow[] = codeResult.rows.map((row) => {
-    const profile = row.used_by ? profileMap.get(row.used_by) : null;
-    return {
-      ...row,
-      used_display_name: profile?.display_name ?? null,
-      used_email: row.used_by ? profile?.email ?? null : null,
-    } as InviteCodeRow;
-  });
-
   const health: OverviewHealth = {
     profiles: profileResult.ok,
-    codes: codeResult.ok,
     challenges: challengeResult.ok,
     badges: badgeResult.ok,
     emailCompatibilityMode: profileResult.emailCompatibilityMode,
   };
 
-  return { codes, participants, warnings: Array.from(new Set(warnings)), health };
+  return { participants, warnings: Array.from(new Set(warnings)), health };
 }
 
 export async function getAdminParticipant(userId: string): Promise<AdminParticipantDetail | null> {

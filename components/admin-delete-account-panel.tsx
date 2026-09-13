@@ -19,12 +19,12 @@ export function AdminDeleteAccountPanel({
       <p className="eyebrow !text-[var(--danger)]">Permanent deletion</p>
       <h3 className="mt-2 text-lg font-black">계정 영구 삭제</h3>
       <p className="copy-pretty mt-2 text-sm font-bold leading-6 text-[var(--danger)]">
-        이 작업은 되돌릴 수 없습니다. 로그인 계정과 프로필, 챌린지, 제출 기록, 주간 결과, 배지가 삭제됩니다. 사용한 초대 코드는 재사용되지 않으며 익명 사용 이력만 남습니다.
+        이 작업은 되돌릴 수 없습니다. 로그인 계정과 프로필, 챌린지, 제출 기록, 주간 결과, 배지가 영구 삭제됩니다.
       </p>
       <form action={deleteParticipantAccountAction} className="mt-4">
         <input type="hidden" name="targetUserId" value={userId} />
         <label className="block text-sm font-black">
-          계정을 삭제하려면 아래 입력란에 표시 이름 <span className="text-[var(--danger)]">{displayName}</span>을 정확히 입력하세요.
+          계정을 삭제하려면 아래 입력란에 톡방 닉네임 <span className="text-[var(--danger)]">{displayName}</span>을 정확히 입력하세요.
           <input
             className="input-field mt-2"
             name="confirmDisplayName"

@@ -8,7 +8,7 @@ import { createClient } from "@/lib/supabase/server";
 export async function updateProfileAction(formData: FormData) {
   const user = await requireUser();
   const displayName = String(formData.get("displayName") ?? "").trim();
-  if (!displayName || displayName.length > 40) redirect(`/mypage?error=${encodeURIComponent("표시 이름은 1~40자로 입력해 주세요.")}`);
+  if (!displayName || displayName.length > 40) redirect(`/mypage?error=${encodeURIComponent("톡방 닉네임은 1~40자로 입력해 주세요.")}`);
   const supabase = await createClient();
   const { error } = await supabase.from("profiles").update({ display_name: displayName }).eq("id", user.id);
   if (error) redirect(`/mypage?error=${encodeURIComponent("프로필을 저장하지 못했습니다.")}`);

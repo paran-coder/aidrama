@@ -15,12 +15,12 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
 
       <section className="grid min-h-[78vh] items-center gap-10 py-14 lg:grid-cols-[.94fr_1.06fr] lg:py-16">
         <div>
-          <p className="eyebrow">Invitation-only · Start with 100 days</p>
+          <p className="eyebrow">Private challenge · Start with 100 days</p>
           <h1 className="mt-5 max-w-3xl text-5xl font-black leading-[.98] tracking-[-0.065em] sm:text-7xl">
             당신은 이미<br/><span className="text-[var(--accent)]">창작자입니다.</span><br/>먼저 100일.
           </h1>
           <p className="copy-pretty mt-7 max-w-xl text-lg leading-8 text-[var(--muted)]">매주 한 편을 이어가며 100일, 300일, 600일, 900일을 지나 OWL1000까지. 작은 성공을 쌓아 나만의 창작 리듬을 만드는 여정입니다.</p>
-          <div className="mt-9 flex flex-wrap gap-3"><Link href="/signup" className="primary-button">초대 코드로 시작하기</Link><a href="#rules" className="secondary-button">성장 방식 보기</a></div>
+          <div className="mt-9 flex flex-wrap gap-3"><Link href="/signup" className="primary-button">참여자로 시작하기</Link><a href="#rules" className="secondary-button">성장 방식 보기</a></div>
           <div className="mt-8 flex flex-wrap gap-2 text-xs font-black text-[var(--muted)]">
             {["100 DAYS", "300 DAYS", "600 DAYS", "900 DAYS", "OWL1000"].map((label) => <span key={label} className="rounded-full border border-[var(--line)] bg-white/55 px-3 py-2">{label}</span>)}
           </div>

@@ -16,15 +16,15 @@ const shell = read("components/app-shell.tsx");
 const nav = fs.existsSync(new URL("../components/app-nav.tsx", import.meta.url)) ? read("components/app-nav.tsx") : shell;
 
 assert(auth.includes('redirect(isAdmin ? "/admin" : "/dashboard")'), "admin login redirect is missing");
-assert(auth.includes("revoked_at"), "signup does not inspect revoked invite status");
+assert(!auth.includes('formData, "inviteCode"'), "v1.3 signup must remain independent from legacy invite codes");
 assert(challengeService.includes('admin.rpc("process_all_missed_weeks"'), "batch missed-week RPC is missing");
 assert(!challengeService.includes("typedChallenges.map((challenge) => processMissedWeeks"), "community N+1 processing still exists");
 assert(!adminService.includes("typedProfiles.map(async"), "admin participant N+1 processing still exists");
 assert(migration.includes("admin_revoke_invite_code"), "invite revoke RPC is missing");
 assert(migration.includes("admin_set_user_status"), "user status RPC is missing");
 assert(migration.includes("public.is_active_user()"), "active-user RLS gate is missing");
-assert(adminPage.includes("used_email"), "admin invite usage email is not displayed");
-assert(adminPage.includes("발급 취소"), "unused invite revoke UI is missing");
+assert(adminPage.includes("톡방 닉네임 / 이메일"), "admin participant identity column is missing");
+assert(!adminPage.includes("새 코드 발급"), "legacy invite-code issuance UI must stay removed");
 assert(nav.includes("/admin/preview"), "read-only admin preview navigation is missing");
 
 console.log("v1.1.2 operations structure checks passed");

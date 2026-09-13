@@ -1,17 +1,18 @@
-# context-notes.md — v1.2.11
+# Context Notes — v1.3.0
 
-## 목표
-Vercel에서 발생한 legacy self-service deletion 파일의 type-check 실패를 막고, 관리자 삭제 방식으로 정리된 현재 운영 구조를 유지한다.
+## Goal
+Simplify participant signup for a private OWL1000 challenge community.
 
-## 확인된 현상
-- Vercel: `lib/actions/account-deletion.ts(5,10)`에서 `clearSupabaseAuthCookies` export를 찾지 못해 build 실패.
-- 로컬 v1.2.10 clean package에는 이미 `lib/actions/account-deletion.ts`와 `components/account-deletion-panel.tsx`가 없음.
-- 따라서 GitHub 업데이트 시 삭제 파일이 저장소에 잔존한 것으로 판단.
+## Product decisions
+- Remove invite-code requirements from participant signup.
+- Remove invite-code issuance/history UI from admin operations.
+- Keep the existing `profiles.display_name` database field; present it as **톡방 닉네임** in participant-facing/admin UI.
+- Signup copy must say: `챌린지 톡방에서 사용 중인 닉네임을 정확히 입력해 주세요. 운영자가 참여자를 확인할 때 사용됩니다.`
+- Do not drop `invite_codes` or historical migrations. Legacy data remains untouched and unused by the normal signup/admin UI.
+- Admin account deletion may continue to anonymize any old invite-code history if such legacy rows exist.
+- No new SQL migration is expected for v1.3.0.
 
-## 수정
-- `lib/supabase/server.ts`에 legacy compatibility export 추가.
-- clean package에서는 사용자 직접 탈퇴 파일을 계속 제외.
-- 관리자 전용 account deletion은 유지.
-
-## DB
-변경 없음. 001~006 재실행 금지.
+## Safety / compatibility
+- Preserve all existing user/challenge/submission/badge data.
+- Preserve admin suspension/reactivation and permanent-delete controls.
+- Keep public unauthenticated landing/login/signup access behavior fixed in v1.2.12.

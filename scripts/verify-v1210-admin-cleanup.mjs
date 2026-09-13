@@ -21,7 +21,7 @@ const expectedCodes = [
 ];
 
 const checks = [
-  ['package retains v1.2.10 cleanup behavior', /^1\.2\.(?:1[0-9]|[2-9][0-9])$/.test(pkg.version)],
+  ['package retains v1.2.10 cleanup behavior', /^1\.2\.(?:1[0-9]|[2-9][0-9])$/.test(pkg.version) || /^1\.(?:[3-9]|[1-9]\d+)\.\d+$/.test(pkg.version)],
   ['preferred profile query filters role user', adminService.includes('.select(PROFILE_FIELDS).eq("role", "user").order("created_at"')],
   ['legacy profile query filters role user', adminService.includes('.select(PROFILE_FIELDS_LEGACY).eq("role", "user").order("created_at"')],
   ['cleanup is exact-code delete', migration.includes('delete from public.invite_codes') && migration.includes('where code in (')],

@@ -32,7 +32,7 @@ export async function deleteParticipantAccountAction(formData: FormData) {
     redirect(`${back}?error=${encodeURIComponent("관리자 계정은 참여자 접근 관리에서 삭제할 수 없습니다.")}`);
   }
   if (confirmDisplayName !== targetProfile.display_name) {
-    redirect(`${back}?error=${encodeURIComponent("표시 이름이 일치하지 않아 계정을 삭제하지 않았습니다.")}`);
+    redirect(`${back}?error=${encodeURIComponent("톡방 닉네임이 일치하지 않아 계정을 삭제하지 않았습니다.")}`);
   }
 
   const { data: usedCodes } = await admin

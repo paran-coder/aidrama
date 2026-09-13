@@ -24,7 +24,7 @@ const communityBody = communityService.slice(communityService.indexOf("export as
 assert(!communityBody.split("export async function getPublicParticipant")[0].includes("syncAllMissedWeeks"), "community still auto-syncs all participants");
 assert(adminPage.includes("진행상태 동기화"), "manual admin sync control missing");
 assert(adminPage.includes("접근 관리"), "participant suspension entry point is not visible");
-assert(adminPage.includes("취소된 코드 이력"), "revoked invite history compaction missing");
+assert(!adminPage.includes("취소된 코드 이력") && adminPage.includes("톡방 닉네임 / 이메일"), "v1.3 admin simplification must replace invite history with participant identity");
 assert(preview.includes("Lv.1") && preview.includes("0 / 100일"), "admin preview still starts at Lv.2");
 assert(owl.includes("object-contain") && owl.includes("lg:min-h-[500px]"), "hero crop hotfix missing");
 assert(proxy.includes("SESSION_REFRESH_FAILED"), "proxy transient auth guard missing");

@@ -27,7 +27,7 @@ const checks = [
   [adminAction.includes('from("invite_codes")') && adminAction.includes("used_account_deleted_at"), "used invite history is anonymized with deletion timestamp"],
   [migration005.includes("used_account_deleted_at"), "existing migration 005 remains the deletion-history schema"],
   [!exists("supabase/migrations/006_v1_2_9_admin_deletion.sql"), "v1.2.9 adds no new DB migration"],
-  [adminPage.includes("계정을 영구 삭제했습니다") && adminPage.includes("익명 이력"), "admin receives a deletion success notice"],
+  [adminPage.includes("계정을 영구 삭제했습니다"), "admin receives a deletion success notice"],
 ];
 
 let failed = 0;

@@ -9,7 +9,7 @@ const server = read("lib/supabase/server.ts");
 const pkg = JSON.parse(read("package.json"));
 
 const checks = [
-  [/^1\.2\.(?:1[1-9]|[2-9]\d+)$/.test(pkg.version), "package version retains v1.2.11+ build compatibility"],
+  [/^1\.2\.(?:1[1-9]|[2-9]\d+)$/.test(pkg.version) || /^1\.(?:[3-9]|[1-9]\d+)\.\d+$/.test(pkg.version), "package version retains v1.2.11+ build compatibility"],
   [server.includes("export async function clearSupabaseAuthCookies"), "legacy auth-cookie helper export exists"],
   [!exists("lib/actions/account-deletion.ts"), "self-service deletion action is absent from clean package"],
   [!exists("components/account-deletion-panel.tsx"), "self-service deletion panel is absent from clean package"],

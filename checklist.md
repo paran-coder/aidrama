@@ -1,10 +1,18 @@
-# v1.2.10 Checklist
+# v1.3.0 Checklist
 
-- [x] v1.2.9에서 작업본 분리
-- [x] 버전 1.2.10 반영
-- [x] 관리자 계정 참여자 목록 제외
-- [x] 테스트 초대 코드 11개 exact cleanup SQL 작성
-- [x] v1.2.10 전용 회귀 테스트
-- [x] 기존 회귀 테스트
-- [x] 문서 갱신
-- [x] ZIP 패키징
+- [x] Create v1.3.0 working copy and update version metadata.
+- [x] Remove invite-code field and validation from signup.
+- [x] Create participant profile directly after Auth user creation.
+- [x] Rename participant-facing `표시 이름` to `톡방 닉네임`.
+- [x] Add chat-room nickname guidance to signup.
+- [x] Remove invite-code issuance/history from admin UI.
+- [x] Stop admin overview from querying invite-code data.
+- [x] Remove unused invite-code issuance/revocation from active admin actions.
+- [x] Update landing/login copy to direct signup language.
+- [x] Update product/spec docs with v1.3.0 override decision.
+- [x] Add v1.3.0 regression checks.
+- [x] Run existing regression suite.
+- [x] Run TS/TSX syntax checks: 56 files, 0 errors.
+- [x] Confirm no DB migration is required.
+- [ ] Confirm Vercel production build succeeds.
+- [ ] Run one real new-participant signup after deployment.

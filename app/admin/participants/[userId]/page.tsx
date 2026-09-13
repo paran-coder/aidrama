@@ -76,7 +76,7 @@ export default async function AdminParticipantPage({
           <section id="access" className="card mt-8 scroll-mt-24 rounded-[2rem] p-5 sm:p-7">
             <p className="eyebrow">Account access</p>
             <h2 className="mt-2 text-xl font-black">사용자 접근 관리</h2>
-            <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">초대 코드와 별개의 계정 권한입니다. 이용 정지해도 가입 정보, 챌린지, 제출 이력은 삭제되지 않으며 다시 활성화하면 기존 기록에서 이어집니다.</p>
+            <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">계정 이용 상태와 기록 삭제는 별개입니다. 이용 정지해도 가입 정보, 챌린지, 제출 이력은 삭제되지 않으며 다시 활성화하면 기존 기록에서 이어집니다.</p>
             {profile.status === "suspended" && profile.suspension_reason && <div className="ui-danger copy-pretty mt-4 rounded-2xl border p-4 text-sm font-bold">현재 정지 사유: {profile.suspension_reason}</div>}
             <form action={setParticipantStatusAction} className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
               <input type="hidden" name="targetUserId" value={userId} />

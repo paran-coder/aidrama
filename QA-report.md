@@ -1,24 +1,52 @@
-# QA Report — v1.2.10
+# QA Report — v1.3.0
 
-## 결과
-- v1.2.10 관리자/테스트 데이터 정리 검사: 8/8 통과
-- 챌린지 규칙 parity: 8,190 sequences 통과
-- v1.1.2 운영 구조 회귀: 통과
-- v1.2.0 성장/마일스톤 회귀: 통과
-- v1.2.1 hotfix 회귀: 통과
-- v1.2.2 제출 UX 회귀: 통과
-- v1.2.3 UI 시스템 회귀: 통과
-- v1.2.4 관리자/내비게이션 회귀: 통과
-- v1.2.5 활성 탭 타이포그래피 회귀: 통과
-- v1.2.9 관리자 영구 삭제 회귀: 15/15 통과
-- TS/TSX 54개 파일 transpile syntax 검사: 오류 0
+## Scope
+Private-challenge signup simplification:
+- per-person invite-code requirement removed from signup,
+- `profiles.display_name` presented as 톡방 닉네임,
+- admin invite-code UI/query path removed,
+- legacy invite-code schema/data preserved but inactive.
 
-## v1.2.10 확인 사항
-- 관리자 참여자 조회의 preferred/legacy 경로 모두 `role = user` 필터 확인
-- 006 cleanup은 정확한 테스트 코드 11개만 `code in (...)`으로 삭제
-- `revoked_at is not null`, `used_account_deleted_at is not null` 같은 광범위 삭제 조건 없음
-- 삭제 결과를 SQL Editor에서 확인할 수 있도록 `returning` 포함
+## Automated regression results
+- Challenge rule parity: **8,190 sequences passed**
+- v1.1.2 operations regression: passed
+- v1.2.0 growth regression: passed
+- v1.2.1 hotfix regression: passed
+- v1.2.2 submission UX regression: passed
+- v1.2.3 UI system regression: passed
+- v1.2.4 navigation/admin resilience: passed
+- v1.2.5 navigation typography: passed
+- v1.2.9 admin account deletion: **15/15 passed**
+- v1.2.10 admin cleanup compatibility: **8/8 passed**
+- v1.2.11 build-compat regression: **6/6 passed**
+- v1.2.12 public-auth regression: **9/9 passed**
+- v1.3.0 signup simplification: **16/16 passed**
+- TS/TSX syntax transpile: **56 files, 0 syntax errors**
 
-## 제한
-- 작업 환경에 프로젝트 `node_modules`가 없어 dependency-aware `next build`는 실행하지 못했습니다.
-- 최종 Next.js 빌드 검증은 Vercel에서 확인합니다.
+## v1.3.0 checks
+Confirmed:
+- signup page contains no invite-code input,
+- signup action performs no invite-code lookup/claim,
+- Auth user creation is followed by direct `profiles` insertion,
+- an orphaned Auth user is deleted if profile creation fails,
+- signup guidance explicitly asks for the challenge chat-room nickname,
+- admin overview contains no invite-code issuance/history UI,
+- admin overview no longer queries `invite_codes`,
+- participant table prioritizes 톡방 닉네임 + email,
+- landing/login copy no longer requires an invite code,
+- legacy `invite_codes` schema remains untouched,
+- no v1.3.0 SQL migration was added.
+
+## Dependency-aware build
+A local full `next build` could not be completed because `npm install --prefer-offline` did not finish within the available 90-second execution window and no project `node_modules` is present in this workspace.
+
+Vercel build remains the final dependency-aware compile check.
+
+## Production verification after deploy
+1. Open the site in a private/incognito browser.
+2. Open `/signup` without being logged in.
+3. Confirm the fields are 톡방 닉네임 / 이메일 / 비밀번호 only.
+4. Create one disposable participant account.
+5. Confirm automatic sign-in and onboarding.
+6. Confirm the new account appears in Admin with the entered 톡방 닉네임 and email.
+7. Confirm existing participants, records, badges, and admin controls remain intact.

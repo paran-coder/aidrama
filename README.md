@@ -1,17 +1,14 @@
-# OWL1000 — v1.2.10
+# OWL1000 — v1.3.0
 
-관리자 데이터 분류와 테스트 초대 코드 정리를 위한 운영 안정화 패치입니다.
+Private challenge signup simplification release.
 
-## 변경점
-- 관리자 계정은 참여자 현황/참여자 수/진행 집계에서 제외됩니다.
-- 실제 참여자(`role = user`)만 관리자 참여자 표에 표시됩니다.
-- 테스트 초대 코드 11개를 exact-match로 삭제하는 일회성 006 SQL을 제공합니다.
-- 관리자 영구 삭제, 계정 정지/재활성화, 초대코드 운영 정책은 그대로 유지합니다.
+## What changed
+Participants no longer need a per-person invite code. The site URL is shared only inside the challenge community, and signup identifies each participant by their **톡방 닉네임** plus email.
 
-## 배포
-1. Supabase SQL Editor에서 `006_v1_2_10_test_data_cleanup.sql` 실행
-2. GitHub에 v1.2.10 반영
-3. Vercel 배포
-4. `/admin`에서 참여자 수와 초대 코드 이력 확인
+The database field remains `profiles.display_name`; only its product meaning/UI label changes to 톡방 닉네임. Legacy `invite_codes` tables/migrations are retained for historical compatibility but are no longer used by ordinary signup or the admin overview.
 
-`001`~`005` migration은 재실행하지 마세요.
+## Database
+No new SQL migration for v1.3.0. Do not rerun migrations 001–006.
+
+## Deploy verification
+After Vercel deploy, create one disposable participant using 톡방 닉네임 / email / password and confirm it appears in Admin.

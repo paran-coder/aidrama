@@ -1,7 +1,9 @@
-# DESIGN-REFERENCE — v1.2.10
+# Design Reference — v1.3.0
 
-UI 디자인 변경은 없습니다. 이번 패치는 관리자 목록의 데이터 분류 정확성과 테스트 데이터 정리에 집중합니다.
+v1.3.0 keeps the established OWL1000 visual system from v1.2.x. This release is an information-architecture simplification rather than a visual redesign.
 
-- 운영 관리의 참여자 현황은 실제 `user` 역할만 노출합니다.
-- 관리자 계정은 별도 운영 주체이며 참여자 카드/집계에 섞지 않습니다.
-- 기존 v1.2.9 시각 시스템과 내비게이션을 그대로 유지합니다.
+Priorities:
+1. Signup should feel direct and low-friction.
+2. 톡방 닉네임 is the primary human-readable participant identifier.
+3. Admin overview should focus on participants, access, and progress—not invite-code operations.
+4. Preserve responsive navigation, semantic colors, Korean keep-all wrapping, and current OWL visual hierarchy.
