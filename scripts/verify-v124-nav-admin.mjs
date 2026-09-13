@@ -4,7 +4,7 @@ function read(file) { return fs.readFileSync(file, "utf8"); }
 function assert(condition, message) { if (!condition) throw new Error(message); }
 
 const pkg = JSON.parse(read("package.json"));
-assert(["1.2.4", "1.2.5"].includes(pkg.version), "package version must remain in the v1.2.4+ resilience line");
+assert(/^1\.2\.(?:[4-9]|[1-9]\d+)$/.test(pkg.version), "package version must remain in the v1.2.4+ resilience line");
 
 const nav = read("components/app-nav.tsx");
 assert(nav.includes('usePathname'), "navigation must derive active state from the current path");

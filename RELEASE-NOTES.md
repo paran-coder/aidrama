@@ -1,8 +1,17 @@
-# Release Notes — v1.2.5
+# Release Notes — v1.2.6
 
-## Navigation typography hotfix
-- Active desktop navigation text now uses font weight 900.
-- Active mobile navigation text now uses font weight 900.
-- Active navigation text uses the same dark ink color as the rest of the primary navigation.
-- Sage active-state background and border remain unchanged.
-- No feature, authentication, challenge-rule, or database changes.
+## Added
+- 일반 사용자 셀프 회원 탈퇴
+- 마이페이지 Danger Zone
+- 탈퇴 전 삭제 범위/복구 불가 안내
+- `탈퇴` 직접 입력 확인 절차
+- 관리자 계정 자기 탈퇴 차단
+- 탈퇴 완료 안내 메시지
+- 익명 초대코드 사용 이력 표시
+
+## Data policy
+탈퇴 시 로그인 계정, 이메일, 표시 이름, 챌린지, 제출 URL, 주간 판정, 배지를 삭제합니다.
+사용한 초대코드는 다시 사용할 수 없으며 개인 식별 정보 없이 사용 완료/탈퇴 이력만 유지합니다.
+
+## Database
+배포 전에 `005_v1_2_6_account_deletion.sql`을 1회 실행해야 합니다.

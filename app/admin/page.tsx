@@ -118,7 +118,7 @@ export default async function AdminPage({
                       <tr key={code.code} className="border-t border-[var(--line)] align-top">
                         <td className="px-5 py-4"><p className="font-black tracking-wider">{code.code}</p><div className="mt-2"><CopyButton value={code.code} /></div></td>
                         <td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${state.className}`}>{state.label}</span>{code.revoke_reason && <p className="mt-2 max-w-48 text-xs leading-5 text-[var(--muted)]">{code.revoke_reason}</p>}</td>
-                        <td className="px-5 py-4 font-bold">{code.used_at ? <><p>{code.used_display_name ?? "가입 사용자"}</p><p className="mt-1 text-xs font-normal text-[var(--muted)]">{code.used_email ?? "이메일 확인 불가"}</p></> : "—"}</td>
+                        <td className="px-5 py-4 font-bold">{code.used_at ? (code.used_account_deleted_at || !code.used_by) ? <><p>탈퇴한 사용자</p><p className="mt-1 text-xs font-normal text-[var(--muted)]">개인 정보 삭제됨</p></> : <><p>{code.used_display_name ?? "가입 사용자"}</p><p className="mt-1 text-xs font-normal text-[var(--muted)]">{code.used_email ?? "이메일 확인 불가"}</p></> : "—"}</td>
                         <td className="px-5 py-4 text-[var(--muted)]">{kstDate(code.created_at)}</td>
                         <td className="px-5 py-4 text-[var(--muted)]">{code.used_at ? kstDateTime(code.used_at) : code.revoked_at ? kstDateTime(code.revoked_at) : "—"}</td>
                         <td className="px-5 py-4">

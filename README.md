@@ -1,36 +1,35 @@
-# AI Drama Challenge v1.2.5
+# AI Drama Challenge v1.2.6
 
-이번 버전은 관리자 화면 복구 안정성, 현재 경로 기반 활성 메뉴, 주간 스트릭 문구 정리를 포함합니다. DB migration은 추가하지 않습니다.
+v1.2.6 is the member-withdrawal release built on v1.2.5.
 
-# AI Drama Challenge v1.2.3
+## Main change
+Regular participants can permanently delete their own account from **마이페이지 → 회원 탈퇴**.
 
-OWL1000 장기 창작 챌린지 서비스의 UI polish 릴리스입니다.
+The confirmation UI explains exactly what is deleted and what remains, and requires the user to type `탈퇴` before the irreversible action is enabled.
 
-## v1.2.3 핵심
-- OWL 브랜드 버튼/상태 컬러 시스템 정리
-- 준비기간 제출 버튼을 명확한 비활성 세이지 톤으로 변경
-- 긴 안내문을 의미 단위 문장으로 분리해 어색한 자동 줄바꿈 감소
-- Hero, 5단계 성장 부엉이, 카드 썸네일을 투명 배경 자산으로 교체
-- 랜딩/대시보드/전체현황/마이페이지/관리자 화면 데스크톱 UI 정합성 점검
+## Withdrawal policy
+Deleted:
+- Supabase Auth account
+- email / display name profile
+- challenge state and streaks
+- submitted URLs
+- weekly results
+- milestone badges
 
-## 데이터베이스
-v1.2.3은 DB migration이 없습니다. 기존 001~004가 적용된 DB를 그대로 사용합니다.
+Retained anonymously:
+- the already-used invite-code row
+- used timestamp
+- an anonymous withdrawn-account marker
 
-## 배포
-1. 현재 운영 코드 백업
-2. v1.2.3 코드로 GitHub 교체
-3. `.env.local`은 GitHub에 올리지 않음
-4. push 후 Vercel 자동 배포
-5. 배포 후 랜딩 → 일반 사용자 → 관리자 순서로 스모크 테스트
+The old invite code never becomes reusable.
 
-## 기존 기능 보존
-인증, 초대코드, 사용자 정지, 제출 판정, 마일스톤/배지 규칙은 v1.2.2와 동일합니다.
+## Admin protection
+Admin accounts cannot self-delete from My Page.
 
-## v1.2.5 UI Hotfix
-- Active navigation tab uses a stronger 900 font weight and dark ink text for consistent visual hierarchy.
-- Existing sage active background/border remains unchanged.
-- No database migration is required.
+## Deployment
+1. Run `supabase/migrations/005_v1_2_6_account_deletion.sql` once.
+2. Push v1.2.6 to GitHub.
+3. Let Vercel deploy.
+4. Test deletion with a disposable regular user.
 
-
-## v1.2.5 deployment
-No Supabase migration is required. Replace code, push to GitHub, and let Vercel redeploy.
+See `MIGRATION-GUIDE.md` and `QA-report.md`.

@@ -4,13 +4,16 @@ import { BrandLogo } from "@/components/brand-logo";
 import { OwlVisual } from "@/components/owl-visual";
 import { getAuthContext } from "@/lib/auth";
 
-export default async function LandingPage() {
+export default async function LandingPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const context = await getAuthContext();
   if (context) redirect(context.isAdmin ? "/admin" : context.profile.status === "suspended" ? "/account-suspended" : "/dashboard");
+  const q = await searchParams;
+  const accountDeleted = q.accountDeleted === "1";
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-6 sm:px-6">
       <header className="flex items-center justify-between"><BrandLogo href="/"/><Link href="/login" className="secondary-button !min-h-0 !px-4 !py-2 text-sm">로그인</Link></header>
+      {accountDeleted && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 text-sm font-bold">회원 탈퇴가 완료되었습니다. 개인 계정과 챌린지 기록은 삭제되었으며 다시 복구할 수 없습니다.</div>}
 
       <section className="grid min-h-[78vh] items-center gap-10 py-14 lg:grid-cols-[.94fr_1.06fr] lg:py-16">
         <div>

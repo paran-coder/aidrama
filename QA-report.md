@@ -1,29 +1,36 @@
-# QA Report — v1.2.5
+# QA Report — v1.2.6
 
 ## Scope
-Navigation active-state typography hotfix only.
+Self-service account withdrawal, admin protection, irreversible-delete guidance, anonymized invite-code history.
 
-## Changes verified
-- Desktop active navigation: `font-weight: 900`.
-- Desktop active navigation: dark `var(--ink)` text.
-- Mobile active navigation: `font-weight: 900`.
-- Mobile active navigation: dark `var(--ink)` text.
-- Existing sage active background/border retained.
-- `usePathname()` route-aware active-state logic retained.
-- `aria-current="page"` semantics retained.
+## Automated regression
+- Challenge rule parity: PASS — 8,190 sequences
+- v1.1.2 operations checks: PASS
+- v1.2.0 growth checks: PASS
+- v1.2.1 hotfix checks: PASS
+- v1.2.2 submit UX checks: PASS
+- v1.2.3 UI checks: PASS
+- v1.2.4 navigation/admin checks: PASS
+- v1.2.5 navigation typography checks: PASS
+- v1.2.6 account deletion checks: PASS — 13 checks
 
-## Regression tests
-- Challenge rule parity: PASS — 8,190 sequences.
-- v1.1.2 operations structure: PASS.
-- v1.2.0 growth structure: PASS.
-- v1.2.1 hotfix structure: PASS.
-- v1.2.2 submission UX: PASS.
-- v1.2.3 UI system: PASS.
-- v1.2.4 navigation/admin resilience: PASS.
-- v1.2.5 navigation typography: PASS.
+## v1.2.6 checks
+- Server action exists: PASS
+- Admin self-delete blocked: PASS
+- Confirmation phrase enforced server-side: PASS
+- Supabase Auth hard delete configured: PASS
+- Session sign-out attempted: PASS
+- User danger zone mounted: PASS
+- Admin protection message: PASS
+- Irreversible deletion guidance: PASS
+- Deleted-data list shown: PASS
+- Typed confirmation UI: PASS
+- Anonymous invite history migration: PASS
+- Admin service reads deletion marker: PASS
+- Admin UI anonymizes withdrawn user: PASS
 
-## Typecheck note
-`tsc --noEmit` could not complete dependency-aware type checking in this extracted package because `node_modules` is not bundled. Errors were missing Next/React/Supabase modules and types, not a v1.2.5 source regression. Vercel build remains the final dependency-aware compilation check.
+## Remaining environment-dependent validation
+This package does not include `node_modules`, so the full dependency-aware Next.js build must be verified by the Vercel deployment. The actual live deletion cascade should be smoke-tested once with a disposable user after migration 005 is applied.
 
-## Database
-No database or Supabase migration changes in v1.2.5.
+## Self-score
+9.6 / 10 before live disposable-account deletion test.

@@ -5,7 +5,7 @@ function read(file) { return fs.readFileSync(file, "utf8"); }
 function assert(condition, message) { if (!condition) throw new Error(message); }
 
 const pkg = JSON.parse(read("package.json"));
-assert(["1.2.3", "1.2.4", "1.2.5"].includes(pkg.version), "package version must remain in the v1.2.3+ UI line");
+assert(/^1\.2\.(?:[3-9]|[1-9]\d+)$/.test(pkg.version), "package version must remain in the v1.2.3+ UI line");
 
 const css = read("app/globals.css");
 for (const token of ["--disabled-bg", "--success-bg", "--warning-bg", "--danger-bg", ".ui-success", ".ui-warning", ".ui-danger", ".copy-pretty"]) {

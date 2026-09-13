@@ -1,16 +1,17 @@
-# Context Notes — v1.2.5
+# Context Notes — v1.2.6
 
-## Goal
-Small UI hotfix for navigation active-state typography.
+## Final scope
+- Self-service account deletion for regular users.
+- Admin self-deletion forbidden.
+- Typed confirmation phrase `탈퇴` required both in UI and server action.
+- Clear irreversible-delete guidance message.
+- Supabase Auth hard delete.
+- Existing FK cascades delete profile/challenge/submission/result/badge data.
+- Used invite code stays consumed and is anonymized after withdrawal.
+- `used_account_deleted_at` records the anonymous withdrawal state; no email/name snapshot is retained.
 
-## Scope
-- Active navigation tab must not look lighter than inactive tabs.
-- Active tab text uses stronger weight (900) and normal dark ink color.
-- Keep existing active sage background/border treatment.
-- Apply consistently to desktop and mobile navigation.
-- No DB, auth, challenge, or submission logic changes.
+## Deployment dependency
+Run migration `005_v1_2_6_account_deletion.sql` before deploying application code.
 
-## Regression focus
-- Current route still controls exactly one active menu item.
-- Admin navigation remains unaffected except shared visual safety.
-- Existing v1.2.4 admin recovery behavior remains intact.
+## Live test still required
+Use a disposable regular account after deployment to verify the live Supabase cascade and session cleanup end-to-end.
