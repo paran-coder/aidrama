@@ -101,6 +101,8 @@ export async function setParticipantStatusAction(formData: FormData) {
   redirect(`${back}?statusChanged=${encodeURIComponent(status)}`);
 }
 
+
+
 export async function correctWeeklyResultAction(formData: FormData) {
   const { user: actor } = await requireAdmin();
   const admin = createAdminClient();

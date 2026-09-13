@@ -34,6 +34,7 @@ export default async function AdminPage({
   const revoked = typeof q.revoked === "string" ? q.revoked : "";
   const error = typeof q.error === "string" ? q.error : "";
   const synced = q.synced === "1";
+  const deleted = typeof q.deleted === "string" ? q.deleted : "";
   const { codes, participants, warnings, health } = await getAdminOverview();
   const currentCodes = codes.filter((code) => !code.revoked_at);
   const revokedCodes = codes.filter((code) => Boolean(code.revoked_at));
@@ -66,6 +67,7 @@ export default async function AdminPage({
         {revoked && <div role="status" className="ui-warning copy-pretty mt-6 rounded-2xl border p-4 font-bold">{revoked} 코드의 발급을 취소했습니다. 기존 가입 사용자에게는 영향이 없습니다.</div>}
         {error && <div role="alert" className="ui-danger mt-6 rounded-2xl border p-4 font-bold">{error}</div>}
         {synced && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 font-bold">모든 참여자의 마감 주차 상태를 한 번 동기화했습니다.</div>}
+        {deleted && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 font-bold">{deleted} 계정을 영구 삭제했습니다. 사용한 초대 코드는 익명 이력으로 보존됩니다.</div>}
 
         <section className="mt-9">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -118,7 +120,7 @@ export default async function AdminPage({
                       <tr key={code.code} className="border-t border-[var(--line)] align-top">
                         <td className="px-5 py-4"><p className="font-black tracking-wider">{code.code}</p><div className="mt-2"><CopyButton value={code.code} /></div></td>
                         <td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${state.className}`}>{state.label}</span>{code.revoke_reason && <p className="mt-2 max-w-48 text-xs leading-5 text-[var(--muted)]">{code.revoke_reason}</p>}</td>
-                        <td className="px-5 py-4 font-bold">{code.used_at ? (code.used_account_deleted_at || !code.used_by) ? <><p>탈퇴한 사용자</p><p className="mt-1 text-xs font-normal text-[var(--muted)]">개인 정보 삭제됨</p></> : <><p>{code.used_display_name ?? "가입 사용자"}</p><p className="mt-1 text-xs font-normal text-[var(--muted)]">{code.used_email ?? "이메일 확인 불가"}</p></> : "—"}</td>
+                        <td className="px-5 py-4 font-bold">{code.used_at ? (code.used_account_deleted_at || !code.used_by) ? <><p>삭제된 사용자</p><p className="mt-1 text-xs font-normal text-[var(--muted)]">개인 정보 삭제됨</p></> : <><p>{code.used_display_name ?? "가입 사용자"}</p><p className="mt-1 text-xs font-normal text-[var(--muted)]">{code.used_email ?? "이메일 확인 불가"}</p></> : "—"}</td>
                         <td className="px-5 py-4 text-[var(--muted)]">{kstDate(code.created_at)}</td>
                         <td className="px-5 py-4 text-[var(--muted)]">{code.used_at ? kstDateTime(code.used_at) : code.revoked_at ? kstDateTime(code.revoked_at) : "—"}</td>
                         <td className="px-5 py-4">

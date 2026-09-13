@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
+import { AdminDeleteAccountPanel } from "@/components/admin-delete-account-panel";
 import { MilestoneBadges } from "@/components/milestone-badges";
 import { StatusBadge } from "@/components/status-badge";
 import { correctWeeklyResultAction, setParticipantStatusAction } from "@/lib/actions/admin";
@@ -83,6 +84,7 @@ export default async function AdminParticipantPage({
               <label className="block text-sm font-bold">{profile.status === "active" ? "이용 정지 사유" : "재활성화 사유"}<input className="input-field mt-2" name="reason" minLength={3} maxLength={500} placeholder={profile.status === "active" ? "예: 운영 정책 위반 또는 일시 이용 중지 요청" : "예: 운영 확인 후 이용 재개"} required /></label>
               <PendingSubmitButton className={profile.status === "active" ? "danger-button" : "primary-button"} pendingLabel="변경 중...">{profile.status === "active" ? "사용자 이용 정지" : "사용자 다시 활성화"}</PendingSubmitButton>
             </form>
+            <AdminDeleteAccountPanel userId={userId} displayName={profile.display_name} />
           </section>
         )}
 

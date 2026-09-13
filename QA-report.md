@@ -1,7 +1,7 @@
-# v1.2.8 QA Report
+# v1.2.9 QA Report
 
 ## Result
-PASS — account-deletion session resilience patch is structurally verified.
+PASS — admin-only account deletion stabilization is structurally verified.
 
 ## Regression checks
 - Challenge rule parity: 8,190 sequences passed.
@@ -12,26 +12,29 @@ PASS — account-deletion session resilience patch is structurally verified.
 - v1.2.3 UI system checks: passed.
 - v1.2.4 navigation/admin resilience: passed.
 - v1.2.5 active-nav typography: passed.
-- v1.2.6 account deletion checks: 13/13 passed.
-- v1.2.7 dedicated account-action module: 9/9 passed.
-- v1.2.8 account-deletion session checks: 10/10 passed.
+- v1.2.9 admin deletion checks: 15/15 passed.
+- TS/TSX syntax/transpile check: 54 files, 0 syntax errors.
 
-## v1.2.8 specific verification
-- Deleted-user JWT error (`User from sub claim in JWT does not exist`) is classified as signed-out state.
-- Missing/invalid refresh-token and missing-session patterns are classified as signed-out state.
-- Network/unknown errors are not blanket-swallowed by the classifier.
-- Account deletion still attempts Supabase sign-out.
-- Supabase auth cookies are explicitly removed before the success redirect.
-- Landing success message remains present.
+## v1.2.9 specific verification
+- User self-service deletion component/action are absent.
+- My Page contains guidance only; it does not hard-delete the current user.
+- Permanent deletion is mounted only in participant Access Management.
+- Exact display-name confirmation is required in the client UI and verified again on the server.
+- The current admin and admin-role profiles are protected from this deletion flow.
+- Supabase Auth uses hard delete for the target participant.
+- Existing invite-code deletion-history marker is retained.
+- No new database migration exists for v1.2.9.
+- Admin receives a success notice after deletion.
 
 ## Dependency-aware validation limit
-The working package intentionally does not include `node_modules`. `tsc --noEmit` therefore cannot resolve Next.js, React, Supabase, or Node type packages in this runtime. The reported errors are dependency-resolution failures rather than a completed project typecheck. Vercel build remains the final dependency-aware validation point.
+The project package does not include `node_modules`. An attempted `npm install --ignore-scripts --no-audit --no-fund` timed out in this execution environment, so a complete local `tsc`/`next build` could not be performed here. Vercel remains the final dependency-aware build check.
 
 ## Required production check
-Use one disposable normal-user account:
-1. Sign in.
-2. Open My Page and delete the account.
-3. Confirm redirect to landing page with the account-deleted success message.
-4. Confirm the generic temporary connection error is not shown.
-5. Confirm the deleted account cannot sign in again.
-6. Confirm admin invite history shows anonymized deleted-user history.
+Use one disposable normal participant account:
+1. Open `운영 관리 → 접근 관리`.
+2. Confirm the delete button is disabled before the exact display name is entered.
+3. Enter the exact display name and delete the account.
+4. Confirm redirect back to `/admin` with the deletion success notice.
+5. Confirm the participant no longer appears in the participant list.
+6. Confirm the old login can no longer authenticate.
+7. Confirm the used invite code remains as anonymous deleted-user history.

@@ -1,19 +1,20 @@
-# v1.2.8 Context Notes
+# Context Notes — v1.2.9
 
-## Trigger
-A real account-deletion test successfully reached the deletion path but then rendered the global temporary connection error screen.
+## Purpose
+Stabilization release. Remove direct self-service account deletion and move irreversible account deletion to admin-only participant access management.
 
-## Root path addressed
-The browser can retain a Supabase auth token after the corresponding Auth user is hard-deleted. `getUser()` previously retried and then threw this deleted-user auth error, which caused the landing page to enter the generic error boundary.
+## Confirmed product decisions
+- Regular users do not directly delete their own Auth account from My Page.
+- Admin deletion is available only inside `/admin/participants/[userId]` access management.
+- Admin accounts cannot be deleted through this participant flow.
+- The administrator must type the participant's exact display name before the destructive button becomes enabled.
+- Deleting an account removes Supabase Auth + profile/challenge/submission/result/badge data through existing cascades.
+- A used invite code remains used. Before deletion, `used_account_deleted_at` is stamped so admin history can show an anonymous deleted-user record.
+- Migration 005 remains valid. No new SQL migration is added in v1.2.9.
 
-## Changes
-- Added narrow stale/signed-out auth error classification in `lib/auth.ts`.
-- Added explicit Supabase auth-cookie cleanup in `lib/supabase/server.ts`.
-- Account deletion now attempts sign-out, forcibly clears auth cookies, then redirects to `/?accountDeleted=1`.
-- Added v1.2.8 structural regression checks.
-
-## Safety
-Unknown/network auth failures still throw; only known signed-out/stale-session signals are downgraded to logged-out state.
-
-## Database
-No schema change. Do not rerun migrations 001-005.
+## Scope
+1. Remove user self-delete panel/action and related success redirect UI.
+2. Add admin-only hard-delete server action.
+3. Add guarded delete UI to participant access management.
+4. Keep suspend/reactivate workflow unchanged.
+5. Add v1.2.9 regression checks and update docs/package version.

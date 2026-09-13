@@ -1,12 +1,16 @@
-# v1.2.8 Release Notes
+# v1.2.9 Release Notes
 
-## Fixed
-- Fixed the post-account-deletion path that could display the generic “잠시 연결이 불안정합니다” screen after a successful Supabase Auth user deletion.
-- Deleted-user JWT and stale refresh/session errors are now treated as signed-out state instead of connectivity failures.
-- Account deletion now performs an explicit cleanup of Supabase auth cookies after sign-out and before redirecting.
+## Changed
+- Removed user self-service account deletion from My Page.
+- Moved permanent deletion to admin-only Participant Access Management.
+- Added exact display-name confirmation before the destructive action becomes available.
+- Added server-side confirmation and protections against deleting the current admin or another admin profile.
+- Split the destructive action into a dedicated `admin-account-deletion.ts` Server Action module.
 
-## Unchanged
-- Account deletion policy remains unchanged.
-- Invite-code anonymized history behavior remains unchanged.
-- No challenge, badge, submission, admin, or navigation logic changes.
-- No database migration is required.
+## Preserved
+- Existing suspend/reactivate behavior is unchanged.
+- Existing challenge, submission, badge, navigation, and invite-code rules are unchanged.
+- Migration 005 remains valid for anonymous deleted-account invite history.
+
+## Database
+No new migration in v1.2.9.

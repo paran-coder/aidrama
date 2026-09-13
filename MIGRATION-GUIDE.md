@@ -1,12 +1,20 @@
-# v1.2.8 Migration Guide
+# v1.2.9 Migration Guide
 
 ## Database migration
-None.
+**None.**
 
-Migration `005_v1_2_6_account_deletion.sql`을 이미 적용했다면 다시 실행하지 마십시오.
+`005_v1_2_6_account_deletion.sql`을 이미 적용했다면 다시 실행하지 마십시오. v1.2.9는 해당 컬럼을 그대로 사용하며 새 SQL 파일을 추가하지 않습니다.
 
 ## Deployment order
-1. Replace application code with v1.2.8.
-2. Deploy through GitHub/Vercel.
-3. Test with a disposable normal-user account: login -> mypage -> delete account -> landing success message.
-4. Verify the deleted account cannot log in again and admin invite history remains anonymized.
+1. GitHub 코드를 v1.2.9로 교체합니다.
+2. Vercel 배포가 성공하는지 확인합니다.
+3. 관리자 계정으로 로그인합니다.
+4. 테스트용 일반 참여자의 `접근 관리` 화면을 엽니다.
+5. 표시 이름을 정확히 입력한 뒤 `계정 영구 삭제`를 실행합니다.
+6. 참여자 목록에서 계정이 사라지는지 확인합니다.
+7. 사용했던 초대 코드가 `삭제된 사용자 / 개인 정보 삭제됨` 이력으로 남는지 확인합니다.
+
+## Important
+- 001~005 migration을 재실행하지 않습니다.
+- 단순 이용 중지는 `사용자 이용 정지`를 사용합니다.
+- `계정 영구 삭제`는 복구할 수 없습니다.
