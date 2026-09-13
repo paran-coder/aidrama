@@ -33,7 +33,7 @@ export function MilestoneBadges({
         return (
           <div
             key={milestone}
-            className={`rounded-2xl border border-[var(--line)] bg-[var(--surface)] text-center ${compact ? "p-1.5" : "p-3"} ${isEarned ? "" : "opacity-35 grayscale"}`}
+            className={`rounded-2xl border text-center transition ${compact ? "p-1.5" : "p-3"} ${isEarned ? "border-[rgba(66,95,75,.28)] bg-[rgba(66,95,75,.055)]" : "border-[var(--neutral-line)] bg-[var(--neutral-bg)] opacity-55 grayscale-[0.65]"}`}
             title={isEarned && row ? `${milestone}일 배지 · ${new Date(row.awarded_at).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}` : `${milestone}일 배지 미획득`}
           >
             <img
@@ -42,7 +42,7 @@ export function MilestoneBadges({
               className={`mx-auto object-contain ${compact ? "size-9" : "size-16"}`}
               loading="lazy"
             />
-            {!compact && <p className="mt-1 text-xs font-black">{milestone} DAYS</p>}
+            {!compact && <p className={`mt-1 text-xs font-black ${isEarned ? "text-[var(--accent-strong)]" : "text-[var(--neutral-ink)]"}`}>{milestone} DAYS</p>}
           </div>
         );
       })}

@@ -16,7 +16,7 @@ export default async function CommunityPage() {
       <div>
         <p className="eyebrow">Community</p>
         <div className="mt-3 flex flex-wrap items-end justify-between gap-4">
-          <div><h1 className="text-4xl font-black tracking-[-.05em]">함께 가는 크리에이터.</h1><p className="mt-2 text-sm font-bold text-[var(--muted)]">각자의 속도로, 같은 방향으로.</p></div>
+          <div><h1 className="text-4xl font-black tracking-[-.05em]">함께 가는 크리에이터.</h1><p className="copy-pretty mt-2 text-sm font-bold text-[var(--muted)]">각자의 속도로, 같은 방향으로.</p></div>
           <p className="text-sm font-bold text-[var(--muted)]">최장 스트릭 순 · {rows.length}명</p>
         </div>
         {rows.length === 0 ? (
@@ -29,7 +29,7 @@ export default async function CommunityPage() {
               const level = CREATOR_LEVELS[levelIndex];
               const me = challenge.user_id === user.id;
               return (
-                <Link href={`/community/${challenge.user_id}`} key={challenge.id} className={`card group rounded-[2rem] p-4 transition hover:-translate-y-1 ${me ? "ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--bg)]" : ""}`}>
+                <Link href={`/community/${challenge.user_id}`} key={challenge.id} className={`card group rounded-[2rem] p-5 transition hover:-translate-y-1 ${me ? "ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--bg)]" : ""}`}>
                   <div className="flex items-center gap-4">
                     <OwlVisual stage={levelIndex} compact />
                     <div className="min-w-0 flex-1">

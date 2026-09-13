@@ -18,7 +18,7 @@ export function AppShell({ children, displayName, isAdmin = false }: { children:
             ) : (
               <>
                 <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/dashboard">내 챌린지</Link>
-                <Link className="rounded-full bg-[var(--accent-strong)] px-4 py-2 text-sm font-bold text-white transition hover:-translate-y-0.5" href="/dashboard/submit">이번 주 제출</Link>
+                <Link className="nav-submit-link px-4 py-2 text-sm" href="/dashboard/submit">이번 주 제출</Link>
                 <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/community">전체 현황</Link>
                 <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/mypage">마이페이지</Link>
               </>
@@ -41,7 +41,7 @@ export function AppShell({ children, displayName, isAdmin = false }: { children:
         ) : (
           <>
             <Link href="/dashboard" className="rounded-xl px-1 py-3 text-center text-[11px] font-extrabold">내 챌린지</Link>
-            <Link href="/dashboard/submit" className="rounded-xl bg-[var(--accent-strong)] px-1 py-3 text-center text-[11px] font-extrabold text-white">이번 주 제출</Link>
+            <Link href="/dashboard/submit" className="nav-submit-link rounded-xl px-1 py-3 text-center text-[11px]">이번 주 제출</Link>
             <Link href="/community" className="rounded-xl px-1 py-3 text-center text-[11px] font-extrabold">전체 현황</Link>
             <Link href="/mypage" className="rounded-xl px-1 py-3 text-center text-[11px] font-extrabold">마이페이지</Link>
           </>

@@ -42,14 +42,14 @@ export function MilestoneCelebration({ milestone, userId }: { milestone: Milesto
       </div>
       <div className="relative flex items-center gap-4 sm:gap-5">
         <div className="relative grid size-20 shrink-0 place-items-center overflow-hidden rounded-[1.4rem] bg-[var(--surface-2)] sm:size-24">
-          <img src={OWL_ASSETS.thumbs[levelIndex]} alt="" className="h-full w-full object-cover" />
+          <img src={OWL_ASSETS.thumbs[levelIndex]} alt="" className="h-[92%] w-[92%] object-contain" />
         </div>
         <div className="min-w-0 flex-1">
           <p className="eyebrow">Milestone unlocked</p>
           <h2 className="mt-1 text-xl font-black tracking-[-.035em] sm:text-2xl">
             {completed ? "OWL1000 완주!" : `${milestone}일 배지를 획득했습니다.`}
           </h2>
-          <p className="mt-1 text-sm font-bold leading-6 text-[var(--muted)]">
+          <p className="copy-pretty mt-1 text-sm font-bold leading-6 text-[var(--muted)]">
             {completed
               ? "1000일의 기록이 완성되었습니다. 획득한 모든 배지와 여정은 영구적으로 남습니다."
               : `이제 Lv.${level.level} ${level.label}입니다. 레벨과 배지는 실패해도 내려가지 않습니다.`}

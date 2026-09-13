@@ -62,26 +62,26 @@ export default async function AdminParticipantPage({
             <p className="mt-2 text-sm font-bold text-[var(--muted)]">{email ?? "이메일 확인 불가"}</p>
           </div>
           <div className="text-right">
-            <span className={`rounded-full px-3 py-1.5 text-xs font-extrabold ${profile.status === "active" ? "bg-emerald-50 text-[var(--success)]" : "bg-red-50 text-[var(--danger)]"}`}>{profile.status === "active" ? "활성 계정" : "이용 정지"}</span>
+            <span className={`rounded-full px-3 py-1.5 text-xs font-extrabold ${profile.status === "active" ? "ui-success border" : "ui-danger border"}`}>{profile.status === "active" ? "활성 계정" : "이용 정지"}</span>
             {challenge && progress && <p className="mt-3 text-sm font-bold text-[var(--muted)]">{progress.day}일째 · 시작 {new Date(challenge.started_at).toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul" })}</p>}
           </div>
         </div>
 
-        {corrected && <div role="status" className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-[var(--success)]">주간 결과를 정정하고 현재 챌린지 상태를 다시 계산했습니다.</div>}
-        {statusChanged && <div role="status" className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-[var(--success)]">계정을 {statusChanged === "active" ? "다시 활성화" : "이용 정지"}했습니다. 기존 기록은 그대로 보존됩니다.</div>}
-        {error && <div role="alert" className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-[var(--danger)]">{error}</div>}
+        {corrected && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 text-sm font-bold">주간 결과를 정정하고 현재 챌린지 상태를 다시 계산했습니다.</div>}
+        {statusChanged && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 text-sm font-bold">계정을 {statusChanged === "active" ? "다시 활성화" : "이용 정지"}했습니다. 기존 기록은 그대로 보존됩니다.</div>}
+        {error && <div role="alert" className="ui-danger mt-6 rounded-2xl border p-4 text-sm font-bold">{error}</div>}
 
         {profile.role !== "admin" && (
           <section id="access" className="card mt-8 scroll-mt-24 rounded-[2rem] p-5 sm:p-7">
             <p className="eyebrow">Account access</p>
             <h2 className="mt-2 text-xl font-black">사용자 접근 관리</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">초대 코드와 별개의 계정 권한입니다. 이용 정지해도 가입 정보, 챌린지, 제출 이력은 삭제되지 않으며 다시 활성화하면 기존 기록에서 이어집니다.</p>
-            {profile.status === "suspended" && profile.suspension_reason && <div className="mt-4 rounded-2xl bg-red-50 p-4 text-sm font-bold text-[var(--danger)]">현재 정지 사유: {profile.suspension_reason}</div>}
+            <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">초대 코드와 별개의 계정 권한입니다. 이용 정지해도 가입 정보, 챌린지, 제출 이력은 삭제되지 않으며 다시 활성화하면 기존 기록에서 이어집니다.</p>
+            {profile.status === "suspended" && profile.suspension_reason && <div className="ui-danger copy-pretty mt-4 rounded-2xl border p-4 text-sm font-bold">현재 정지 사유: {profile.suspension_reason}</div>}
             <form action={setParticipantStatusAction} className="mt-5 grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
               <input type="hidden" name="targetUserId" value={userId} />
               <input type="hidden" name="status" value={profile.status === "active" ? "suspended" : "active"} />
               <label className="block text-sm font-bold">{profile.status === "active" ? "이용 정지 사유" : "재활성화 사유"}<input className="input-field mt-2" name="reason" minLength={3} maxLength={500} placeholder={profile.status === "active" ? "예: 운영 정책 위반 또는 일시 이용 중지 요청" : "예: 운영 확인 후 이용 재개"} required /></label>
-              <PendingSubmitButton className={profile.status === "active" ? "secondary-button border-red-200 text-[var(--danger)]" : "primary-button"} pendingLabel="변경 중...">{profile.status === "active" ? "사용자 이용 정지" : "사용자 다시 활성화"}</PendingSubmitButton>
+              <PendingSubmitButton className={profile.status === "active" ? "danger-button" : "primary-button"} pendingLabel="변경 중...">{profile.status === "active" ? "사용자 이용 정지" : "사용자 다시 활성화"}</PendingSubmitButton>
             </form>
           </section>
         )}
@@ -110,7 +110,7 @@ export default async function AdminParticipantPage({
             <section className="card mt-6 rounded-[2rem] p-5 sm:p-7">
               <p className="eyebrow">Correction</p>
               <h2 className="mt-2 text-xl font-black">주간 결과 정정</h2>
-              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">운영상 명백한 판정 오류만 수정하십시오. 모든 정정은 사유와 함께 감사 로그에 남고, 전체 스트릭·연속 실패 상태가 공식 주간 이력에서 다시 계산됩니다. 이미 획득한 레벨과 배지는 회수되지 않습니다.</p>
+              <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">운영상 명백한 판정 오류만 수정하십시오. 모든 정정은 사유와 함께 감사 로그에 남고, 전체 스트릭·연속 실패 상태가 공식 주간 이력에서 다시 계산됩니다. 이미 획득한 레벨과 배지는 회수되지 않습니다.</p>
               <form action={correctWeeklyResultAction} className="mt-5 grid gap-4 md:grid-cols-2">
                 <input type="hidden" name="targetUserId" value={userId} />
                 <input type="hidden" name="challengeId" value={challenge.id} />
@@ -142,7 +142,7 @@ export default async function AdminParticipantPage({
 
         <section className="mt-9">
           <div><p className="eyebrow">Audit</p><h2 className="mt-2 text-2xl font-black">운영 감사 로그</h2></div>
-          {auditLogs.length === 0 ? <div className="card mt-4 rounded-[1.8rem] p-7 font-bold text-[var(--muted)]">관리자 운영 이력이 없습니다.</div> : <ol className="mt-4 space-y-3">{auditLogs.map((log) => <li key={log.id} className="card rounded-[1.5rem] p-5"><div className="flex flex-wrap items-center justify-between gap-3"><p className="font-black">{auditLabels[log.action] ?? log.action}{log.week_start ? ` · ${log.week_start}` : ""}</p><p className="text-xs font-bold text-[var(--muted)]">{new Date(log.created_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}</p></div><p className="mt-2 text-sm leading-6">{log.reason}</p></li>)}</ol>}
+          {auditLogs.length === 0 ? <div className="card mt-4 rounded-[1.8rem] p-7 font-bold text-[var(--muted)]">관리자 운영 이력이 없습니다.</div> : <ol className="mt-4 space-y-3">{auditLogs.map((log) => <li key={log.id} className="card rounded-[1.5rem] p-5"><div className="flex flex-wrap items-center justify-between gap-3"><p className="font-black">{auditLabels[log.action] ?? log.action}{log.week_start ? ` · ${log.week_start}` : ""}</p><p className="text-xs font-bold text-[var(--muted)]">{new Date(log.created_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}</p></div><p className="copy-pretty mt-2 text-sm leading-6">{log.reason}</p></li>)}</ol>}
         </section>
       </div>
     </AppShell>

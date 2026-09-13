@@ -12,7 +12,7 @@ export default async function AdminPreviewPage() {
     <AppShell displayName={profile.display_name} isAdmin>
       <div className="mx-auto max-w-5xl">
         <div className="flex flex-wrap items-end justify-between gap-4">
-          <div><p className="eyebrow">Read-only preview</p><h1 className="mt-3 text-4xl font-black tracking-[-.05em]">사용자 화면 미리보기</h1><p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-[var(--muted)]">관리자 계정에 실제 챌린지를 만들지 않고 현재 성장 화면을 확인합니다. 제출이나 실제 상태 변경은 일어나지 않습니다.</p></div>
+          <div><p className="eyebrow">Read-only preview</p><h1 className="mt-3 text-4xl font-black tracking-[-.05em]">사용자 화면 미리보기</h1><p className="copy-pretty mt-3 max-w-2xl text-sm font-bold leading-6 text-[var(--muted)]">관리자 계정에 실제 챌린지를 만들지 않고 현재 성장 화면을 확인합니다. 제출이나 실제 상태 변경은 일어나지 않습니다.</p></div>
           <Link className="secondary-button" href="/admin">운영 관리로 돌아가기</Link>
         </div>
         <div className="mt-8 grid gap-7 lg:grid-cols-[1.05fr_.95fr] lg:items-stretch">

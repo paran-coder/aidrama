@@ -34,12 +34,13 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
             <p className="mt-2 text-sm font-bold text-[var(--muted)]">제출 가능 시간 · 매주 월요일 00:00 ~ 일요일 23:59 KST</p>
           </div>
         ) : (
-          <div className="mt-3 rounded-2xl border border-[var(--line)] bg-white/55 p-4 leading-7 text-[var(--muted)]">
+          <div className="copy-pretty mt-3 rounded-2xl border border-[var(--line)] bg-white/55 p-4 leading-7 text-[var(--muted)]">
             <p>첫 제출은 <strong className="text-[var(--ink)]">{formatKoreanDateKey(challenge.first_judgement_week_start)} 월요일 00:00 KST</strong>부터 가능합니다.</p>
+            <p className="mt-1">이번 주는 준비 기간입니다.</p>
             <p className="mt-1 text-sm font-bold">제출 가능 시간 · 매주 월요일 00:00 ~ 일요일 23:59 KST</p>
           </div>
         )}
-        {error && <div role="alert" className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-[var(--danger)]">{error}</div>}
+        {error && <div role="alert" className="ui-danger mt-6 rounded-2xl border p-4 text-sm font-bold">{error}</div>}
         {result ? (
           <div className="card mt-8 rounded-[2rem] p-6"><div className="flex items-center justify-between"><h2 className="text-xl font-black">이미 제출했습니다.</h2>{submission && <StatusBadge status={submission.verification_status} />}</div>{submission?.url && <p className="mt-3 break-all text-sm leading-6 text-[var(--muted)]">{submission.url}</p>}<Link href="/dashboard" className="secondary-button mt-6 w-full">대시보드로 돌아가기</Link></div>
         ) : weekStart ? (
@@ -47,7 +48,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
         ) : (
           <div className="card mt-8 rounded-[2rem] p-6">
             <p className="text-lg font-black">이번 주는 준비 기간입니다.</p>
-            <p className="mt-2 text-sm leading-6 text-[var(--muted)]">제출 입력란은 첫 제출 가능 시점부터 자동으로 열립니다. 그 전에는 링크를 저장하거나 미리 제출할 수 없습니다.</p>
+            <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">제출 입력란은 첫 제출 가능 시점부터 자동으로 열립니다. 그 전에는 링크를 저장하거나 미리 제출할 수 없습니다.</p>
             <button type="button" className="primary-button mt-6 w-full" disabled aria-disabled="true">
               {formatKoreanDateKey(challenge.first_judgement_week_start)}부터 링크 입력 가능
             </button>

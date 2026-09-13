@@ -9,10 +9,10 @@ import { challengeProgress } from "@/lib/challenge";
 import { CREATOR_LEVELS, creatorLevelIndex } from "@/lib/growth";
 
 function inviteState(code: InviteCodeRow) {
-  if (code.used_at) return { label: "사용 완료", className: "bg-zinc-100 text-zinc-600" };
-  if (code.revoked_at) return { label: "발급 취소", className: "bg-red-50 text-[var(--danger)]" };
-  if (code.expires_at && new Date(code.expires_at) < new Date()) return { label: "만료", className: "bg-amber-50 text-[var(--warning)]" };
-  return { label: "사용 가능", className: "bg-emerald-50 text-[var(--success)]" };
+  if (code.used_at) return { label: "사용 완료", className: "ui-neutral border" };
+  if (code.revoked_at) return { label: "발급 취소", className: "ui-danger border" };
+  if (code.expires_at && new Date(code.expires_at) < new Date()) return { label: "만료", className: "ui-warning border" };
+  return { label: "사용 가능", className: "ui-success border" };
 }
 
 function kstDate(value: string) {
@@ -45,7 +45,7 @@ export default async function AdminPage({
           <div>
             <p className="eyebrow">Admin</p>
             <h1 className="mt-3 text-4xl font-black tracking-[-.05em]">운영 관리</h1>
-            <p className="mt-3 max-w-2xl text-sm font-bold leading-6 text-[var(--muted)]">초대 코드와 참여자 접근 상태, 진행 현황을 한곳에서 관리합니다. 코드 발급과 사용자 접근 권한은 서로 독립적으로 관리됩니다.</p>
+            <p className="copy-pretty mt-3 max-w-2xl text-sm font-bold leading-6 text-[var(--muted)]">초대 코드와 참여자 접근 상태, 진행 현황을 한곳에서 관리합니다. 코드 발급과 사용자 접근 권한은 서로 독립적으로 관리됩니다.</p>
           </div>
           <form action={createInviteCodeAction}>
             <PendingSubmitButton pendingLabel="코드 발급 중...">새 코드 발급</PendingSubmitButton>
@@ -53,13 +53,13 @@ export default async function AdminPage({
         </div>
 
         {created && (
-          <div role="status" className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-bold text-[var(--success)]">
+          <div role="status" className="ui-success mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 font-bold">
             <span>새 초대 코드: <strong className="tracking-wider">{created}</strong></span><CopyButton value={created} />
           </div>
         )}
-        {revoked && <div role="status" className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 font-bold text-[var(--warning)]">{revoked} 코드의 발급을 취소했습니다. 기존 가입 사용자에게는 영향이 없습니다.</div>}
-        {error && <div role="alert" className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-[var(--danger)]">{error}</div>}
-        {synced && <div role="status" className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-bold text-[var(--success)]">모든 참여자의 마감 주차 상태를 한 번 동기화했습니다.</div>}
+        {revoked && <div role="status" className="ui-warning copy-pretty mt-6 rounded-2xl border p-4 font-bold">{revoked} 코드의 발급을 취소했습니다. 기존 가입 사용자에게는 영향이 없습니다.</div>}
+        {error && <div role="alert" className="ui-danger mt-6 rounded-2xl border p-4 font-bold">{error}</div>}
+        {synced && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 font-bold">모든 참여자의 마감 주차 상태를 한 번 동기화했습니다.</div>}
 
         <section className="mt-9">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -82,7 +82,7 @@ export default async function AdminPage({
                     return (
                       <tr key={participant.id} className="border-t border-[var(--line)]">
                         <td className="px-5 py-4"><p className="font-black">{participant.display_name}</p><p className="mt-1 text-xs text-[var(--muted)]">{email ?? "이메일 없음"} · {participant.role === "admin" ? "관리자" : "참여자"}</p></td>
-                        <td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${participant.status === "active" ? "bg-emerald-50 text-[var(--success)]" : "bg-red-50 text-[var(--danger)]"}`}>{participant.status === "active" ? "활성" : "정지"}</span></td>
+                        <td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${participant.status === "active" ? "ui-success border" : "ui-danger border"}`}>{participant.status === "active" ? "활성" : "정지"}</span></td>
                         <td className="px-5 py-4 font-bold">{challenge ? `Lv.${level.level} ${level.label}` : "—"}</td>
                         <td className="px-5 py-4 font-bold">{progress ? `${progress.day}일` : "시작 전"}</td>
                         <td className="px-5 py-4 font-bold">{challenge ? `${challenge.streak} / ${challenge.longest_streak}` : "—"}</td>
@@ -100,7 +100,7 @@ export default async function AdminPage({
 
         <section className="mt-10">
           <div className="flex items-end justify-between gap-4"><div><p className="eyebrow">Invitations</p><h2 className="mt-2 text-2xl font-black">초대 코드</h2></div><p className="text-sm font-bold text-[var(--muted)]">{codes.length}개 발급</p></div>
-          <p className="mt-2 text-sm font-bold leading-6 text-[var(--muted)]">발급 취소는 <strong>아직 사용하지 않은 코드</strong>만 막습니다. 이미 가입한 사용자의 접근을 중지하려면 위 참여자 목록의 <strong>접근 관리</strong>에서 계정을 정지하세요.</p>
+          <p className="copy-pretty mt-2 text-sm font-bold leading-6 text-[var(--muted)]">발급 취소는 <strong>아직 사용하지 않은 코드</strong>만 막습니다. 이미 가입한 사용자의 접근을 중지하려면 위 참여자 목록의 <strong>접근 관리</strong>에서 계정을 정지하세요.</p>
           <div className="mt-4 overflow-hidden rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)]">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1100px] text-left text-sm">

@@ -43,8 +43,8 @@ export default async function DashboardPage({
       {!completed && challenge.consecutive_failures >= 2 && <WarningDialog failures={challenge.consecutive_failures} />}
       {celebratedMilestone && <MilestoneCelebration milestone={celebratedMilestone} userId={user.id} />}
 
-      <div className="grid gap-7 lg:grid-cols-[1.05fr_.95fr] lg:items-stretch">
-        <section className="soft-shadow rounded-[2.6rem] p-3">
+      <div className="grid gap-7 lg:grid-cols-[1.02fr_.98fr] lg:items-stretch">
+        <section className="soft-shadow overflow-hidden rounded-[2.6rem]">
           <OwlVisual stage={levelIndex} />
         </section>
 
@@ -64,7 +64,7 @@ export default async function DashboardPage({
           <div className="mt-7">
             <ProgressBar value={goal.percent} label={goal.label} />
             {goal.target && progress.day >= goal.target && (
-              <p className="mt-2 text-xs font-bold leading-5 text-[var(--accent)]">목표 날짜에 도달했습니다. 다음 정상 인증으로 {goal.target}일 배지를 확정하세요.</p>
+              <p className="copy-pretty mt-2 text-xs font-bold leading-5 text-[var(--accent)]">목표 날짜에 도달했습니다. 다음 정상 인증으로 {goal.target}일 배지를 확정하세요.</p>
             )}
           </div>
 
@@ -82,11 +82,11 @@ export default async function DashboardPage({
           <div className="mt-5 rounded-2xl border border-[var(--line)] bg-white/55 p-4">
             <div className="flex items-center justify-between gap-3 text-xs font-black text-[var(--muted)]"><span>전체 OWL1000 여정</span><span>{progress.percent.toFixed(1)}%</span></div>
             <div className="mt-2 h-2 overflow-hidden rounded-full bg-[var(--surface-2)]"><div className="h-full rounded-full bg-[var(--accent)]" style={{ width: `${progress.percent}%` }} /></div>
-            <p className="mt-3 text-sm leading-6 text-[var(--muted)]">{level.subtitle}</p>
+            <p className="copy-pretty mt-3 text-sm leading-6 text-[var(--muted)]">{level.subtitle}</p>
           </div>
 
           {submitted && (
-            <div role="status" className="mt-5 flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-[var(--success)]">
+            <div role="status" className="ui-success mt-5 flex flex-wrap items-center gap-3 rounded-2xl border p-4 text-sm font-bold">
               이번 주 제출이 기록되었습니다. <StatusBadge status={submitted === "verified" ? "verified" : "unverified"} />
             </div>
           )}
@@ -95,20 +95,21 @@ export default async function DashboardPage({
             <Link className="primary-button mt-6" href={`/complete/${user.id}`}>OWL1000 완주 기록 보기</Link>
           ) : weekStart ? (
             weeklyResult ? (
-              <div className="mt-6 rounded-full border border-emerald-200 bg-emerald-50 px-5 py-4 text-center font-extrabold text-[var(--success)]">✓ 이번 주 제출 완료</div>
+              <div className="ui-success mt-6 rounded-full border px-5 py-4 text-center font-extrabold">✓ 이번 주 제출 완료</div>
             ) : (
               <Link className="primary-button mt-6" href="/dashboard/submit">이번 주 업로드 제출하기</Link>
             )
           ) : (
             <div className="mt-6 space-y-3">
               <div className="rounded-2xl border border-[var(--line)] bg-white/60 p-4 text-sm font-bold leading-6 text-[var(--muted)]">
-                <p>첫 제출은 <strong className="text-[var(--ink)]">{formatKoreanDateKey(challenge.first_judgement_week_start)} 월요일 00:00 KST</strong>부터 가능합니다. 이번 주는 준비 기간입니다.</p>
+                <p>첫 제출은 <strong className="text-[var(--ink)]">{formatKoreanDateKey(challenge.first_judgement_week_start)} 월요일 00:00 KST</strong>부터 가능합니다.</p>
+                <p className="mt-1">이번 주는 준비 기간입니다.</p>
                 <p className="mt-2 text-xs leading-5">제출 가능 시간 · 매주 월요일 00:00 ~ 일요일 23:59 KST</p>
               </div>
               <button type="button" className="primary-button w-full" disabled aria-disabled="true">
                 {formatKoreanDateKey(challenge.first_judgement_week_start)}부터 업로드 제출 가능
               </button>
-              <p className="text-center text-xs font-bold text-[var(--muted)]">상단의 ‘이번 주 제출’ 메뉴에서도 제출 일정과 입력 화면을 언제든 확인할 수 있습니다.</p>
+              <p className="copy-pretty text-center text-xs font-bold text-[var(--muted)]">상단의 ‘이번 주 제출’ 메뉴에서도 제출 일정과 입력 화면을 언제든 확인할 수 있습니다.</p>
             </div>
           )}
         </section>
