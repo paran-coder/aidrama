@@ -1,16 +1,10 @@
-# v1.2.9 Checklist
+# v1.2.10 Checklist
 
-- [x] Create isolated v1.2.9 working copy
-- [x] Create/update context-notes.md, checklist.md, README.md, User manual.md before code changes
-- [x] Remove self-service deletion UI/action
-- [x] Add admin-only account deletion action
-- [x] Add exact display-name confirmation UI in access management
-- [x] Preserve anonymous invite history marker from migration 005
-- [x] Protect admin accounts/self from destructive deletion
-- [x] Remove obsolete deletion-success redirect copy
-- [x] Split destructive action into a dedicated server-action module
-- [x] Add v1.2.9 verification script
-- [x] Run existing relevant regression tests
-- [x] Run TS/TSX syntax/static checks
-- [x] Document dependency-aware build limitation
-- [x] Package v1.2.9 ZIP
+- [x] v1.2.9에서 작업본 분리
+- [x] 버전 1.2.10 반영
+- [x] 관리자 계정 참여자 목록 제외
+- [x] 테스트 초대 코드 11개 exact cleanup SQL 작성
+- [x] v1.2.10 전용 회귀 테스트
+- [x] 기존 회귀 테스트
+- [x] 문서 갱신
+- [x] ZIP 패키징

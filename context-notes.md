@@ -1,20 +1,16 @@
-# Context Notes — v1.2.9
+# context-notes.md — v1.2.10
 
-## Purpose
-Stabilization release. Remove direct self-service account deletion and move irreversible account deletion to admin-only participant access management.
+## 목표
+- 운영 관리자 계정을 참여자 현황/참여자 수/진행 집계에서 제외한다.
+- 테스트로 사용된 초대 코드 11개를 일회성 SQL로 정확히 삭제한다.
+- 운영용 초대 코드나 실제 참여자 데이터는 건드리지 않는다.
 
-## Confirmed product decisions
-- Regular users do not directly delete their own Auth account from My Page.
-- Admin deletion is available only inside `/admin/participants/[userId]` access management.
-- Admin accounts cannot be deleted through this participant flow.
-- The administrator must type the participant's exact display name before the destructive button becomes enabled.
-- Deleting an account removes Supabase Auth + profile/challenge/submission/result/badge data through existing cascades.
-- A used invite code remains used. Before deletion, `used_account_deleted_at` is stamped so admin history can show an anonymous deleted-user record.
-- Migration 005 remains valid. No new SQL migration is added in v1.2.9.
+## 범위
+- `lib/admin-service.ts`: 참여자 조회는 `role = user`만 포함.
+- `006_v1_2_10_test_data_cleanup.sql`: 화면에서 확인된 테스트 코드 11개만 exact match 삭제.
+- 관리자 영구 삭제/정지/초대 코드 발급 정책은 유지.
 
-## Scope
-1. Remove user self-delete panel/action and related success redirect UI.
-2. Add admin-only hard-delete server action.
-3. Add guarded delete UI to participant access management.
-4. Keep suspend/reactivate workflow unchanged.
-5. Add v1.2.9 regression checks and update docs/package version.
+## DB
+- 구조 변경 없음.
+- 데이터 정리용 006 SQL 1개 있음.
+- 001~005 재실행 금지.

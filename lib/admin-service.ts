@@ -68,7 +68,7 @@ function isMissingEmailColumn(error: { code?: string; message?: string } | null 
 async function readProfiles(admin: ReturnType<typeof createAdminClient>) {
   const warnings: string[] = [];
   try {
-    const preferred = await admin.from("profiles").select(PROFILE_FIELDS).order("created_at", { ascending: true });
+    const preferred = await admin.from("profiles").select(PROFILE_FIELDS).eq("role", "user").order("created_at", { ascending: true });
     if (!preferred.error) {
       return {
         profiles: (preferred.data ?? []) as AdminParticipantRow["profile"][],
@@ -83,7 +83,7 @@ async function readProfiles(admin: ReturnType<typeof createAdminClient>) {
       return { profiles: [] as AdminParticipantRow["profile"][], ok: false, emailCompatibilityMode: false, warnings };
     }
 
-    const legacy = await admin.from("profiles").select(PROFILE_FIELDS_LEGACY).order("created_at", { ascending: true });
+    const legacy = await admin.from("profiles").select(PROFILE_FIELDS_LEGACY).eq("role", "user").order("created_at", { ascending: true });
     if (legacy.error) {
       warnings.push(describeReadFailure("참여자"));
       return { profiles: [] as AdminParticipantRow["profile"][], ok: false, emailCompatibilityMode: true, warnings };

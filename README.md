@@ -1,26 +1,17 @@
-# AI Drama Challenge v1.2.9
+# OWL1000 — v1.2.10
 
-Stabilization release that removes user self-service deletion and moves irreversible account deletion to admin-only participant access management.
+관리자 데이터 분류와 테스트 초대 코드 정리를 위한 운영 안정화 패치입니다.
 
-## What changed
-- Removed the My Page self-delete panel and self-delete Server Action.
-- Added admin-only permanent deletion inside `/admin/participants/[userId]#access`.
-- The destructive button stays disabled until the administrator types the participant's exact display name.
-- The server re-checks the display name and blocks deleting the current admin or any admin profile.
-- Supabase Auth deletion remains a hard delete. Existing foreign-key cascades remove profile/challenge/submission/result/badge data.
-- Used invite codes remain used and are shown as anonymous deleted-user history.
+## 변경점
+- 관리자 계정은 참여자 현황/참여자 수/진행 집계에서 제외됩니다.
+- 실제 참여자(`role = user`)만 관리자 참여자 표에 표시됩니다.
+- 테스트 초대 코드 11개를 exact-match로 삭제하는 일회성 006 SQL을 제공합니다.
+- 관리자 영구 삭제, 계정 정지/재활성화, 초대코드 운영 정책은 그대로 유지합니다.
 
-## Database
-No new migration is required for v1.2.9.
+## 배포
+1. Supabase SQL Editor에서 `006_v1_2_10_test_data_cleanup.sql` 실행
+2. GitHub에 v1.2.10 반영
+3. Vercel 배포
+4. `/admin`에서 참여자 수와 초대 코드 이력 확인
 
-Migration `005_v1_2_6_account_deletion.sql` remains part of the current schema. If it has already been applied, do not run it again.
-
-## Deployment
-1. Replace application code with v1.2.9.
-2. Push to GitHub and let Vercel build/deploy.
-3. Sign in as admin.
-4. Open one disposable participant under `운영 관리 → 접근 관리`.
-5. Type the participant's exact display name and delete the account.
-6. Confirm the participant disappears from the participant list and the used invite code remains as anonymous deleted-user history.
-
-No SQL should be run for this release.
+`001`~`005` migration은 재실행하지 마세요.

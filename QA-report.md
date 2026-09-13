@@ -1,40 +1,24 @@
-# v1.2.9 QA Report
+# QA Report — v1.2.10
 
-## Result
-PASS — admin-only account deletion stabilization is structurally verified.
+## 결과
+- v1.2.10 관리자/테스트 데이터 정리 검사: 8/8 통과
+- 챌린지 규칙 parity: 8,190 sequences 통과
+- v1.1.2 운영 구조 회귀: 통과
+- v1.2.0 성장/마일스톤 회귀: 통과
+- v1.2.1 hotfix 회귀: 통과
+- v1.2.2 제출 UX 회귀: 통과
+- v1.2.3 UI 시스템 회귀: 통과
+- v1.2.4 관리자/내비게이션 회귀: 통과
+- v1.2.5 활성 탭 타이포그래피 회귀: 통과
+- v1.2.9 관리자 영구 삭제 회귀: 15/15 통과
+- TS/TSX 54개 파일 transpile syntax 검사: 오류 0
 
-## Regression checks
-- Challenge rule parity: 8,190 sequences passed.
-- v1.1.2 operations structure: passed.
-- v1.2.0 growth/milestone structure: passed.
-- v1.2.1 hotfix checks: passed.
-- v1.2.2 submission UX checks: passed.
-- v1.2.3 UI system checks: passed.
-- v1.2.4 navigation/admin resilience: passed.
-- v1.2.5 active-nav typography: passed.
-- v1.2.9 admin deletion checks: 15/15 passed.
-- TS/TSX syntax/transpile check: 54 files, 0 syntax errors.
+## v1.2.10 확인 사항
+- 관리자 참여자 조회의 preferred/legacy 경로 모두 `role = user` 필터 확인
+- 006 cleanup은 정확한 테스트 코드 11개만 `code in (...)`으로 삭제
+- `revoked_at is not null`, `used_account_deleted_at is not null` 같은 광범위 삭제 조건 없음
+- 삭제 결과를 SQL Editor에서 확인할 수 있도록 `returning` 포함
 
-## v1.2.9 specific verification
-- User self-service deletion component/action are absent.
-- My Page contains guidance only; it does not hard-delete the current user.
-- Permanent deletion is mounted only in participant Access Management.
-- Exact display-name confirmation is required in the client UI and verified again on the server.
-- The current admin and admin-role profiles are protected from this deletion flow.
-- Supabase Auth uses hard delete for the target participant.
-- Existing invite-code deletion-history marker is retained.
-- No new database migration exists for v1.2.9.
-- Admin receives a success notice after deletion.
-
-## Dependency-aware validation limit
-The project package does not include `node_modules`. An attempted `npm install --ignore-scripts --no-audit --no-fund` timed out in this execution environment, so a complete local `tsc`/`next build` could not be performed here. Vercel remains the final dependency-aware build check.
-
-## Required production check
-Use one disposable normal participant account:
-1. Open `운영 관리 → 접근 관리`.
-2. Confirm the delete button is disabled before the exact display name is entered.
-3. Enter the exact display name and delete the account.
-4. Confirm redirect back to `/admin` with the deletion success notice.
-5. Confirm the participant no longer appears in the participant list.
-6. Confirm the old login can no longer authenticate.
-7. Confirm the used invite code remains as anonymous deleted-user history.
+## 제한
+- 작업 환경에 프로젝트 `node_modules`가 없어 dependency-aware `next build`는 실행하지 못했습니다.
+- 최종 Next.js 빌드 검증은 Vercel에서 확인합니다.
