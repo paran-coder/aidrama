@@ -1,14 +1,15 @@
-# OWL1000 v1.3.1 Release Notes
+# OWL1000 v1.3.2 Release Notes
 
-## Fixed
-- Elapsed day/progress now changes at KST calendar midnight instead of after rolling 24-hour blocks.
-- Dashboard, community, mypage and admin use the same shared day calculation.
-- Milestone badge eligibility and calendar-completion helpers are aligned to the same KST date rule through migration 007.
+## Changed
+- Weekly proof periods are now personalized 7-day windows anchored to each participant's KST challenge start date.
+- Dashboard and submission pages show the exact current proof period and personal deadline.
+- Admin participant views show current proof period and next deadline.
 
-## Admin operations
-- Added a visible `제출 내역` action in the participant table.
-- Added an admin-only `참여자 제출 링크` section showing week, submitted time, original URL, verification status and whether the URL is the official accepted proof.
+## Preserved
+- KST calendar-day elapsed progress.
+- 100/300/600/900/1000 milestone rules and permanent badges.
+- Existing user, submission, weekly result, streak, and badge data.
+- Admin submission-link review from v1.3.1.
 
-## Data safety
-- Existing submissions, streaks, profiles and badges are preserved.
-- No table/column deletion or participant data reset.
+## Database
+- Requires one new migration: `008_v1_3_2_rolling_weeks.sql`.

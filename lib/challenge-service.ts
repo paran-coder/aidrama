@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
-  currentWeekStartKey,
-  previousWeekStartKey,
+  formatDateKey,
+  rollingWeekStartKey,
 } from "@/lib/challenge";
 import type { Challenge, ChallengeBadge, Profile, Submission, WeeklyResult } from "@/lib/types";
 
@@ -28,13 +28,11 @@ export async function processMissedWeeks(userId: string, now = new Date()): Prom
   if (!challenge) return null;
 
   const typed = challenge as Challenge;
-  const lastClosed = previousWeekStartKey(now);
-  if (lastClosed < typed.first_judgement_week_start) return typed;
-  if (typed.last_processed_week_start && typed.last_processed_week_start >= lastClosed) return typed;
-
   const { error: processingError } = await admin.rpc("process_missed_weeks", {
     p_user_id: userId,
-    p_last_closed_week: lastClosed,
+    // The database derives the participant-specific last closed 7-day window
+    // from the challenge anchor and caps this requested date accordingly.
+    p_last_closed_week: formatDateKey(now),
   });
   if (processingError) throw processingError;
 
@@ -50,7 +48,7 @@ export async function processMissedWeeks(userId: string, now = new Date()): Prom
 export async function syncAllMissedWeeks(now = new Date()) {
   const admin = createAdminClient();
   const { error } = await admin.rpc("process_all_missed_weeks", {
-    p_last_closed_week: previousWeekStartKey(now),
+    p_last_closed_week: formatDateKey(now),
   });
   if (error) throw error;
 }
@@ -64,9 +62,7 @@ export async function getChallenge(userId: string, process = true): Promise<Chal
 }
 
 export function currentChallengeWeek(challenge: Challenge, now = new Date()) {
-  const current = currentWeekStartKey(now);
-  if (current < challenge.first_judgement_week_start) return null;
-  return current;
+  return rollingWeekStartKey(challenge.first_judgement_week_start, now);
 }
 
 export async function getWeeklyResult(challengeId: string, weekStart: string): Promise<WeeklyResult | null> {

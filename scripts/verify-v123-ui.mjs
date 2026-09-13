@@ -19,8 +19,8 @@ assert(!shell.includes('primary-button min-h-0 px-4 py-2 text-sm" href="/dashboa
 assert(nav.includes("이번 주 제출"), "submit navigation entry missing");
 
 const dashboard = read("app/dashboard/page.tsx");
-assert(dashboard.includes("부터 가능합니다.</p>"), "first-submit availability sentence must end as its own paragraph");
-assert(dashboard.includes('<p className="mt-1">이번 주는 준비 기간입니다.</p>'), "prep-period sentence must be a separate paragraph");
+assert(dashboard.includes("이번 인증 기간"), "dashboard must show the current personal proof period");
+assert(dashboard.includes("다음 마감"), "dashboard must show the personal proof deadline");
 assert(dashboard.includes('className="soft-shadow overflow-hidden rounded-[2.6rem]"'), "dashboard owl wrapper should not create a padded double surface");
 
 const owlVisual = read("components/owl-visual.tsx");

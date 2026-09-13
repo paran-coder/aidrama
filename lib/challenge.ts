@@ -23,11 +23,16 @@ export function formatDateKey(date: Date): string {
   return `${p.year}-${String(p.month + 1).padStart(2, "0")}-${String(p.date).padStart(2, "0")}`;
 }
 
-
 export function formatKoreanDateKey(key: string): string {
   const [year, month, date] = key.split("-").map(Number);
   if (!year || !month || !date) return key;
   return `${year}년 ${month}월 ${date}일`;
+}
+
+export function formatShortKoreanDateKey(key: string): string {
+  const [, month, date] = key.split("-").map(Number);
+  if (!month || !date) return key;
+  return `${month}월 ${date}일`;
 }
 
 export function dateKeyToKstStart(key: string): Date {
@@ -35,6 +40,15 @@ export function dateKeyToKstStart(key: string): Date {
   return utcFromKstParts(year, month - 1, date);
 }
 
+export function addDaysToDateKey(key: string, days: number): string {
+  return formatDateKey(new Date(dateKeyToKstStart(key).getTime() + days * DAY_MS));
+}
+
+export function formatProofPeriod(startKey: string): string {
+  return `${formatShortKoreanDateKey(startKey)} ~ ${formatShortKoreanDateKey(addDaysToDateKey(startKey, 6))}`;
+}
+
+// Legacy Monday helpers are retained for older migration/test compatibility only.
 export function mondayOfKstWeek(date: Date): Date {
   const p = kstDateParts(date);
   const isoDay = p.day === 0 ? 7 : p.day;
@@ -53,14 +67,41 @@ export function previousWeekStartKey(date = new Date()): string {
   return formatDateKey(new Date(mondayOfKstWeek(date).getTime() - 7 * DAY_MS));
 }
 
+function dateKeyOrdinal(key: string): number {
+  const [year, month, date] = key.split("-").map(Number);
+  return Math.floor(Date.UTC(year, month - 1, date) / DAY_MS);
+}
+
+export function rollingWeekStartKey(anchorKey: string, now = new Date()): string | null {
+  const todayKey = formatDateKey(now);
+  const diff = dateKeyOrdinal(todayKey) - dateKeyOrdinal(anchorKey);
+  if (diff < 0) return null;
+  return addDaysToDateKey(anchorKey, Math.floor(diff / 7) * 7);
+}
+
+export function previousRollingWeekStartKey(anchorKey: string, now = new Date()): string | null {
+  const current = rollingWeekStartKey(anchorKey, now);
+  if (!current || current === anchorKey) return null;
+  return addDaysToDateKey(current, -7);
+}
+
 export function weekDeadlineFromKey(weekStart: string): Date {
-  const monday = dateKeyToKstStart(weekStart);
-  return new Date(monday.getTime() + 7 * DAY_MS - 1000);
+  const start = dateKeyToKstStart(weekStart);
+  return new Date(start.getTime() + 7 * DAY_MS - 1000);
 }
 
 export function isWeekOpen(weekStart: string, now = new Date()) {
   const start = dateKeyToKstStart(weekStart);
   return now >= start && now <= weekDeadlineFromKey(weekStart);
+}
+
+export function proofPeriodForAnchor(anchorKey: string, now = new Date()) {
+  const startKey = rollingWeekStartKey(anchorKey, now);
+  if (!startKey) return null;
+  const endKey = addDaysToDateKey(startKey, 6);
+  const deadline = weekDeadlineFromKey(startKey);
+  const index = Math.floor((dateKeyOrdinal(startKey) - dateKeyOrdinal(anchorKey)) / 7) + 1;
+  return { startKey, endKey, deadline, index };
 }
 
 function kstCalendarDayOrdinal(date: Date): number {

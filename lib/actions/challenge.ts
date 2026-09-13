@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAppContext } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { challengeProgress, formatDateKey, nextMondayAfterStart, weekDeadlineFromKey } from "@/lib/challenge";
+import { challengeProgress, formatDateKey, weekDeadlineFromKey } from "@/lib/challenge";
 import { currentChallengeWeek, getChallenge, getChallengeBadges, processMissedWeeks } from "@/lib/challenge-service";
 import { inspectSubmissionUrl } from "@/lib/urls";
 import { hasCompletionBadge, MILESTONES, type Milestone } from "@/lib/growth";
@@ -20,7 +20,7 @@ export async function startChallengeAction() {
   const { error } = await admin.from("challenges").insert({
     user_id: user.id,
     started_at: now.toISOString(),
-    first_judgement_week_start: formatDateKey(nextMondayAfterStart(now)),
+    first_judgement_week_start: formatDateKey(now),
   });
   if (error) redirect(`/onboarding?error=${encodeURIComponent("챌린지를 시작하지 못했습니다.")}`);
   redirect("/dashboard");
@@ -42,14 +42,14 @@ export async function submitLinkAction(formData: FormData) {
   const badgesBefore = await getChallengeBadges(challenge.id);
   if (hasCompletionBadge(badgesBefore, challengeProgress(challenge).day)) redirect(`/complete/${user.id}`);
   const weekStart = currentChallengeWeek(challenge);
-  if (!weekStart) redirect(`/dashboard/submit?error=${encodeURIComponent("첫 주간 챌린지는 다음 월요일부터 시작됩니다.")}`);
+  if (!weekStart) redirect(`/dashboard/submit?error=${encodeURIComponent("현재 인증 기간을 계산하지 못했습니다. 잠시 후 다시 시도해 주세요.")}`);
   if (!requestedWeekStart || requestedWeekStart !== weekStart) {
     if (requestedWeekStart && new Date() > weekDeadlineFromKey(requestedWeekStart)) {
-      redirect(`/dashboard/submit?error=${encodeURIComponent("열어둔 제출 주차의 마감 시간이 지났습니다. 해당 주는 실패로 기록되며, 새 주차는 새 화면에서 제출해 주세요.")}`);
+      redirect(`/dashboard/submit?error=${encodeURIComponent("열어둔 인증 기간의 마감 시간이 지났습니다. 해당 기간은 실패로 기록되며, 새 인증 기간은 새 화면에서 제출해 주세요.")}`);
     }
-    redirect(`/dashboard/submit?error=${encodeURIComponent("제출 주차가 변경되었습니다. 새로 열린 화면에서 다시 제출해 주세요.")}`);
+    redirect(`/dashboard/submit?error=${encodeURIComponent("인증 기간이 변경되었습니다. 새로 열린 화면에서 다시 제출해 주세요.")}`);
   }
-  if (new Date() > weekDeadlineFromKey(requestedWeekStart)) redirect(`/dashboard/submit?error=${encodeURIComponent("이번 주 제출 마감 시간이 지났습니다.")}`);
+  if (new Date() > weekDeadlineFromKey(requestedWeekStart)) redirect(`/dashboard/submit?error=${encodeURIComponent("현재 인증 기간의 제출 마감 시간이 지났습니다.")}`);
 
   const admin = createAdminClient();
   const verification = inspected.verified ? "verified" : "unverified";
@@ -63,7 +63,7 @@ export async function submitLinkAction(formData: FormData) {
 
   if (error) {
     const duplicate = error.message.includes("WEEK_ALREADY_PROCESSED") || error.message.toLowerCase().includes("duplicate");
-    redirect(`/dashboard/submit?error=${encodeURIComponent(duplicate ? "이번 주 제출은 이미 완료되었습니다." : "제출을 저장하지 못했습니다.")}`);
+    redirect(`/dashboard/submit?error=${encodeURIComponent(duplicate ? "현재 인증 기간의 제출은 이미 완료되었습니다." : "제출을 저장하지 못했습니다.")}`);
   }
 
   const badgesAfter = await getChallengeBadges(challenge.id);

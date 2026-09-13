@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
-import { currentWeekStartKey } from "@/lib/challenge";
+import { rollingWeekStartKey } from "@/lib/challenge";
 import { syncAllMissedWeeks } from "@/lib/challenge-service";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { inspectSubmissionUrl } from "@/lib/urls";
@@ -69,7 +69,7 @@ export async function correctWeeklyResultAction(formData: FormData) {
   const back = `/admin/participants/${targetUserId}`;
 
   if (!targetUserId || !challengeId || !/^\d{4}-\d{2}-\d{2}$/.test(weekStart)) {
-    redirect(`${back}?error=${encodeURIComponent("정정할 사용자와 주차를 확인해 주세요.")}`);
+    redirect(`${back}?error=${encodeURIComponent("정정할 사용자와 인증 기간을 확인해 주세요.")}`);
   }
   if (status !== "success" && status !== "failure") {
     redirect(`${back}?error=${encodeURIComponent("정정 상태를 선택해 주세요.")}`);
@@ -77,12 +77,20 @@ export async function correctWeeklyResultAction(formData: FormData) {
   if (reason.length < 3) {
     redirect(`${back}?error=${encodeURIComponent("정정 사유를 3자 이상 입력해 주세요.")}`);
   }
-  const currentWeek = currentWeekStartKey();
-  if (weekStart > currentWeek) {
-    redirect(`${back}?error=${encodeURIComponent("아직 시작하지 않은 미래 주차는 정정할 수 없습니다.")}`);
+  const { data: challengeForWindow, error: challengeError } = await admin
+    .from("challenges")
+    .select("first_judgement_week_start")
+    .eq("id", challengeId)
+    .maybeSingle();
+  if (challengeError || !challengeForWindow) {
+    redirect(`${back}?error=${encodeURIComponent("챌린지 정보를 확인하지 못했습니다.")}`);
+  }
+  const currentWeek = rollingWeekStartKey(challengeForWindow.first_judgement_week_start);
+  if (!currentWeek || weekStart > currentWeek) {
+    redirect(`${back}?error=${encodeURIComponent("아직 시작하지 않은 미래 인증 기간은 정정할 수 없습니다.")}`);
   }
   if (status === "failure" && weekStart >= currentWeek) {
-    redirect(`${back}?error=${encodeURIComponent("진행 중인 이번 주는 마감 전 실패로 확정할 수 없습니다.")}`);
+    redirect(`${back}?error=${encodeURIComponent("진행 중인 인증 기간은 마감 전 실패로 확정할 수 없습니다.")}`);
   }
 
   let platformHost: string | null = null;
@@ -111,8 +119,8 @@ export async function correctWeeklyResultAction(formData: FormData) {
     const message = error.message.includes("SUCCESS_SUBMISSION_REQUIRED")
       ? "실패 기록을 성공으로 바꾸려면 인정할 업로드 링크를 입력해 주세요."
       : error.message.includes("WEEK_NOT_STARTED")
-        ? "챌린지 판정 시작 전 주차는 정정할 수 없습니다."
-        : "주간 결과를 정정하지 못했습니다.";
+        ? "챌린지 시작 전 인증 기간은 정정할 수 없습니다."
+        : "인증 결과를 정정하지 못했습니다.";
     redirect(`${back}?error=${encodeURIComponent(message)}`);
   }
 

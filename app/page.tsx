@@ -31,7 +31,7 @@ export default async function LandingPage({ searchParams }: { searchParams: Prom
       <section id="rules" className="grid gap-4 border-t border-[var(--line)] py-16 md:grid-cols-3">
         {[
           ["01", "먼저 100일", "1000일을 한 번에 약속하지 않습니다. 첫 목표는 100일, 달성할 때마다 다음 마일스톤이 열립니다."],
-          ["02", "매주 한 편", "월요일부터 일요일 23:59까지 작업 링크를 제출합니다. 실패하면 스트릭은 끊기지만 레벨과 이미 얻은 배지는 사라지지 않습니다."],
+          ["02", "매주 한 편", "챌린지 시작일부터 7일마다 열리는 개인 인증 기간 안에 작업 링크를 제출합니다. 실패하면 스트릭은 끊기지만 레벨과 이미 얻은 배지는 사라지지 않습니다."],
           ["03", "창작자로 레벨업", "크리에이터에서 시작해 루틴·스토리·시그니처·마스터 크리에이터로 성장합니다. 1000일은 완주의 상징입니다."],
         ].map(([n,t,d]) => <article key={n} className="card rounded-[1.6rem] p-6"><span className="display-number text-3xl text-[var(--accent)]">{n}</span><h2 className="mt-6 text-xl font-black">{t}</h2><p className="copy-pretty mt-2 leading-7 text-[var(--muted)]">{d}</p></article>)}
       </section>

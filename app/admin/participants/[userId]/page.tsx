@@ -8,7 +8,7 @@ import { StatusBadge } from "@/components/status-badge";
 import { correctWeeklyResultAction, setParticipantStatusAction } from "@/lib/actions/admin";
 import { getAdminParticipant } from "@/lib/admin-service";
 import { requireAdmin } from "@/lib/auth";
-import { challengeProgress } from "@/lib/challenge";
+import { challengeProgress, formatProofPeriod, formatShortKoreanDateKey, proofPeriodForAnchor } from "@/lib/challenge";
 import type { AuditAction, WeeklyEffect } from "@/lib/types";
 import { CREATOR_LEVELS, creatorLevelIndex } from "@/lib/growth";
 
@@ -20,7 +20,7 @@ const effectLabels: Record<Exclude<WeeklyEffect, "none">, string> = {
 };
 
 const auditLabels: Record<AuditAction, string> = {
-  weekly_result_corrected: "주간 결과 정정",
+  weekly_result_corrected: "인증 결과 정정",
   invite_code_revoked: "초대 코드 발급 취소",
   user_suspended: "사용자 이용 정지",
   user_reactivated: "사용자 재활성화",
@@ -44,6 +44,7 @@ export default async function AdminParticipantPage({
 
   const { profile, email, challenge, results, submissions, auditLogs, badges } = data;
   const progress = challenge ? challengeProgress(challenge) : null;
+  const proofPeriod = challenge ? proofPeriodForAnchor(challenge.first_judgement_week_start) : null;
   const level = CREATOR_LEVELS[creatorLevelIndex(badges, progress?.day ?? 0)];
   const attemptsByWeek = new Map<string, typeof submissions>();
   submissions.forEach((submission) => {
@@ -69,7 +70,7 @@ export default async function AdminParticipantPage({
           </div>
         </div>
 
-        {corrected && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 text-sm font-bold">주간 결과를 정정하고 현재 챌린지 상태를 다시 계산했습니다.</div>}
+        {corrected && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 text-sm font-bold">인증 결과를 정정하고 현재 챌린지 상태를 다시 계산했습니다.</div>}
         {statusChanged && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 text-sm font-bold">계정을 {statusChanged === "active" ? "다시 활성화" : "이용 정지"}했습니다. 기존 기록은 그대로 보존됩니다.</div>}
         {error && <div role="alert" className="ui-danger mt-6 rounded-2xl border p-4 text-sm font-bold">{error}</div>}
 
@@ -104,6 +105,17 @@ export default async function AdminParticipantPage({
               ].map(([label, value]) => <div key={String(label)} className="card rounded-2xl p-4"><p className="display-number text-3xl">{value}</p><p className="mt-1 text-xs font-bold text-[var(--muted)]">{label}</p></div>)}
             </section>
 
+            {proofPeriod && (
+              <section className="card mt-6 rounded-[2rem] p-5 sm:p-7">
+                <p className="eyebrow">Proof period</p>
+                <div className="mt-2 grid gap-4 sm:grid-cols-2">
+                  <div><p className="text-xs font-black text-[var(--muted)]">현재 인증 기간 · {proofPeriod.index}주차</p><p className="mt-1 text-lg font-black">{formatProofPeriod(proofPeriod.startKey)}</p></div>
+                  <div><p className="text-xs font-black text-[var(--muted)]">다음 마감</p><p className="mt-1 text-lg font-black text-[var(--accent)]">{formatShortKoreanDateKey(proofPeriod.endKey)} 23:59 KST</p></div>
+                </div>
+                <p className="copy-pretty mt-3 text-xs font-bold leading-5 text-[var(--muted)]">이 참여자의 챌린지 시작일을 기준으로 7일마다 새로운 인증 기간이 열립니다.</p>
+              </section>
+            )}
+
             <section className="card mt-6 rounded-[2rem] p-5 sm:p-7">
               <p className="eyebrow">Creator growth</p>
               <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="mt-2 text-xl font-black">Lv.{level.level} · {level.label}</h2><p className="mt-1 text-sm text-[var(--muted)]">{level.subtitle}</p></div></div>
@@ -115,7 +127,7 @@ export default async function AdminParticipantPage({
                 <div><p className="eyebrow">Submission links</p><h2 className="mt-2 text-xl font-black">참여자 제출 링크</h2></div>
                 <p className="text-sm font-bold text-[var(--muted)]">총 {submissions.length}건</p>
               </div>
-              <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">참여자가 제출한 원본 URL을 확인할 수 있습니다. 공식 주간 결과에 채택된 링크는 ‘공식 인정’으로 표시됩니다.</p>
+              <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">참여자가 제출한 원본 URL을 확인할 수 있습니다. 공식 인증 결과에 채택된 링크는 ‘공식 인정’으로 표시됩니다.</p>
               {submissions.length === 0 ? (
                 <div className="mt-5 rounded-2xl bg-[var(--surface-2)] p-5 text-sm font-bold text-[var(--muted)]">아직 제출된 링크가 없습니다.</div>
               ) : (
@@ -123,7 +135,7 @@ export default async function AdminParticipantPage({
                   {submissions.map((submission) => (
                     <article key={submission.id} className="rounded-2xl border border-[var(--line)] bg-[var(--surface)] p-4">
                       <div className="flex flex-wrap items-center justify-between gap-3">
-                        <div><p className="text-xs font-black text-[var(--muted)]">{submission.week_start} 주차</p><p className="mt-1 text-xs font-bold text-[var(--muted)]">{new Date(submission.submitted_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}</p></div>
+                        <div><p className="text-xs font-black text-[var(--muted)]">{formatProofPeriod(submission.week_start)}</p><p className="mt-1 text-xs font-bold text-[var(--muted)]">{new Date(submission.submitted_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}</p></div>
                         <div className="flex items-center gap-2"><StatusBadge status={submission.verification_status} />{officialSubmissionIds.has(submission.id) && <span className="ui-success rounded-full border px-2.5 py-1 text-xs font-extrabold">공식 인정</span>}</div>
                       </div>
                       <a className="copy-pretty mt-3 block break-all font-bold text-[var(--accent)] underline underline-offset-4" href={submission.url} target="_blank" rel="noreferrer">{submission.url}</a>
@@ -136,12 +148,12 @@ export default async function AdminParticipantPage({
 
             <section className="card mt-6 rounded-[2rem] p-5 sm:p-7">
               <p className="eyebrow">Correction</p>
-              <h2 className="mt-2 text-xl font-black">주간 결과 정정</h2>
-              <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">운영상 명백한 판정 오류만 수정하십시오. 모든 정정은 사유와 함께 감사 로그에 남고, 전체 스트릭·연속 실패 상태가 공식 주간 이력에서 다시 계산됩니다. 이미 획득한 레벨과 배지는 회수되지 않습니다.</p>
+              <h2 className="mt-2 text-xl font-black">인증 결과 정정</h2>
+              <p className="copy-pretty mt-2 text-sm leading-6 text-[var(--muted)]">운영상 명백한 판정 오류만 수정하십시오. 모든 정정은 사유와 함께 감사 로그에 남고, 전체 스트릭·연속 실패 상태가 공식 인증 이력에서 다시 계산됩니다. 이미 획득한 레벨과 배지는 회수되지 않습니다.</p>
               <form action={correctWeeklyResultAction} className="mt-5 grid gap-4 md:grid-cols-2">
                 <input type="hidden" name="targetUserId" value={userId} />
                 <input type="hidden" name="challengeId" value={challenge.id} />
-                <label className="block text-sm font-bold">주차 시작일 (월요일)<input className="input-field mt-2" type="date" name="weekStart" min={challenge.first_judgement_week_start} required /></label>
+                <label className="block text-sm font-bold">인증 기간 시작일<input className="input-field mt-2" type="date" name="weekStart" min={challenge.first_judgement_week_start} max={proofPeriod?.startKey} step={7} required /><span className="mt-1 block text-xs font-bold text-[var(--muted)]">챌린지 시작일 기준 7일 간격의 시작일을 선택하세요.</span></label>
                 <label className="block text-sm font-bold">공식 결과<select className="input-field mt-2" name="status" defaultValue="success" required><option value="success">성공</option><option value="failure">실패</option></select></label>
                 <label className="block text-sm font-bold md:col-span-2">인정할 업로드 링크 (성공 정정 시 필요할 수 있음)<input className="input-field mt-2" name="url" type="url" inputMode="url" placeholder="https://..." /></label>
                 <label className="block text-sm font-bold md:col-span-2">정정 사유<textarea className="input-field mt-2 min-h-24 resize-y" name="reason" minLength={3} maxLength={500} placeholder="예: 마감 전 제출 확인 후 수동 성공 정정" required /></label>
@@ -150,13 +162,13 @@ export default async function AdminParticipantPage({
             </section>
 
             <section className="mt-9">
-              <div><p className="eyebrow">Official history</p><h2 className="mt-2 text-2xl font-black">공식 주간 결과</h2></div>
-              {results.length === 0 ? <div className="card mt-4 rounded-[1.8rem] p-7 font-bold text-[var(--muted)]">아직 공식 주간 결과가 없습니다.</div> : (
+              <div><p className="eyebrow">Official history</p><h2 className="mt-2 text-2xl font-black">공식 인증 결과</h2></div>
+              {results.length === 0 ? <div className="card mt-4 rounded-[1.8rem] p-7 font-bold text-[var(--muted)]">아직 공식 인증 결과가 없습니다.</div> : (
                 <div className="mt-4 space-y-3">
                   {results.map((result) => {
                     const attempts = attemptsByWeek.get(result.week_start) ?? [];
                     return <div key={result.id} className="card rounded-[1.6rem] p-5">
-                      <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold text-[var(--muted)]">{result.week_start} · {result.source}</p><p className="mt-1 font-black">공식 결과: {result.status === "success" ? "성공" : "실패"}</p></div><StatusBadge status={result.status} /></div>
+                      <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold text-[var(--muted)]">{formatProofPeriod(result.week_start)} · {result.source}</p><p className="mt-1 font-black">공식 결과: {result.status === "success" ? "성공" : "실패"}</p></div><StatusBadge status={result.status} /></div>
                       <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-[var(--muted)]"><span>스트릭 {result.streak_after}</span><span>·</span><span>연속실패 {result.consecutive_failures_after}</span>{result.effect !== "none" && <><span>·</span><span>{effectLabels[result.effect]}</span></>}</div>
                       {attempts.length > 0 && <div className="mt-4 border-t border-[var(--line)] pt-4"><p className="text-xs font-black text-[var(--muted)]">제출 이력 {attempts.length}건</p><div className="mt-2 space-y-2">{attempts.map((attempt) => <div key={attempt.id} className="rounded-xl bg-[var(--surface-2)] p-3 text-xs"><div className="flex flex-wrap items-center justify-between gap-2"><a className="max-w-[80%] truncate font-bold text-[var(--accent)] underline underline-offset-4" href={attempt.url} target="_blank" rel="noreferrer">{attempt.url}</a><StatusBadge status={attempt.verification_status} /></div><p className="mt-1 text-[var(--muted)]">{new Date(attempt.submitted_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul" })}{result.final_submission_id === attempt.id ? " · 공식 인정 링크" : ""}</p></div>)}</div></div>}
                     </div>;

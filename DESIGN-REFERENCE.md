@@ -1,9 +1,10 @@
-# Design Reference — v1.3.0
+# OWL1000 v1.3.2 Design Reference
 
-v1.3.0 keeps the established OWL1000 visual system from v1.2.x. This release is an information-architecture simplification rather than a visual redesign.
+Keep the v1.3.1 visual system unchanged. This release is primarily a scheduling/clarity update.
 
-Priorities:
-1. Signup should feel direct and low-friction.
-2. 톡방 닉네임 is the primary human-readable participant identifier.
-3. Admin overview should focus on participants, access, and progress—not invite-code operations.
-4. Preserve responsive navigation, semantic colors, Korean keep-all wrapping, and current OWL visual hierarchy.
+## UI priorities
+- Make the personal proof period visible as a compact high-signal date range.
+- Use existing OWL green/neutral semantic colors; no new palette.
+- Prefer labels such as `이번 인증 기간` and `다음 마감` over Monday-Sunday wording.
+- Preserve desktop-first layout and existing mobile wrapping behavior.
+- Avoid adding extra cards when the period/deadline can fit into existing schedule/status areas.

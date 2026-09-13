@@ -1,6 +1,6 @@
 {
   "name": "ai-drama-challenge",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "private": true,
   "engines": {
     "node": ">=22"
@@ -24,7 +24,8 @@
     "test:v1211": "node scripts/verify-v1211-build-compat.mjs",
     "test:v1212": "node scripts/verify-v1212-public-auth.mjs",
     "test:v130": "node scripts/verify-v130-signup-simplification.mjs",
-    "test:v131": "node scripts/verify-v131-kst-admin-links.mjs"
+    "test:v131": "node scripts/verify-v131-kst-admin-links.mjs",
+    "test:v132": "node scripts/verify-v132-rolling-weeks.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",

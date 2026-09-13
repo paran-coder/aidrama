@@ -12,14 +12,14 @@ const challenge = read('lib/challenge.ts');
 const checks = [
   [nav.includes('/dashboard/submit') && nav.includes('이번 주 제출'), 'header submit entry'],
   [nav.includes('grid-cols-4'), 'mobile four-item navigation'],
-  [dashboard.includes('월요일 00:00 ~ 일요일 23:59 KST'), 'dashboard KST window'],
-  [dashboard.includes('disabled aria-disabled="true"'), 'dashboard disabled prep CTA'],
-  [submit.includes('제출 일정을 확인하세요.'), 'submit preparation heading'],
-  [submit.includes('링크 입력 가능'), 'submit disabled preparation CTA'],
-  [challenge.includes('formatKoreanDateKey'), 'Korean date formatting helper'],
+  [dashboard.includes('이번 인증 기간') && dashboard.includes('시작일 기준 7일'), 'dashboard proof-window guidance'],
+  [submit.includes('현재 인증 기간의 작업을 기록하세요.'), 'submit proof-window heading'],
+  [submit.includes('다음 마감') && submit.includes('23:59 KST'), 'submit deadline guidance'],
+  [challenge.includes('formatProofPeriod') && challenge.includes('proofPeriodForAnchor'), 'personal proof-period helpers'],
+  [!dashboard.includes('매주 월요일 00:00 ~ 일요일 23:59 KST'), 'legacy fixed-week guidance removed'],
 ];
 
 for (const [ok, label] of checks) {
-  if (!ok) throw new Error(`v1.2.2 submit UX check failed: ${label}`);
+  if (!ok) throw new Error(`submission UX regression check failed: ${label}`);
 }
-console.log('v1.2.2 submission UX structure checks passed');
+console.log('submission UX structure checks passed');

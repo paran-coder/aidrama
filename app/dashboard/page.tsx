@@ -7,7 +7,7 @@ import { OwlVisual } from "@/components/owl-visual";
 import { ProgressBar } from "@/components/progress-bar";
 import { StatusBadge } from "@/components/status-badge";
 import { WarningDialog } from "@/components/warning-dialog";
-import { challengeProgress, formatKoreanDateKey } from "@/lib/challenge";
+import { challengeProgress, formatProofPeriod, formatShortKoreanDateKey, proofPeriodForAnchor } from "@/lib/challenge";
 import { currentChallengeWeek, getChallengeBadges, getWeeklyResult, processMissedWeeks } from "@/lib/challenge-service";
 import { CREATOR_LEVELS, MILESTONES, creatorLevelIndex, hasCompletionBadge, milestoneProgress, type Milestone } from "@/lib/growth";
 import { getAppContext } from "@/lib/page-context";
@@ -23,6 +23,7 @@ export default async function DashboardPage({
   if (!challenge) redirect("/onboarding");
 
   const weekStart = currentChallengeWeek(challenge);
+  const proofPeriod = proofPeriodForAnchor(challenge.first_judgement_week_start);
   const [badges, weeklyResultCandidate] = await Promise.all([
     getChallengeBadges(challenge.id),
     weekStart ? getWeeklyResult(challenge.id, weekStart) : Promise.resolve(null),
@@ -85,9 +86,20 @@ export default async function DashboardPage({
             <p className="copy-pretty mt-3 text-sm leading-6 text-[var(--muted)]">{level.subtitle}</p>
           </div>
 
+          {proofPeriod && (
+            <div className="mt-5 rounded-2xl border border-[var(--line)] bg-white/60 p-4">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="text-xs font-black text-[var(--muted)]">이번 인증 기간 · {proofPeriod.index}주차</p>
+                <p className="text-xs font-black text-[var(--accent)]">시작일 기준 7일</p>
+              </div>
+              <p className="mt-2 font-black">{formatProofPeriod(proofPeriod.startKey)}</p>
+              <p className="mt-1 text-xs font-bold text-[var(--muted)]">다음 마감 · {formatShortKoreanDateKey(proofPeriod.endKey)} 23:59 KST</p>
+            </div>
+          )}
+
           {submitted && (
             <div role="status" className="ui-success mt-5 flex flex-wrap items-center gap-3 rounded-2xl border p-4 text-sm font-bold">
-              이번 주 제출이 기록되었습니다. <StatusBadge status={submitted === "verified" ? "verified" : "unverified"} />
+              현재 인증 기간의 제출이 기록되었습니다. <StatusBadge status={submitted === "verified" ? "verified" : "unverified"} />
             </div>
           )}
 
@@ -95,22 +107,12 @@ export default async function DashboardPage({
             <Link className="primary-button mt-6" href={`/complete/${user.id}`}>OWL1000 완주 기록 보기</Link>
           ) : weekStart ? (
             weeklyResult ? (
-              <div className="ui-success mt-6 rounded-full border px-5 py-4 text-center font-extrabold">✓ 이번 주 제출 완료</div>
+              <div className="ui-success mt-6 rounded-full border px-5 py-4 text-center font-extrabold">✓ 이번 인증 기간 제출 완료</div>
             ) : (
-              <Link className="primary-button mt-6" href="/dashboard/submit">이번 주 업로드 제출하기</Link>
+              <Link className="primary-button mt-6" href="/dashboard/submit">현재 인증 기간 업로드 제출하기</Link>
             )
           ) : (
-            <div className="mt-6 space-y-3">
-              <div className="rounded-2xl border border-[var(--line)] bg-white/60 p-4 text-sm font-bold leading-6 text-[var(--muted)]">
-                <p>첫 제출은 <strong className="text-[var(--ink)]">{formatKoreanDateKey(challenge.first_judgement_week_start)} 월요일 00:00 KST</strong>부터 가능합니다.</p>
-                <p className="mt-1">이번 주는 준비 기간입니다.</p>
-                <p className="mt-2 text-xs leading-5">제출 가능 시간 · 매주 월요일 00:00 ~ 일요일 23:59 KST</p>
-              </div>
-              <button type="button" className="primary-button w-full" disabled aria-disabled="true">
-                {formatKoreanDateKey(challenge.first_judgement_week_start)}부터 업로드 제출 가능
-              </button>
-              <p className="copy-pretty text-center text-xs font-bold text-[var(--muted)]">상단의 ‘이번 주 제출’ 메뉴에서도 제출 일정과 입력 화면을 언제든 확인할 수 있습니다.</p>
-            </div>
+            <div className="ui-warning mt-6 rounded-2xl border p-4 text-sm font-bold leading-6">현재 인증 기간을 계산하고 있습니다. 잠시 후 새로고침해 주세요.</div>
           )}
         </section>
       </div>

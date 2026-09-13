@@ -1,10 +1,14 @@
-# User manual — v1.2.10
+# OWL1000 v1.3.2 User Manual
 
-## 운영 관리
-- `참여자 현황`에는 실제 참여자 계정만 표시됩니다.
-- 관리자 계정은 운영 주체이므로 참여자 수, 레벨, 경과일, 스트릭 통계에 포함되지 않습니다.
-- 계정 정지/재활성화와 영구 삭제는 기존처럼 `접근 관리`에서 수행합니다.
+## Weekly proof period
+Each participant has a personal 7-day proof period based on the KST calendar date they started OWL1000.
 
-## 초대 코드
-- 테스트 단계에서 생성된 코드 11개는 v1.2.10의 006 SQL로 한 번 정리합니다.
-- 이후 운영용 초대 코드는 사용/취소/이력 보존 정책을 그대로 따릅니다.
+Example: if the challenge starts on September 14, the first proof period is September 14 through September 20, the second is September 21 through September 27, and so on.
+
+You may submit one proof link during the currently open 7-day period. The dashboard and `이번 주 제출` page show the exact start date, end date, and deadline for your current period.
+
+## Progress
+Elapsed days and milestone badges continue to use KST calendar days. Weekly proof streaks count consecutive successful 7-day proof periods.
+
+## Admin
+Admins can see each participant's current proof period, next deadline, and submitted links from the participant management detail screen.
