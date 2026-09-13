@@ -1,18 +1,19 @@
-# Checklist — v1.2.6
+# v1.2.8 Checklist
 
-- [x] Create versioned worktree
-- [x] Create/update context-notes.md, checklist.md, README.md, User manual.md before implementation
-- [x] Add account-deletion migration
-- [x] Add server-side self-delete action
-- [x] Protect admin accounts from self-delete
-- [x] Add My Page danger zone
-- [x] Add irreversible-delete guidance message
-- [x] Require typed confirmation phrase
-- [x] Preserve anonymized invite-code history
-- [x] Keep used invite code non-reusable
-- [x] Add withdrawal-complete message
-- [x] Add admin anonymized-history display
-- [x] Run rule/ops/growth/hotfix/submit/UI/nav regression checks
-- [x] Run v1.2.6 static account-deletion checks
-- [x] Update QA report / release notes / migration guide
-- [ ] Live disposable-account deletion smoke test after deploy
+- [x] Create isolated v1.2.8 working copy
+- [x] Create/update release context documents before code edits
+- [x] Harden auth lookup for deleted-user stale sessions
+- [x] Strengthen account deletion sign-out/session cleanup
+- [x] Preserve account-deleted success landing
+- [x] Add v1.2.8 regression tests
+- [x] Run existing regression suite
+- [x] Run v1.2.8 session regression checks (10/10)
+- [x] Record dependency-aware typecheck limitation (`node_modules` absent)
+- [x] Update QA/release/migration/user documentation
+- [x] Package v1.2.8 zip
+
+## Production acceptance pending
+- [ ] Vercel build succeeds
+- [ ] Disposable-user deletion redirects to landing success message without temporary connection error
+- [ ] Deleted user cannot log in again
+- [ ] Admin invite history remains anonymized

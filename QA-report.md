@@ -1,36 +1,37 @@
-# QA Report — v1.2.6
+# v1.2.8 QA Report
 
-## Scope
-Self-service account withdrawal, admin protection, irreversible-delete guidance, anonymized invite-code history.
+## Result
+PASS — account-deletion session resilience patch is structurally verified.
 
-## Automated regression
-- Challenge rule parity: PASS — 8,190 sequences
-- v1.1.2 operations checks: PASS
-- v1.2.0 growth checks: PASS
-- v1.2.1 hotfix checks: PASS
-- v1.2.2 submit UX checks: PASS
-- v1.2.3 UI checks: PASS
-- v1.2.4 navigation/admin checks: PASS
-- v1.2.5 navigation typography checks: PASS
-- v1.2.6 account deletion checks: PASS — 13 checks
+## Regression checks
+- Challenge rule parity: 8,190 sequences passed.
+- v1.1.2 operations structure: passed.
+- v1.2.0 growth/milestone structure: passed.
+- v1.2.1 hotfix checks: passed.
+- v1.2.2 submission UX checks: passed.
+- v1.2.3 UI system checks: passed.
+- v1.2.4 navigation/admin resilience: passed.
+- v1.2.5 active-nav typography: passed.
+- v1.2.6 account deletion checks: 13/13 passed.
+- v1.2.7 dedicated account-action module: 9/9 passed.
+- v1.2.8 account-deletion session checks: 10/10 passed.
 
-## v1.2.6 checks
-- Server action exists: PASS
-- Admin self-delete blocked: PASS
-- Confirmation phrase enforced server-side: PASS
-- Supabase Auth hard delete configured: PASS
-- Session sign-out attempted: PASS
-- User danger zone mounted: PASS
-- Admin protection message: PASS
-- Irreversible deletion guidance: PASS
-- Deleted-data list shown: PASS
-- Typed confirmation UI: PASS
-- Anonymous invite history migration: PASS
-- Admin service reads deletion marker: PASS
-- Admin UI anonymizes withdrawn user: PASS
+## v1.2.8 specific verification
+- Deleted-user JWT error (`User from sub claim in JWT does not exist`) is classified as signed-out state.
+- Missing/invalid refresh-token and missing-session patterns are classified as signed-out state.
+- Network/unknown errors are not blanket-swallowed by the classifier.
+- Account deletion still attempts Supabase sign-out.
+- Supabase auth cookies are explicitly removed before the success redirect.
+- Landing success message remains present.
 
-## Remaining environment-dependent validation
-This package does not include `node_modules`, so the full dependency-aware Next.js build must be verified by the Vercel deployment. The actual live deletion cascade should be smoke-tested once with a disposable user after migration 005 is applied.
+## Dependency-aware validation limit
+The working package intentionally does not include `node_modules`. `tsc --noEmit` therefore cannot resolve Next.js, React, Supabase, or Node type packages in this runtime. The reported errors are dependency-resolution failures rather than a completed project typecheck. Vercel build remains the final dependency-aware validation point.
 
-## Self-score
-9.6 / 10 before live disposable-account deletion test.
+## Required production check
+Use one disposable normal-user account:
+1. Sign in.
+2. Open My Page and delete the account.
+3. Confirm redirect to landing page with the account-deleted success message.
+4. Confirm the generic temporary connection error is not shown.
+5. Confirm the deleted account cannot sign in again.
+6. Confirm admin invite history shows anonymized deleted-user history.

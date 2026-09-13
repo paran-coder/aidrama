@@ -1,35 +1,16 @@
-# AI Drama Challenge v1.2.6
+# AI Drama Challenge v1.2.8
 
-v1.2.6 is the member-withdrawal release built on v1.2.5.
+Patch release focused on account-deletion session cleanup.
 
-## Main change
-Regular participants can permanently delete their own account from **마이페이지 → 회원 탈퇴**.
+## What changed
+When a Supabase Auth user is hard-deleted, a browser can briefly retain an old auth token. v1.2.8 recognizes deleted/invalid auth-session errors as signed-out state and explicitly clears Supabase auth cookies before redirecting to the landing page.
 
-The confirmation UI explains exactly what is deleted and what remains, and requires the user to type `탈퇴` before the irreversible action is enabled.
+Expected successful flow:
 
-## Withdrawal policy
-Deleted:
-- Supabase Auth account
-- email / display name profile
-- challenge state and streaks
-- submitted URLs
-- weekly results
-- milestone badges
+`마이페이지 → 회원 탈퇴 → 영구 삭제 → 세션 정리 → 랜딩 페이지 → 회원 탈퇴 완료 안내`
 
-Retained anonymously:
-- the already-used invite-code row
-- used timestamp
-- an anonymous withdrawn-account marker
-
-The old invite code never becomes reusable.
-
-## Admin protection
-Admin accounts cannot self-delete from My Page.
+## Database
+No database migration is required for v1.2.8. If migration `005_v1_2_6_account_deletion.sql` was already applied, do not run it again.
 
 ## Deployment
-1. Run `supabase/migrations/005_v1_2_6_account_deletion.sql` once.
-2. Push v1.2.6 to GitHub.
-3. Let Vercel deploy.
-4. Test deletion with a disposable regular user.
-
-See `MIGRATION-GUIDE.md` and `QA-report.md`.
+Replace the application code with v1.2.8 and deploy through GitHub/Vercel. After the build succeeds, run one disposable-user account-deletion test before inviting all participants.

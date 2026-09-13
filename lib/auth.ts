@@ -12,6 +12,27 @@ export type AuthContext = {
 
 const PROFILE_SELECT = "id,display_name,role,status,suspended_at,suspended_by,suspension_reason,created_at";
 
+function authErrorText(error: unknown) {
+  if (!error || typeof error !== "object") return String(error ?? "");
+  const value = error as { message?: unknown; code?: unknown; name?: unknown };
+  return [value.name, value.code, value.message].filter(Boolean).join(" ").toLowerCase();
+}
+
+export function isSignedOutAuthError(error: unknown) {
+  const text = authErrorText(error);
+  return [
+    "user from sub claim in jwt does not exist",
+    "user_not_found",
+    "user not found",
+    "session_not_found",
+    "session not found",
+    "refresh_token_not_found",
+    "refresh token not found",
+    "invalid refresh token",
+    "jwt expired",
+  ].some((signal) => text.includes(signal));
+}
+
 export async function getUser() {
   const supabase = await createClient();
   let lastError: unknown = null;
@@ -19,6 +40,7 @@ export async function getUser() {
   for (let attempt = 0; attempt < 2; attempt += 1) {
     const { data: { user }, error } = await supabase.auth.getUser();
     if (!error) return user;
+    if (isSignedOutAuthError(error)) return null;
     lastError = error;
     if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 120));
   }

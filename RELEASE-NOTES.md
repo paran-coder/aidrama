@@ -1,17 +1,12 @@
-# Release Notes — v1.2.6
+# v1.2.8 Release Notes
 
-## Added
-- 일반 사용자 셀프 회원 탈퇴
-- 마이페이지 Danger Zone
-- 탈퇴 전 삭제 범위/복구 불가 안내
-- `탈퇴` 직접 입력 확인 절차
-- 관리자 계정 자기 탈퇴 차단
-- 탈퇴 완료 안내 메시지
-- 익명 초대코드 사용 이력 표시
+## Fixed
+- Fixed the post-account-deletion path that could display the generic “잠시 연결이 불안정합니다” screen after a successful Supabase Auth user deletion.
+- Deleted-user JWT and stale refresh/session errors are now treated as signed-out state instead of connectivity failures.
+- Account deletion now performs an explicit cleanup of Supabase auth cookies after sign-out and before redirecting.
 
-## Data policy
-탈퇴 시 로그인 계정, 이메일, 표시 이름, 챌린지, 제출 URL, 주간 판정, 배지를 삭제합니다.
-사용한 초대코드는 다시 사용할 수 없으며 개인 식별 정보 없이 사용 완료/탈퇴 이력만 유지합니다.
-
-## Database
-배포 전에 `005_v1_2_6_account_deletion.sql`을 1회 실행해야 합니다.
+## Unchanged
+- Account deletion policy remains unchanged.
+- Invite-code anonymized history behavior remains unchanged.
+- No challenge, badge, submission, admin, or navigation logic changes.
+- No database migration is required.

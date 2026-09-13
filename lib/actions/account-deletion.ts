@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { requireAppContext } from "@/lib/auth";
-import { createClient } from "@/lib/supabase/server";
+import { clearSupabaseAuthCookies, createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function deleteMyAccountAction(formData: FormData) {
@@ -46,5 +46,6 @@ export async function deleteMyAccountAction(formData: FormData) {
 
   const supabase = await createClient();
   await supabase.auth.signOut().catch(() => undefined);
+  await clearSupabaseAuthCookies();
   redirect("/?accountDeleted=1");
 }

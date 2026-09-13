@@ -22,3 +22,19 @@ export async function createClient() {
     },
   );
 }
+
+export async function clearSupabaseAuthCookies() {
+  const cookieStore = await cookies();
+  for (const cookie of cookieStore.getAll()) {
+    const isSupabaseAuthCookie = cookie.name.startsWith("sb-") && (
+      cookie.name.includes("-auth-token") ||
+      cookie.name.includes("-auth-token-code-verifier")
+    );
+    if (!isSupabaseAuthCookie) continue;
+    try {
+      cookieStore.delete(cookie.name);
+    } catch {
+      // Called from a Server Action in the deletion flow, where cookie writes are allowed.
+    }
+  }
+}
