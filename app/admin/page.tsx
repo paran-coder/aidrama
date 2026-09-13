@@ -34,7 +34,7 @@ export default async function AdminPage({
   const revoked = typeof q.revoked === "string" ? q.revoked : "";
   const error = typeof q.error === "string" ? q.error : "";
   const synced = q.synced === "1";
-  const { codes, participants } = await getAdminOverview();
+  const { codes, participants, warnings, health } = await getAdminOverview();
   const currentCodes = codes.filter((code) => !code.revoked_at);
   const revokedCodes = codes.filter((code) => Boolean(code.revoked_at));
 
@@ -57,6 +57,12 @@ export default async function AdminPage({
             <span>새 초대 코드: <strong className="tracking-wider">{created}</strong></span><CopyButton value={created} />
           </div>
         )}
+        {warnings.length > 0 && (
+          <div role="status" className="ui-warning copy-pretty mt-6 rounded-2xl border p-4 text-sm font-bold leading-6">
+            <p className="font-black">일부 운영 정보를 호환 모드로 불러왔습니다.</p>
+            <ul className="mt-2 space-y-1">{warnings.map((warning) => <li key={warning}>· {warning}</li>)}</ul>
+          </div>
+        )}
         {revoked && <div role="status" className="ui-warning copy-pretty mt-6 rounded-2xl border p-4 font-bold">{revoked} 코드의 발급을 취소했습니다. 기존 가입 사용자에게는 영향이 없습니다.</div>}
         {error && <div role="alert" className="ui-danger mt-6 rounded-2xl border p-4 font-bold">{error}</div>}
         {synced && <div role="status" className="ui-success mt-6 rounded-2xl border p-4 font-bold">모든 참여자의 마감 주차 상태를 한 번 동기화했습니다.</div>}
@@ -73,7 +79,7 @@ export default async function AdminPage({
             <div className="overflow-x-auto">
               <table className="w-full min-w-[960px] text-left text-sm">
                 <thead className="bg-[var(--surface-2)] text-xs uppercase tracking-wider text-[var(--muted)]">
-                  <tr><th className="px-5 py-4">참여자</th><th className="px-5 py-4">계정 상태</th><th className="px-5 py-4">레벨</th><th className="px-5 py-4">경과일</th><th className="px-5 py-4">현재/최장 스트릭</th><th className="px-5 py-4">성공/실패</th><th className="px-5 py-4"></th></tr>
+                  <tr><th className="px-5 py-4">참여자</th><th className="px-5 py-4">계정 상태</th><th className="px-5 py-4">레벨</th><th className="px-5 py-4">경과일</th><th className="px-5 py-4">현재/최장 인증(주)</th><th className="px-5 py-4">성공/실패</th><th className="px-5 py-4"></th></tr>
                 </thead>
                 <tbody>
                   {participants.map(({ profile: participant, email, challenge, badges }) => {
@@ -94,7 +100,7 @@ export default async function AdminPage({
                 </tbody>
               </table>
             </div>
-            {participants.length === 0 && <p className="p-8 text-center font-bold text-[var(--muted)]">가입한 참여자가 없습니다.</p>}
+            {participants.length === 0 && <p className="p-8 text-center font-bold text-[var(--muted)]">{health.profiles ? "가입한 참여자가 없습니다." : "참여자 정보를 불러오지 못했습니다. 잠시 후 진행상태 동기화를 다시 시도해 주세요."}</p>}
           </div>
         </section>
 
@@ -130,7 +136,7 @@ export default async function AdminPage({
                 </tbody>
               </table>
             </div>
-            {currentCodes.length === 0 && <p className="p-8 text-center font-bold text-[var(--muted)]">현재 사용 가능하거나 사용 완료된 코드가 없습니다.</p>}
+            {currentCodes.length === 0 && <p className="p-8 text-center font-bold text-[var(--muted)]">{health.codes ? "현재 사용 가능하거나 사용 완료된 코드가 없습니다." : "초대 코드 정보를 불러오지 못했습니다. 다른 관리자 기능은 계속 사용할 수 있습니다."}</p>}
           </div>
           {revokedCodes.length > 0 && (
             <details className="mt-4 rounded-[1.5rem] border border-[var(--line)] bg-white/45 p-4">

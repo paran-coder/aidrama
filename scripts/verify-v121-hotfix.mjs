@@ -17,7 +17,8 @@ assert(migration.includes("add column email text"), "profile email cache migrati
 assert(migration.includes("delete from public.challenge_badges"), "invalid badge cleanup missing");
 assert(migration.includes("trigger_weekly_result_id is null"), "badge validity cleanup is too weak");
 assert(growth.includes("maxEligibleDay"), "day-gated level calculation missing");
-assert(!adminService.includes("auth.admin.listUsers"), "admin overview still calls Auth listUsers");
+assert(adminService.includes("emailCompatibilityMode") && adminService.includes("auth.admin.listUsers"), "admin email fallback compatibility path missing");
+assert(adminService.indexOf("auth.admin.listUsers") > adminService.indexOf("isMissingEmailColumn"), "Auth listUsers must remain a compatibility fallback, not the primary overview path");
 assert(!adminService.includes("syncAllMissedWeeks"), "admin overview still auto-syncs all participants");
 const communityBody = communityService.slice(communityService.indexOf("export async function getCommunityRows"));
 assert(!communityBody.split("export async function getPublicParticipant")[0].includes("syncAllMissedWeeks"), "community still auto-syncs all participants");

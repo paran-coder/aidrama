@@ -70,8 +70,8 @@ export default async function DashboardPage({
 
           <div className="mt-7 grid grid-cols-2 gap-4">
             <div className="rounded-2xl bg-[var(--surface-2)] p-4">
-              <p className="display-number text-4xl">{challenge.streak}</p>
-              <p className="mt-1 text-xs font-black text-[var(--muted)]">현재 주간 스트릭</p>
+              <p className="display-number text-4xl">{challenge.streak}<span className="ml-1 font-sans text-sm font-black tracking-normal">주</span></p>
+              <p className="mt-1 text-xs font-black text-[var(--muted)]">현재 연속 인증</p>
             </div>
             <div className="rounded-2xl bg-[var(--surface-2)] p-4">
               <p className="display-number text-4xl">{progress.day}</p>

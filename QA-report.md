@@ -1,42 +1,25 @@
-# QA Report — v1.2.3
+# QA Report — v1.2.4
 
-## Scope
-- UI semantic color system
-- Disabled/active CTA hierarchy
-- Korean line wrapping and copy breaks
-- Transparent owl assets
-- Desktop-first layout polish
-- Regression protection for v1.2.x functionality
+## 결과
+- Challenge rule parity: **8,190 sequences PASS**
+- v1.1.2 operations regression: **PASS**
+- v1.2.0 growth regression: **PASS**
+- v1.2.1 hotfix regression: **PASS**
+- v1.2.2 submit UX regression: **PASS**
+- v1.2.3 UI system regression: **PASS**
+- v1.2.4 navigation/admin resilience: **PASS**
+- TS/TSX syntax transform: **53 files, 0 syntax errors**
 
-## Automated/static checks
-- Challenge state rule parity: 8,190 sequences PASS
-- v1.1.2 operations structure check PASS
-- v1.2.0 milestone/growth structure check PASS
-- v1.2.1 hotfix structure check PASS
-- v1.2.2 submission UX structure check PASS
-- v1.2.3 UI system structure check PASS
-- TS/TSX syntax transpile: 52 files PASS, 0 syntax diagnostics
+## v1.2.4 확인 내용
+1. 현재 URL 기반 active navigation이 데스크톱/모바일 모두 존재함.
+2. submit 메뉴가 모든 화면에서 고정 강조되지 않음.
+3. community 스트릭은 `연속 인증 N주`로 표시함.
+4. admin overview는 `profiles.email` 누락 시 legacy select로 폴백함.
+5. 이메일 캐시 폴백은 primary path가 아니라 schema compatibility path에서만 Auth Admin listUsers를 사용함.
+6. admin overview의 invite/challenge/badge read failure는 전체 페이지 throw 대신 warning/partial data로 격리함.
+7. admin participant detail은 화면 진입 시 `processMissedWeeks`를 호출하지 않음.
 
-## Owl asset checks
-- Hero/Stage/Thumb 11 files present
-- All 11 WebP files retain alpha channel (0~255)
-- Opaque PNG owl assets excluded from package
-- Owl asset directory total: approximately 1.1MB
+## 제한
+현재 연결된 Vercel connector에서 `aidrama` 프로젝트가 프로젝트 목록에 노출되지 않아 해당 production deployment의 runtime error stack을 직접 읽지는 못했습니다. 따라서 `/admin` 장애의 단일 원인을 확정한 것이 아니라, 코드에서 확인된 admin-only hard-failure 경로와 DB schema compatibility 경로를 함께 방어했습니다.
 
-## Dependency build status
-`npm install --prefer-offline` was attempted in the current execution environment but timed out before dependencies were installed. Therefore full `tsc --noEmit` and `next build` could not be completed locally. Vercel remains the final dependency-aware build check.
-
-## Database
-No new migration is required for v1.2.3.
-
-## Production smoke checklist
-1. Landing hero owl: no square image background
-2. Dashboard owl: no double image background / no large empty lower area
-3. Preparation period CTA: pale sage disabled state
-4. Active CTA: deep OWL green
-5. Header `이번 주 제출`: quiet sage navigation emphasis
-6. First-submit copy breaks after `가능합니다.`
-7. Community thumbnails: transparent assets read cleanly on card grid background
-8. Mypage milestone badges: locked/earned states distinguishable
-9. Admin state chips: active/suspended/invite states use semantic palette
-10. Login/signup/error messages: semantic palette retained
+전체 dependency-aware `next build`는 이 작업 환경에 로컬 node_modules가 없어 수행하지 않았습니다. Vercel Production build를 최종 compile 검증 지점으로 사용합니다.

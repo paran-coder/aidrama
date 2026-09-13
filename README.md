@@ -1,3 +1,7 @@
+# AI Drama Challenge v1.2.4
+
+이번 버전은 관리자 화면 복구 안정성, 현재 경로 기반 활성 메뉴, 주간 스트릭 문구 정리를 포함합니다. DB migration은 추가하지 않습니다.
+
 # AI Drama Challenge v1.2.3
 
 OWL1000 장기 창작 챌린지 서비스의 UI polish 릴리스입니다.

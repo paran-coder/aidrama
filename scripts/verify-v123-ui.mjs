@@ -5,17 +5,18 @@ function read(file) { return fs.readFileSync(file, "utf8"); }
 function assert(condition, message) { if (!condition) throw new Error(message); }
 
 const pkg = JSON.parse(read("package.json"));
-assert(pkg.version === "1.2.3", "package version must be 1.2.3");
+assert(["1.2.3", "1.2.4"].includes(pkg.version), "package version must remain in the v1.2.3+ UI line");
 
 const css = read("app/globals.css");
-for (const token of ["--disabled-bg", "--success-bg", "--warning-bg", "--danger-bg", ".nav-submit-link", ".ui-success", ".ui-warning", ".ui-danger", ".copy-pretty"]) {
+for (const token of ["--disabled-bg", "--success-bg", "--warning-bg", "--danger-bg", ".ui-success", ".ui-warning", ".ui-danger", ".copy-pretty"]) {
   assert(css.includes(token), `missing UI token/class: ${token}`);
 }
 assert(css.includes("word-break: keep-all"), "Korean keep-all wrapping rule missing");
 
 const shell = read("components/app-shell.tsx");
-assert(shell.includes('className="nav-submit-link px-4 py-2 text-sm"'), "desktop submit nav should use quiet sage nav style");
+const nav = fs.existsSync("components/app-nav.tsx") ? read("components/app-nav.tsx") : shell;
 assert(!shell.includes('primary-button min-h-0 px-4 py-2 text-sm" href="/dashboard/submit"'), "submit nav must not look like primary CTA");
+assert(nav.includes("이번 주 제출"), "submit navigation entry missing");
 
 const dashboard = read("app/dashboard/page.tsx");
 assert(dashboard.includes("부터 가능합니다.</p>"), "first-submit availability sentence must end as its own paragraph");

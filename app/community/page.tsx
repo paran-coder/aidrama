@@ -36,7 +36,7 @@ export default async function CommunityPage() {
                       <div className="flex items-center gap-2"><p className="truncate font-black">{participant.display_name}</p>{me && <span className="rounded-full bg-[var(--accent)] px-2 py-1 text-[10px] font-black text-white">나</span>}</div>
                       <p className="mt-1 text-xs font-bold text-[var(--accent)]">Lv.{level.level} · {level.label}</p>
                       <p className="mt-1 text-xs font-bold text-[var(--muted)]">#{index + 1} · Day {progress.day}</p>
-                      <p className="display-number mt-3 text-2xl">{challenge.streak}<span className="ml-1 font-sans text-xs font-extrabold tracking-normal text-[var(--muted)]">주 연속</span></p>
+                      <p className="mt-3 text-xs font-extrabold text-[var(--muted)]">연속 인증 <span className="display-number ml-1 text-2xl text-[var(--ink)]">{challenge.streak}</span><span className="ml-1 text-[var(--ink)]">주</span></p>
                     </div>
                   </div>
                   <div className="mt-4"><MilestoneBadges badges={badges} currentDay={progress.day} compact /></div>

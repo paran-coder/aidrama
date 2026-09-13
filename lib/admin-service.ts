@@ -1,4 +1,3 @@
-import { processMissedWeeks } from "@/lib/challenge-service";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AuditLog, Challenge, ChallengeBadge, Profile, Submission, WeeklyResult } from "@/lib/types";
 
@@ -44,32 +43,137 @@ export type AdminParticipantDetail = {
 };
 
 const PROFILE_FIELDS = "id,display_name,email,role,status,suspended_at,suspension_reason,created_at";
+const PROFILE_FIELDS_LEGACY = "id,display_name,role,status,suspended_at,suspension_reason,created_at";
+
+type OverviewHealth = {
+  profiles: boolean;
+  codes: boolean;
+  challenges: boolean;
+  badges: boolean;
+  emailCompatibilityMode: boolean;
+};
+
+function describeReadFailure(label: string) {
+  return `${label} 조회에 실패해 해당 영역만 비워 두었습니다. 새로고침 없이도 다른 관리자 기능은 사용할 수 있습니다.`;
+}
+
+function isMissingEmailColumn(error: { code?: string; message?: string } | null | undefined) {
+  if (!error) return false;
+  const message = error.message ?? "";
+  return error.code === "42703" || error.code === "PGRST204" || /column[^\n]*email|email[^\n]*does not exist/i.test(message);
+}
+
+async function readProfiles(admin: ReturnType<typeof createAdminClient>) {
+  const warnings: string[] = [];
+  try {
+    const preferred = await admin.from("profiles").select(PROFILE_FIELDS).order("created_at", { ascending: true });
+    if (!preferred.error) {
+      return {
+        profiles: (preferred.data ?? []) as AdminParticipantRow["profile"][],
+        ok: true,
+        emailCompatibilityMode: false,
+        warnings,
+      };
+    }
+
+    if (!isMissingEmailColumn(preferred.error)) {
+      warnings.push(describeReadFailure("참여자"));
+      return { profiles: [] as AdminParticipantRow["profile"][], ok: false, emailCompatibilityMode: false, warnings };
+    }
+
+    const legacy = await admin.from("profiles").select(PROFILE_FIELDS_LEGACY).order("created_at", { ascending: true });
+    if (legacy.error) {
+      warnings.push(describeReadFailure("참여자"));
+      return { profiles: [] as AdminParticipantRow["profile"][], ok: false, emailCompatibilityMode: true, warnings };
+    }
+
+    const baseProfiles = (legacy.data ?? []) as Array<Omit<AdminParticipantRow["profile"], "email">>;
+    const emailById = new Map<string, string>();
+    try {
+      const authUsers = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+      if (!authUsers.error) {
+        for (const user of authUsers.data.users) {
+          if (user.email) emailById.set(user.id, user.email.toLowerCase());
+        }
+      }
+    } catch {
+      // Email is supplementary. Keep the admin page usable even if Auth Admin lookup is temporarily unavailable.
+    }
+
+    warnings.push("프로필 이메일 캐시 필드를 확인하지 못해 호환 모드로 표시하고 있습니다. 계정 관리와 초대코드 기능은 계속 사용할 수 있습니다.");
+    return {
+      profiles: baseProfiles.map((profile) => ({ ...profile, email: emailById.get(profile.id) ?? null })) as AdminParticipantRow["profile"][],
+      ok: true,
+      emailCompatibilityMode: true,
+      warnings,
+    };
+  } catch {
+    warnings.push(describeReadFailure("참여자"));
+    return { profiles: [] as AdminParticipantRow["profile"][], ok: false, emailCompatibilityMode: false, warnings };
+  }
+}
+
+async function readInviteCodes(admin: ReturnType<typeof createAdminClient>) {
+  try {
+    const response = await admin
+      .from("invite_codes")
+      .select("code,created_at,expires_at,used_by,used_at,revoked_at,revoked_by,revoke_reason")
+      .order("created_at", { ascending: false });
+    if (response.error) return { rows: [] as RawInviteCode[], ok: false };
+    return { rows: (response.data ?? []) as RawInviteCode[], ok: true };
+  } catch {
+    return { rows: [] as RawInviteCode[], ok: false };
+  }
+}
+
+async function readChallenges(admin: ReturnType<typeof createAdminClient>) {
+  try {
+    const response = await admin.from("challenges").select("*");
+    if (response.error) return { rows: [] as Challenge[], ok: false };
+    return { rows: (response.data ?? []) as Challenge[], ok: true };
+  } catch {
+    return { rows: [] as Challenge[], ok: false };
+  }
+}
+
+async function readBadges(admin: ReturnType<typeof createAdminClient>) {
+  try {
+    const response = await admin
+      .from("challenge_badges")
+      .select("id,challenge_id,user_id,milestone_days,awarded_at,trigger_weekly_result_id,trigger_submission_id,created_at");
+    if (response.error) return { rows: [] as ChallengeBadge[], ok: false };
+    return { rows: (response.data ?? []) as ChallengeBadge[], ok: true };
+  } catch {
+    return { rows: [] as ChallengeBadge[], ok: false };
+  }
+}
 
 export async function getAdminOverview() {
   const admin = createAdminClient();
-  const [codesResponse, profilesResponse, challengesResponse, badgesResponse] = await Promise.all([
-    admin.from("invite_codes").select("code,created_at,expires_at,used_by,used_at,revoked_at,revoked_by,revoke_reason").order("created_at", { ascending: false }),
-    admin.from("profiles").select(PROFILE_FIELDS).order("created_at", { ascending: true }),
-    admin.from("challenges").select("*"),
-    admin.from("challenge_badges").select("id,challenge_id,user_id,milestone_days,awarded_at,trigger_weekly_result_id,trigger_submission_id,created_at"),
+  const [profileResult, codeResult, challengeResult, badgeResult] = await Promise.all([
+    readProfiles(admin),
+    readInviteCodes(admin),
+    readChallenges(admin),
+    readBadges(admin),
   ]);
 
-  if (codesResponse.error) throw codesResponse.error;
-  if (profilesResponse.error) throw profilesResponse.error;
-  if (challengesResponse.error) throw challengesResponse.error;
-  if (badgesResponse.error) throw badgesResponse.error;
+  const warnings = [...profileResult.warnings];
+  if (!codeResult.ok) warnings.push(describeReadFailure("초대 코드"));
+  if (!challengeResult.ok) warnings.push(describeReadFailure("챌린지 진행 상태"));
+  if (!badgeResult.ok) warnings.push(describeReadFailure("마일스톤 배지"));
 
-  const typedProfiles = (profilesResponse.data ?? []) as AdminParticipantRow["profile"][];
-  const typedChallenges = (challengesResponse.data ?? []) as Challenge[];
+  const typedProfiles = profileResult.profiles;
+  const typedChallenges = challengeResult.rows;
   const challengeMap = new Map(typedChallenges.map((challenge) => [challenge.user_id, challenge]));
   const profileMap = new Map(typedProfiles.map((profile) => [profile.id, profile]));
-  const typedBadges = (badgesResponse.data ?? []) as ChallengeBadge[];
+  const typedBadges = badgeResult.rows;
   const badgesByUser = new Map<string, ChallengeBadge[]>();
   for (const badge of typedBadges) {
     const list = badgesByUser.get(badge.user_id) ?? [];
     list.push(badge);
     badgesByUser.set(badge.user_id, list);
   }
+
   const participants: AdminParticipantRow[] = typedProfiles.map((profile) => ({
     profile,
     email: profile.email ?? null,
@@ -77,27 +181,55 @@ export async function getAdminOverview() {
     badges: badgesByUser.get(profile.id) ?? [],
   }));
 
-  const rawCodes = (codesResponse.data ?? []) as RawInviteCode[];
-  const codes: InviteCodeRow[] = rawCodes.map((row) => {
+  const codes: InviteCodeRow[] = codeResult.rows.map((row) => {
     const profile = row.used_by ? profileMap.get(row.used_by) : null;
     return {
       ...row,
       used_display_name: profile?.display_name ?? null,
-      used_email: row.used_by ? profileMap.get(row.used_by)?.email ?? null : null,
+      used_email: row.used_by ? profile?.email ?? null : null,
     } as InviteCodeRow;
   });
 
-  return { codes, participants };
+  const health: OverviewHealth = {
+    profiles: profileResult.ok,
+    codes: codeResult.ok,
+    challenges: challengeResult.ok,
+    badges: badgeResult.ok,
+    emailCompatibilityMode: profileResult.emailCompatibilityMode,
+  };
+
+  return { codes, participants, warnings: Array.from(new Set(warnings)), health };
 }
 
 export async function getAdminParticipant(userId: string): Promise<AdminParticipantDetail | null> {
   const admin = createAdminClient();
-  const profileResponse = await admin.from("profiles").select(PROFILE_FIELDS).eq("id", userId).maybeSingle();
-  if (profileResponse.error) throw profileResponse.error;
-  if (!profileResponse.data) return null;
 
-  const profile = profileResponse.data as AdminParticipantDetail["profile"];
-  const challenge = await processMissedWeeks(userId);
+  let profile: AdminParticipantDetail["profile"] | null = null;
+  const preferred = await admin.from("profiles").select(PROFILE_FIELDS).eq("id", userId).maybeSingle();
+  if (!preferred.error && preferred.data) {
+    profile = preferred.data as AdminParticipantDetail["profile"];
+  } else if (isMissingEmailColumn(preferred.error)) {
+    const legacy = await admin.from("profiles").select(PROFILE_FIELDS_LEGACY).eq("id", userId).maybeSingle();
+    if (legacy.error) throw legacy.error;
+    if (!legacy.data) return null;
+    let email: string | null = null;
+    try {
+      const authUser = await admin.auth.admin.getUserById(userId);
+      email = authUser.data.user?.email?.toLowerCase() ?? null;
+    } catch {
+      email = null;
+    }
+    profile = { ...(legacy.data as Omit<AdminParticipantDetail["profile"], "email">), email };
+  } else if (preferred.error) {
+    throw preferred.error;
+  }
+
+  if (!profile) return null;
+
+  const challengeResponse = await admin.from("challenges").select("*").eq("user_id", userId).maybeSingle();
+  if (challengeResponse.error) throw challengeResponse.error;
+  const challenge = (challengeResponse.data ?? null) as Challenge | null;
+
   if (!challenge) {
     return {
       profile,
