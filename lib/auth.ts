@@ -21,11 +21,17 @@ function authErrorText(error: unknown) {
 export function isSignedOutAuthError(error: unknown) {
   const text = authErrorText(error);
   return [
+    // Normal signed-out state: Supabase returns AuthSessionMissingError when
+    // a public visitor has no auth cookie/session at all. This must never be
+    // treated as a temporary connection failure.
+    "authsessionmissingerror",
+    "auth session missing",
+    "session_not_found",
+    "session not found",
+    // Stale/deleted-account session states.
     "user from sub claim in jwt does not exist",
     "user_not_found",
     "user not found",
-    "session_not_found",
-    "session not found",
     "refresh_token_not_found",
     "refresh token not found",
     "invalid refresh token",
