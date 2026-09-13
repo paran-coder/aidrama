@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { deleteMyAccountAction } from "@/lib/actions/profile";
+import { deleteMyAccountAction } from "@/lib/actions/account-deletion";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 
 export function AccountDeletionPanel() {

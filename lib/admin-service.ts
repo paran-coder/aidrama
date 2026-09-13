@@ -10,6 +10,7 @@ type RawInviteCode = {
   revoked_at: string | null;
   revoked_by: string | null;
   revoke_reason: string | null;
+  used_account_deleted_at: string | null;
 };
 
 export type InviteCodeRow = {
@@ -21,6 +22,7 @@ export type InviteCodeRow = {
   revoked_at: string | null;
   revoked_by: string | null;
   revoke_reason: string | null;
+  used_account_deleted_at: string | null;
   used_display_name: string | null;
   used_email: string | null;
 };
@@ -117,7 +119,7 @@ async function readInviteCodes(admin: ReturnType<typeof createAdminClient>) {
   try {
     const response = await admin
       .from("invite_codes")
-      .select("code,created_at,expires_at,used_by,used_at,revoked_at,revoked_by,revoke_reason")
+      .select("code,created_at,expires_at,used_by,used_at,revoked_at,revoked_by,revoke_reason,used_account_deleted_at")
       .order("created_at", { ascending: false });
     if (response.error) return { rows: [] as RawInviteCode[], ok: false };
     return { rows: (response.data ?? []) as RawInviteCode[], ok: true };
