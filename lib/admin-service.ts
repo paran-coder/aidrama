@@ -1,4 +1,4 @@
-import { processMissedWeeks, syncAllMissedWeeks } from "@/lib/challenge-service";
+import { processMissedWeeks } from "@/lib/challenge-service";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { AuditLog, Challenge, ChallengeBadge, Profile, Submission, WeeklyResult } from "@/lib/types";
 
@@ -12,8 +12,6 @@ type RawInviteCode = {
   revoked_by: string | null;
   revoke_reason: string | null;
 };
-
-type AuthUserSummary = { id: string; email?: string | null };
 
 export type InviteCodeRow = {
   code: string;
@@ -29,14 +27,14 @@ export type InviteCodeRow = {
 };
 
 export type AdminParticipantRow = {
-  profile: Pick<Profile, "id" | "display_name" | "role" | "status" | "suspended_at" | "suspension_reason" | "created_at">;
+  profile: Pick<Profile, "id" | "display_name" | "email" | "role" | "status" | "suspended_at" | "suspension_reason" | "created_at">;
   email: string | null;
   challenge: Challenge | null;
   badges: ChallengeBadge[];
 };
 
 export type AdminParticipantDetail = {
-  profile: Pick<Profile, "id" | "display_name" | "role" | "status" | "suspended_at" | "suspension_reason" | "created_at">;
+  profile: Pick<Profile, "id" | "display_name" | "email" | "role" | "status" | "suspended_at" | "suspension_reason" | "created_at">;
   email: string | null;
   challenge: Challenge | null;
   results: WeeklyResult[];
@@ -45,25 +43,21 @@ export type AdminParticipantDetail = {
   badges: ChallengeBadge[];
 };
 
-const PROFILE_FIELDS = "id,display_name,role,status,suspended_at,suspension_reason,created_at";
+const PROFILE_FIELDS = "id,display_name,email,role,status,suspended_at,suspension_reason,created_at";
 
 export async function getAdminOverview() {
   const admin = createAdminClient();
-  await syncAllMissedWeeks();
-
-  const [codesResponse, profilesResponse, challengesResponse, badgesResponse, authUsersResponse] = await Promise.all([
+  const [codesResponse, profilesResponse, challengesResponse, badgesResponse] = await Promise.all([
     admin.from("invite_codes").select("code,created_at,expires_at,used_by,used_at,revoked_at,revoked_by,revoke_reason").order("created_at", { ascending: false }),
     admin.from("profiles").select(PROFILE_FIELDS).order("created_at", { ascending: true }),
     admin.from("challenges").select("*"),
     admin.from("challenge_badges").select("id,challenge_id,user_id,milestone_days,awarded_at,trigger_weekly_result_id,trigger_submission_id,created_at"),
-    admin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
   ]);
 
   if (codesResponse.error) throw codesResponse.error;
   if (profilesResponse.error) throw profilesResponse.error;
   if (challengesResponse.error) throw challengesResponse.error;
   if (badgesResponse.error) throw badgesResponse.error;
-  if (authUsersResponse.error) throw authUsersResponse.error;
 
   const typedProfiles = (profilesResponse.data ?? []) as AdminParticipantRow["profile"][];
   const typedChallenges = (challengesResponse.data ?? []) as Challenge[];
@@ -76,12 +70,9 @@ export async function getAdminOverview() {
     list.push(badge);
     badgesByUser.set(badge.user_id, list);
   }
-  const authUsers = authUsersResponse.data.users as AuthUserSummary[];
-  const emailMap = new Map<string, string | null>(authUsers.map((user) => [user.id, user.email ?? null]));
-
   const participants: AdminParticipantRow[] = typedProfiles.map((profile) => ({
     profile,
-    email: emailMap.get(profile.id) ?? null,
+    email: profile.email ?? null,
     challenge: challengeMap.get(profile.id) ?? null,
     badges: badgesByUser.get(profile.id) ?? [],
   }));
@@ -92,7 +83,7 @@ export async function getAdminOverview() {
     return {
       ...row,
       used_display_name: profile?.display_name ?? null,
-      used_email: row.used_by ? emailMap.get(row.used_by) ?? null : null,
+      used_email: row.used_by ? profileMap.get(row.used_by)?.email ?? null : null,
     } as InviteCodeRow;
   });
 
@@ -101,20 +92,16 @@ export async function getAdminOverview() {
 
 export async function getAdminParticipant(userId: string): Promise<AdminParticipantDetail | null> {
   const admin = createAdminClient();
-  const [profileResponse, authUserResponse] = await Promise.all([
-    admin.from("profiles").select(PROFILE_FIELDS).eq("id", userId).maybeSingle(),
-    admin.auth.admin.getUserById(userId),
-  ]);
+  const profileResponse = await admin.from("profiles").select(PROFILE_FIELDS).eq("id", userId).maybeSingle();
   if (profileResponse.error) throw profileResponse.error;
   if (!profileResponse.data) return null;
-  if (authUserResponse.error) throw authUserResponse.error;
 
   const profile = profileResponse.data as AdminParticipantDetail["profile"];
   const challenge = await processMissedWeeks(userId);
   if (!challenge) {
     return {
       profile,
-      email: authUserResponse.data.user?.email ?? null,
+      email: profile.email ?? null,
       challenge: null,
       results: [],
       submissions: [],
@@ -154,7 +141,7 @@ export async function getAdminParticipant(userId: string): Promise<AdminParticip
 
   return {
     profile,
-    email: authUserResponse.data.user?.email ?? null,
+    email: profile.email ?? null,
     challenge,
     results: (resultsResponse.data ?? []) as WeeklyResult[],
     submissions: (submissionsResponse.data ?? []) as Submission[],

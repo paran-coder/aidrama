@@ -12,7 +12,7 @@ export function AppShell({ children, displayName, isAdmin = false }: { children:
             {isAdmin ? (
               <>
                 <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/admin">운영 관리</Link>
-                <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/admin/preview">사용자 화면 보기</Link>
+                <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/admin/preview" target="_blank" rel="noreferrer">사용자 화면 미리보기</Link>
                 <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/mypage">계정 설정</Link>
               </>
             ) : (
@@ -34,7 +34,7 @@ export function AppShell({ children, displayName, isAdmin = false }: { children:
         {isAdmin ? (
           <>
             <Link href="/admin" className="rounded-xl px-2 py-3 text-center text-xs font-extrabold">운영 관리</Link>
-            <Link href="/admin/preview" className="rounded-xl px-2 py-3 text-center text-xs font-extrabold">화면 보기</Link>
+            <Link href="/admin/preview" target="_blank" rel="noreferrer" className="rounded-xl px-2 py-3 text-center text-xs font-extrabold">미리보기</Link>
             <Link href="/mypage" className="rounded-xl px-2 py-3 text-center text-xs font-extrabold">계정 설정</Link>
           </>
         ) : (

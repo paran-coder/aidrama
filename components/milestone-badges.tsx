@@ -6,13 +6,19 @@ export function MilestoneBadges({
   badges,
   compact = false,
   showLocked = true,
+  currentDay = Number.POSITIVE_INFINITY,
 }: {
   badges: Pick<ChallengeBadge, "milestone_days" | "awarded_at">[];
   compact?: boolean;
   showLocked?: boolean;
+  currentDay?: number;
 }) {
-  const earned = milestoneSet(badges);
-  const earnedRows = new Map(badges.map((badge) => [badge.milestone_days, badge]));
+  const earned = milestoneSet(badges, currentDay);
+  const earnedRows = new Map(
+    badges
+      .filter((badge) => badge.milestone_days <= currentDay)
+      .map((badge) => [badge.milestone_days, badge]),
+  );
   const milestones = showLocked ? MILESTONES : MILESTONES.filter((m) => earned.has(m));
 
   if (!showLocked && milestones.length === 0) {

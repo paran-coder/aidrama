@@ -1,60 +1,41 @@
-# AI Drama Challenge v1.2.0
+# AI Drama Challenge v1.2.1
 
-OWL1000 is one continuous 1000-day creator journey with a believable first promise: **100 days**. Participants begin as creators on day zero, earn permanent milestone badges, and level up through five creator identities. Weekly failures affect the current streak, never identity already earned.
+100일을 첫 목표로 시작해 300 / 600 / 900 / 1000일로 성장하는 초대제 AI 드라마 크리에이터 챌린지입니다.
 
-## Product model
+## Stack
+- Next.js 16 / React 19 / TypeScript
+- Vercel
+- Supabase Auth + PostgreSQL
 
-- Milestones: `100 → 300 → 600 → 900 → 1000`
-- A milestone is awarded only after its threshold is reached **and a later qualifying weekly success is recorded**.
-- At most one next milestone is awarded per successful weekly proof. Long-inactive users cannot unlock several badges with one submission.
-- Levels are badge-driven and permanent:
-  1. Lv.1 Creator
-  2. Lv.2 Routine Creator — after 100 badge
-  3. Lv.3 Story Creator — after 300 badge
-  4. Lv.4 Signature Creator — after 600 badge
-  5. Lv.5 Master Creator — after 900 badge
-- 1000 is the permanent OWL1000 completion badge, not Lv.6.
-- New badge acquisition triggers a small accessible level-up celebration. Reduced-motion users receive the same message without animation.
+## Current growth model
+- Lv.1 크리에이터: 시작 즉시
+- Lv.2 루틴 크리에이터: 100일 배지
+- Lv.3 스토리 크리에이터: 300일 배지
+- Lv.4 시그니처 크리에이터: 600일 배지
+- Lv.5 마스터 크리에이터: 900일 배지
+- OWL1000: 1000일 완주 배지
 
-## Operational model
+배지는 목표 날짜를 지난 뒤 정상 주간 인증 성공 시 순서대로 하나씩 획득하며, 한번 획득한 레벨/배지는 실패해도 하락하지 않습니다.
 
-The v1.1.2 stabilization features remain intact:
-- admin login goes directly to `/admin`
-- invite issuance, revocation and permanent usage history
-- participant email/usage visibility for administrators
-- participant suspension/reactivation independent from invite codes
-- administrator corrections + audit logs
-- batch missed-week synchronization for admin/community lists
-- pending/loading states for long-running form actions
+## v1.2.1 highlights
+- 랜딩 Hero/썸네일 크롭 수정
+- 잘못된 선행 마일스톤 배지 정리 및 날짜 기반 UI 방어
+- 관리자/커뮤니티 자동 전체 동기화 제거
+- 관리자 이메일 캐시로 Auth `listUsers` 제거
+- 관리자 참여자 `접근 관리` 개선
+- 관리자 사용자 화면 미리보기 안정화
+- 세션 일시 오류 재시도 + 프록시/화면 오류 방어
 
-## Database migrations
-
-### Your current live project (v1.1.0/v1.1.1 code with only `001_init.sql` applied)
-Run these **once, in this order**, in Supabase SQL Editor:
+## Existing production migration
+이미 v1.2.0 DB를 사용 중이면 다음 SQL **하나만** 실행합니다.
 
 ```text
-supabase/migrations/002_v1_1_2_ops.sql
-supabase/migrations/003_v1_2_0_growth.sql
+supabase/migrations/004_v1_2_1_hotfix.sql
 ```
 
-Then push the v1.2.0 code to GitHub and let Vercel redeploy.
-
-### If 002 is already applied
-Run only:
-
-```text
-supabase/migrations/003_v1_2_0_growth.sql
-```
-
-### Fresh project
-Run `001 → 002 → 003` in numeric order.
-
-Do not rerun a migration that has already completed successfully.
+자세한 내용은 `MIGRATION-GUIDE.md`를 확인하십시오.
 
 ## Environment variables
-
-Unchanged from v1.1.x:
-
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
 NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
@@ -63,21 +44,15 @@ NEXT_PUBLIC_SITE_URL=https://your-project.vercel.app
 ADMIN_EMAIL=admin@example.com
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` is server-only. Never expose it in browser code or commit `.env.local`.
-
-## Performance deployment note
-
-For lowest latency, set the Vercel Function Region as close as possible to the Supabase database region. The code also removes participant-by-participant synchronization from admin/community list rendering and uses one batch RPC instead.
-
-## Verification
-
+## Local verification
 ```bash
 npm install
 npm run test:rules
 npm run test:ops
 npm run test:growth
+npm run test:hotfix
 npm run typecheck
 npm run build
 ```
 
-GitHub CI runs the same verification flow. See `QA-report.md` and `MIGRATION-GUIDE.md` before production deployment.
+`.env.local`은 GitHub에 올리지 않습니다.

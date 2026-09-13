@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireAdmin } from "@/lib/auth";
 import { currentWeekStartKey } from "@/lib/challenge";
+import { syncAllMissedWeeks } from "@/lib/challenge-service";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { inspectSubmissionUrl } from "@/lib/urls";
 import type { AccountStatus, WeeklyStatus } from "@/lib/types";
@@ -15,6 +16,18 @@ function makeCode() {
   let body = "";
   for (let i = 0; i < 10; i += 1) body += ALPHABET[bytes[i] % ALPHABET.length];
   return `OWL-${body.slice(0, 5)}-${body.slice(5)}`;
+}
+
+export async function syncParticipantStatesAction() {
+  await requireAdmin();
+  try {
+    await syncAllMissedWeeks();
+  } catch {
+    redirect(`/admin?error=${encodeURIComponent("진행상태 동기화 중 일시적인 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.")}`);
+  }
+  revalidatePath("/admin");
+  revalidatePath("/community");
+  redirect("/admin?synced=1");
 }
 
 export async function createInviteCodeAction() {

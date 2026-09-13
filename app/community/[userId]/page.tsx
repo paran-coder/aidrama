@@ -17,10 +17,10 @@ export default async function CommunityProfilePage({ params }: { params: Promise
 
   const { profile: target, challenge, badges } = participant;
   const progress = challengeProgress(challenge);
-  const levelIndex = creatorLevelIndex(badges);
+  const levelIndex = creatorLevelIndex(badges, progress.day);
   const level = CREATOR_LEVELS[levelIndex];
   const goal = milestoneProgress(progress.day, badges);
-  const completed = hasCompletionBadge(badges);
+  const completed = hasCompletionBadge(badges, progress.day);
 
   return (
     <AppShell displayName={profile.display_name} isAdmin={isAdmin}>
@@ -39,7 +39,7 @@ export default async function CommunityProfilePage({ params }: { params: Promise
               <div className="card rounded-2xl p-4"><p className="display-number text-3xl">{challenge.longest_streak}</p><p className="mt-1 text-xs font-bold text-[var(--muted)]">최장 스트릭</p></div>
             </div>
             <div className="mt-7"><ProgressBar value={goal.percent} label={goal.target ? `현재 목표 · ${progress.day} / ${goal.target}일` : "OWL1000 완주"} /></div>
-            <div className="mt-5"><MilestoneBadges badges={badges} /></div>
+            <div className="mt-5"><MilestoneBadges badges={badges} currentDay={progress.day} /></div>
             {completed && <Link href={`/complete/${userId}`} className="primary-button mt-7">완주 아카이브 보기</Link>}
           </section>
         </div>

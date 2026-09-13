@@ -9,6 +9,7 @@ export type AuditAction = "weekly_result_corrected" | "invite_code_revoked" | "u
 export type Profile = {
   id: string;
   display_name: string;
+  email?: string | null;
   role: UserRole;
   status: AccountStatus;
   suspended_at: string | null;

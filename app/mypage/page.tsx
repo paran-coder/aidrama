@@ -5,6 +5,7 @@ import { getAppContext } from "@/lib/page-context";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
 import { getChallenge, getChallengeBadges } from "@/lib/challenge-service";
 import { CREATOR_LEVELS, creatorLevelIndex } from "@/lib/growth";
+import { challengeProgress } from "@/lib/challenge";
 
 export default async function MyPage({searchParams}:{searchParams:Promise<Record<string,string|string[]|undefined>>}) {
   const {user,profile,isAdmin}=await getAppContext();
@@ -14,10 +15,11 @@ export default async function MyPage({searchParams}:{searchParams:Promise<Record
   const password=q.password==="1";
   const challenge = isAdmin ? null : await getChallenge(user.id, false);
   const badges = challenge ? await getChallengeBadges(challenge.id) : [];
-  const levelIndex = creatorLevelIndex(badges);
+  const progress = challenge ? challengeProgress(challenge) : null;
+  const levelIndex = creatorLevelIndex(badges, progress?.day ?? 0);
   const level = CREATOR_LEVELS[levelIndex];
 
   return <AppShell displayName={profile.display_name} isAdmin={isAdmin}><div className="mx-auto max-w-2xl"><p className="eyebrow">Account</p><h1 className="mt-3 text-4xl font-black tracking-[-.05em]">{isAdmin ? "계정 설정" : "마이페이지"}</h1>{error&&<div role="alert" className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-[var(--danger)]">{error}</div>}{(saved||password)&&<div role="status" className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-bold text-[var(--success)]">{saved?"프로필이 저장되었습니다.":"비밀번호가 변경되었습니다."}</div>}
-  {!isAdmin && challenge && <section className="card mt-8 rounded-[2rem] p-6"><p className="eyebrow">Creator identity</p><div className="mt-2 flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-2xl font-black">Lv.{level.level} · {level.label}</h2><p className="mt-1 text-sm leading-6 text-[var(--muted)]">{level.subtitle}</p></div></div><div className="mt-5"><MilestoneBadges badges={badges} /></div></section>}
+  {!isAdmin && challenge && <section className="card mt-8 rounded-[2rem] p-6"><p className="eyebrow">Creator identity</p><div className="mt-2 flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-2xl font-black">Lv.{level.level} · {level.label}</h2><p className="mt-1 text-sm leading-6 text-[var(--muted)]">{level.subtitle}</p></div></div><div className="mt-5"><MilestoneBadges badges={badges} currentDay={progress?.day ?? 0} /></div></section>}
   <section className={`card rounded-[2rem] p-6 ${!isAdmin && challenge ? "mt-4" : "mt-8"}`}><h2 className="text-xl font-black">프로필</h2><form action={updateProfileAction} className="mt-5 space-y-4"><label className="block text-sm font-bold">표시 이름<input className="input-field mt-2" name="displayName" defaultValue={profile.display_name} maxLength={40} required/></label><label className="block text-sm font-bold">이메일<input className="input-field mt-2 opacity-70" value={user.email??""} disabled readOnly/></label><PendingSubmitButton pendingLabel="저장 중...">정보 저장</PendingSubmitButton></form></section><section className="card mt-4 rounded-[2rem] p-6"><h2 className="text-xl font-black">비밀번호 변경</h2><form action={updatePasswordAction} className="mt-5 space-y-4"><label className="block text-sm font-bold">새 비밀번호<input className="input-field mt-2" name="password" type="password" minLength={8} required/></label><PendingSubmitButton className="secondary-button" pendingLabel="변경 중...">비밀번호 변경</PendingSubmitButton></form></section></div></AppShell>;
 }

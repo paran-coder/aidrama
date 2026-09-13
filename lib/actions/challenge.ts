@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { requireAppContext } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { formatDateKey, nextMondayAfterStart, weekDeadlineFromKey } from "@/lib/challenge";
+import { challengeProgress, formatDateKey, nextMondayAfterStart, weekDeadlineFromKey } from "@/lib/challenge";
 import { currentChallengeWeek, getChallenge, getChallengeBadges, processMissedWeeks } from "@/lib/challenge-service";
 import { inspectSubmissionUrl } from "@/lib/urls";
 import { hasCompletionBadge, MILESTONES, type Milestone } from "@/lib/growth";
@@ -40,7 +40,7 @@ export async function submitLinkAction(formData: FormData) {
     throw new Error("UNREACHABLE_AFTER_REDIRECT");
   }
   const badgesBefore = await getChallengeBadges(challenge.id);
-  if (hasCompletionBadge(badgesBefore)) redirect(`/complete/${user.id}`);
+  if (hasCompletionBadge(badgesBefore, challengeProgress(challenge).day)) redirect(`/complete/${user.id}`);
   const weekStart = currentChallengeWeek(challenge);
   if (!weekStart) redirect(`/dashboard/submit?error=${encodeURIComponent("첫 주간 챌린지는 다음 월요일부터 시작됩니다.")}`);
   if (!requestedWeekStart || requestedWeekStart !== weekStart) {

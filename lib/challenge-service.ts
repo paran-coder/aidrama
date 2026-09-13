@@ -137,7 +137,6 @@ export async function getChallengeBadges(challengeId: string): Promise<Challenge
 
 export async function getCommunityRows(): Promise<CommunityRow[]> {
   const admin = createAdminClient();
-  await syncAllMissedWeeks();
   const [
     { data: profiles, error: profilesError },
     { data: challenges, error: challengesError },

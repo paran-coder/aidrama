@@ -1,54 +1,34 @@
-# Production Upgrade Guide — v1.1.1 → v1.2.0
+# v1.2.1 Migration Guide
 
-This guide matches the current live setup: Vercel is running the v1.1.x app and Supabase has `001_init.sql` applied.
-
-## 1. Keep the existing Supabase project
-Do not create a new database. Existing admin/test accounts, invite history, challenge and submission records are preserved.
-
-## 2. Apply migration 002
-Open Supabase → SQL Editor → New query. Paste the full contents of:
+## 현재 운영 DB가 이미 v1.2.0인 경우
+사용자가 이미 `001_init.sql` → `002_v1_1_2_ops.sql` → `003_v1_2_0_growth.sql`을 적용했으므로, **이번에는 아래 파일 하나만** Supabase SQL Editor에서 실행합니다.
 
 ```text
-supabase/migrations/002_v1_1_2_ops.sql
+supabase/migrations/004_v1_2_1_hotfix.sql
 ```
 
-Run it once and confirm success.
+`001`, `002`, `003`은 다시 실행하지 않습니다.
 
-This adds invite revocation history, participant suspension/reactivation, audit actions and batch synchronization.
+## 004가 하는 일
+- `profiles.email` 운영용 캐시 컬럼 추가
+- 기존 Auth 이메일을 `profiles.email`로 백필
+- 신규 초대 가입 시 이메일 캐시 동기화
+- 관리자 목록에서 느린 Auth Admin `listUsers` 호출 제거를 위한 기반 제공
+- 유효한 성공 기록 없이 잘못 생성된 마일스톤 배지 제거
+- 시작일 + 마일스톤 일수보다 이른 잘못된 배지 제거
 
-## 3. Apply migration 003
-In a new SQL Editor query, paste and run:
+## 실행 후 확인
+1. SQL Editor 결과가 `Success. No rows returned`인지 확인합니다.
+2. Table Editor → `profiles`에 `email` 컬럼이 생성됐는지 확인합니다.
+3. 기존 테스트 사용자 `roent`가 아직 Day 0이라면 `challenge_badges`의 잘못된 100일 배지가 제거되어야 합니다.
+4. GitHub에 v1.2.1 코드를 올리고 Vercel 배포 후 실환경 스모크 테스트를 진행합니다.
+
+## Fresh install
+새 프로젝트는 아래 순서로 한 번씩 실행합니다.
 
 ```text
-supabase/migrations/003_v1_2_0_growth.sql
+001_init.sql
+002_v1_1_2_ops.sql
+003_v1_2_0_growth.sql
+004_v1_2_1_hotfix.sql
 ```
-
-Run it once and confirm success.
-
-This adds permanent milestone badges, sequential milestone awarding and the non-regressing creator-level model. Existing weekly history is retained and eligible historical successes are backfilled sequentially.
-
-## 4. Update GitHub
-Replace the repository code with the v1.2.0 release. Never commit `.env.local`.
-
-## 5. Vercel deploy
-Git push should trigger deployment automatically. The existing five environment variables remain unchanged.
-
-For latency, confirm Vercel Function Region is close to the Supabase database region.
-
-## 6. Smoke test after deployment
-Use the existing admin account and one test participant:
-
-1. Admin login opens `/admin` directly.
-2. Create an invite code and confirm immediate pending feedback.
-3. Confirm used invite code displays participant email + use time.
-4. Confirm unused code can be revoked but used code remains history.
-5. Confirm participant login/dashboard/community/mypage still work.
-6. Confirm current first target is 100 days and Lv.1 Creator is shown.
-7. Confirm existing earned milestone rows (if any) display correctly.
-8. Confirm admin preview is read-only.
-
-## 7. Do not do these
-- Do not rerun `001_init.sql` on the live database.
-- Do not rerun 002/003 after successful execution.
-- Do not delete used invite codes to block users; use participant suspension instead.
-- Do not expose `SUPABASE_SERVICE_ROLE_KEY`.

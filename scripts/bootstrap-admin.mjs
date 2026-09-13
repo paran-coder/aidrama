@@ -26,6 +26,7 @@ if (createError) {
 const { error: profileError } = await supabase.from("profiles").upsert({
   id: user.id,
   display_name: displayName,
+  email: email.toLowerCase(),
   role: "admin",
   status: "active",
   suspended_at: null,

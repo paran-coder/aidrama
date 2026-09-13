@@ -1,33 +1,18 @@
-# User Manual — v1.2.0
+# OWL1000 User Manual — v1.2.1
 
-## Participant journey
+## 일반 사용자
+1. 관리자가 발급한 미사용 초대코드로 가입합니다.
+2. 가입/온보딩 직후 Lv.1 `크리에이터`로 시작합니다.
+3. 첫 목표는 100일이며 300 → 600 → 900 → 1000일로 이어집니다.
+4. 매주 정상 링크를 제출해 주간 성공을 기록합니다.
+5. 마일스톤 날짜가 지난 뒤 정상 인증에 성공하면 다음 배지를 하나 획득합니다.
+6. 실패하면 현재 스트릭은 끊기지만 이미 획득한 레벨과 배지는 유지됩니다.
 
-You start immediately as **Lv.1 Creator**. The first target is 100 days. The same OWL1000 journey then continues through 300, 600, 900 and 1000 days; milestones do not create separate challenges.
-
-### Milestones and levels
-
-- 100-day threshold + next qualifying weekly success → 100 badge + **Lv.2 Routine Creator**
-- 300-day threshold + next qualifying weekly success → 300 badge + **Lv.3 Story Creator**
-- 600-day threshold + next qualifying weekly success → 600 badge + **Lv.4 Signature Creator**
-- 900-day threshold + next qualifying weekly success → 900 badge + **Lv.5 Master Creator**
-- 1000-day threshold + next qualifying weekly success → **OWL1000 completion badge**
-
-Only the participant's next unearned milestone can be awarded by one successful week. If someone returns after a long absence, milestones are still earned one successful weekly proof at a time.
-
-Earned badges and creator levels are permanent. A failed week resets the current streak and affects recent status only. Two consecutive failures show a warning; three show a restart prompt, but the owl level and earned badges stay intact.
-
-When a new milestone is earned, the dashboard displays a short celebration with the new creator level. The celebration is non-blocking and respects reduced-motion accessibility settings.
-
-## Administrator
-
-The administrator can:
-- issue invite codes
-- revoke unused codes without deleting history
-- see who used a code, including email and usage time
-- suspend/reactivate participant access independently from invite-code history
-- inspect submission attempts and official weekly outcomes
-- correct official weekly outcomes with a required reason
-- review audit logs
-- use a read-only participant UI preview
-
-Suspending a participant preserves all challenge history. Revoking an unused invite code does not affect existing users.
+## 관리자
+- 로그인하면 `/admin`으로 바로 이동합니다.
+- 새 초대코드를 발급할 수 있습니다.
+- **발급 취소는 아직 사용하지 않은 코드만 무효화합니다.**
+- 이미 가입한 사용자의 접근을 막으려면 참여자 목록의 `접근 관리`에서 계정을 정지합니다.
+- 계정 정지는 챌린지/제출 기록을 삭제하지 않으며 다시 활성화할 수 있습니다.
+- 참여자 현황이 오래된 경우 `진행상태 동기화`를 눌러 마감 주차를 일괄 반영할 수 있습니다.
+- `사용자 화면 미리보기`는 새 탭에서 열리며 실제 관리자/사용자 데이터를 변경하지 않습니다.

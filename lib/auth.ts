@@ -14,8 +14,16 @@ const PROFILE_SELECT = "id,display_name,role,status,suspended_at,suspended_by,su
 
 export async function getUser() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  return user;
+  let lastError: unknown = null;
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (!error) return user;
+    lastError = error;
+    if (attempt === 0) await new Promise((resolve) => setTimeout(resolve, 120));
+  }
+
+  throw lastError instanceof Error ? lastError : new Error("AUTH_SESSION_LOOKUP_FAILED");
 }
 
 export async function getAuthContext(): Promise<AuthContext | null> {

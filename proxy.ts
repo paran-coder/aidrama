@@ -19,7 +19,11 @@ export async function proxy(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getClaims();
+  try {
+    await supabase.auth.getClaims();
+  } catch (error) {
+    console.error("SESSION_REFRESH_FAILED", error);
+  }
   return response;
 }
 

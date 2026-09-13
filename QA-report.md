@@ -1,70 +1,31 @@
-# QA Report — AI Drama Challenge v1.2.0
+# QA Report — v1.2.1
 
-## Scope
-v1.2.0 combines the approved creator-growth redesign with the v1.1.2 production-stabilization work. The release keeps the single OWL1000 journey while changing the participant-facing motivation model to 100 → 300 → 600 → 900 → 1000 permanent milestones.
+## 실환경에서 확인된 문제와 대응
+- Hero 부엉이 크롭 → contain + Hero 프레임 확대
+- 관리자 미리보기 후 세션 혼동 → 새 탭 미리보기, 인증 일시 오류 재시도
+- 시작 전 Lv.2 / 100일 배지 → 날짜 기반 UI 방어 + DB 무효 배지 cleanup migration
+- 사용자 정지 위치가 불명확 → 관리자 목록에 `접근 관리` 노출
+- 미사용 코드 취소와 기존 사용자 차단 개념 혼동 → 화면 설명 추가
+- 관리자/전체현황 체감 속도 저하 → 자동 전체 동기화 제거, Auth listUsers 제거
+- 간헐적 Internal Server Error → proxy 세션 갱신 방어 + app/global error boundary
 
-## Automated / static checks completed
-- v1.2 challenge rule parity: **8,190 / 8,190 success/failure sequences passed** via `npm run test:rules`.
-- v1.1.2 operations structure checks: **passed** via `npm run test:ops`.
-- v1.2 milestone/creator-growth structure checks: **passed** via `npm run test:growth`.
-- TypeScript/TSX syntax transpilation: **51 files checked, 0 syntax diagnostics** using the available global TypeScript compiler.
-- Route inventory: **17 page routes present**, including admin preview and suspended-account routes.
-- Production mascot assets: **11 owl WebP assets** (hero + 5 stage + 5 thumbnail) present.
-- Milestone assets: **5 badge WebP assets** present.
-- Secret scan: no embedded `sb_secret_...`/JWT-like credential values found in source files.
-- `.env`, `.env.local`, `.env.*.local` remain ignored by Git.
+## Automated/static checks
+- Challenge state rule parity: 8,190 sequences PASS
+- v1.1.2 operations structure check PASS
+- v1.2 growth structure check PASS
+- v1.2.1 hotfix structure check PASS
+- TS/TSX syntax/transpile check: 52 files, 0 syntax errors
 
-## Growth model verified
-- First visible target is 100 days.
-- Milestones are exactly 100, 300, 600, 900, 1000.
-- One successful weekly proof can award **at most the next unearned milestone**.
-- Long inactivity cannot mass-unlock several badges with one success.
-- Lv.1 Creator is granted from challenge start; there is no egg stage.
-- 100/300/600/900 badges drive Lv.2/Lv.3/Lv.4/Lv.5 respectively.
-- 1000 is completion, not Lv.6.
-- Earned levels/badges never regress on failure.
-- Two/three consecutive failures still produce warning/restart UX while preserving identity.
+## Remaining deployment-time verification
+현재 실행환경에는 프로젝트 npm dependencies가 설치되어 있지 않아 공식 `tsc --noEmit` / `next build`는 Vercel 빌드 또는 의존성 설치 후 최종 확인해야 합니다.
 
-## Celebration / accessibility verified in source
-- Newly awarded milestone is detected after the submission RPC and surfaced once through the dashboard redirect.
-- The dashboard shows a non-blocking milestone celebration with new creator level and badge.
-- The milestone query parameter is removed from browser history after render so refresh does not replay the celebration.
-- `prefers-reduced-motion` disables celebration animation.
-- Milestone progress caps its display at the target while waiting for the qualifying success (no `120 / 100` display).
-
-## Mascot QA
-- The approved floral owl concept is used as the common design language.
-- Production stage assets were re-cropped to remove excessive whitespace and improve dashboard/card readability.
-- Dedicated 320×320 thumbnail assets are used for compact cards.
-- Hero/stage/thumb paths are centralized in `lib/owl-assets.ts`.
-- Production preview: `spec/owl-v1.2-production-preview.jpg`.
-
-## v1.1.2 operations retained
-- Admin login defaults to `/admin`.
-- Participant mutation routes redirect administrators away from challenge flows.
-- Invite lifecycle: issue → used/revoked/expired history; used codes are retained.
-- Admin sees invite user display name, email and usage time.
-- Participant access can be suspended/reactivated independently of invite history.
-- Admin correction and suspension/revocation actions are audited.
-- Community/admin list synchronization uses one batch missed-week RPC instead of participant-by-participant RPC calls.
-- Form buttons show immediate pending state.
-
-## Performance changes
-- Admin/community removed participant-level N+1 missed-week synchronization.
-- Dashboard badge/current-week result reads run in parallel after challenge synchronization.
-- Submission adds only one post-write badge read to determine whether a celebration is necessary.
-- Deployment should place Vercel Functions near the Supabase database region to reduce network round trips.
-
-## Migration review
-Current live project upgrade path is:
-1. `002_v1_1_2_ops.sql`
-2. `003_v1_2_0_growth.sql`
-3. deploy v1.2.0 code
-
-Migrations have **not** been executed against the user's live Supabase project from this environment.
-
-## Verification limitation
-`npm install --no-audit --no-fund` timed out in this execution environment, so dependency-backed `npm run typecheck` and `npm run build` could not be completed locally. GitHub CI is configured to install dependencies and run rule/ops/growth tests, TypeScript checking and the production Next.js build. Vercel build remains the final integration gate.
-
-## Self-assessment
-**9.5 / 10**. Product rules, operational model, mascot assets, accessibility behavior and static regression checks are complete. Remaining risk is limited to live SQL migration execution plus dependency-backed Vercel/CI integration.
+## Production smoke checklist
+1. `004_v1_2_1_hotfix.sql` 적용
+2. 관리자 로그인 → `/admin`
+3. roent 계정 Day 0 → Lv.1 / 배지 미획득
+4. Hero 전체 몸이 프레임 안에 표시
+5. 관리자 초대코드 발급 체감 속도
+6. 전체현황 로딩 체감 속도
+7. 참여자 `접근 관리` → 정지 → 해당 계정 접근 차단 → 재활성화
+8. 관리자 사용자 화면 미리보기 새 탭 동작 및 세션 유지
+9. 간헐적 오류 재현 여부

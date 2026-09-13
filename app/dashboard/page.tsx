@@ -27,10 +27,10 @@ export default async function DashboardPage({
     getChallengeBadges(challenge.id),
     weekStart ? getWeeklyResult(challenge.id, weekStart) : Promise.resolve(null),
   ]);
-  const completed = hasCompletionBadge(badges);
-  const weeklyResult = completed ? null : weeklyResultCandidate;
   const progress = challengeProgress(challenge);
-  const levelIndex = creatorLevelIndex(badges);
+  const completed = hasCompletionBadge(badges, progress.day);
+  const weeklyResult = completed ? null : weeklyResultCandidate;
+  const levelIndex = creatorLevelIndex(badges, progress.day);
   const level = CREATOR_LEVELS[levelIndex];
   const goal = milestoneProgress(progress.day, badges);
   const q = await searchParams;
@@ -112,7 +112,7 @@ export default async function DashboardPage({
           <div><p className="eyebrow">Milestones</p><h2 className="mt-2 text-xl font-black">쌓인 시간은 사라지지 않습니다.</h2></div>
           <p className="text-xs font-bold text-[var(--muted)]">100 · 300 · 600 · 900 · 1000</p>
         </div>
-        <div className="mt-5"><MilestoneBadges badges={badges} /></div>
+        <div className="mt-5"><MilestoneBadges badges={badges} currentDay={progress.day} /></div>
       </section>
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">

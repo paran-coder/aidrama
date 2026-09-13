@@ -3,6 +3,8 @@ import type { ChallengeBadge } from "@/lib/types";
 export const MILESTONES = [100, 300, 600, 900, 1000] as const;
 export type Milestone = (typeof MILESTONES)[number];
 
+type BadgeLike = Pick<ChallengeBadge, "milestone_days"> | number;
+
 export const CREATOR_LEVELS = [
   { level: 1, requiredMilestone: null, label: "크리에이터", english: "Creator", subtitle: "시작하는 순간 이미 창작자" },
   { level: 2, requiredMilestone: 100, label: "루틴 크리에이터", english: "Routine Creator", subtitle: "꾸준함을 창작 습관으로 만든 단계" },
@@ -11,12 +13,20 @@ export const CREATOR_LEVELS = [
   { level: 5, requiredMilestone: 900, label: "마스터 크리에이터", english: "Master Creator", subtitle: "지속과 자기 스타일을 모두 가진 단계" },
 ] as const;
 
-export function milestoneSet(badges: Pick<ChallengeBadge, "milestone_days">[] | number[]) {
-  return new Set<number>(badges.map((badge) => typeof badge === "number" ? badge : badge.milestone_days));
+export function milestoneSet(badges: BadgeLike[], maxEligibleDay = Number.POSITIVE_INFINITY) {
+  return new Set<number>(
+    badges
+      .map((badge) => typeof badge === "number" ? badge : badge.milestone_days)
+      .filter((milestone) => milestone <= maxEligibleDay),
+  );
 }
 
-export function creatorLevelIndex(badges: Pick<ChallengeBadge, "milestone_days">[] | number[]) {
-  const earned = milestoneSet(badges);
+export function validBadgesForDay<T extends Pick<ChallengeBadge, "milestone_days">>(badges: T[], day: number) {
+  return badges.filter((badge) => badge.milestone_days <= day);
+}
+
+export function creatorLevelIndex(badges: BadgeLike[], day = Number.POSITIVE_INFINITY) {
+  const earned = milestoneSet(badges, day);
   if (earned.has(900)) return 4;
   if (earned.has(600)) return 3;
   if (earned.has(300)) return 2;
@@ -24,13 +34,13 @@ export function creatorLevelIndex(badges: Pick<ChallengeBadge, "milestone_days">
   return 0;
 }
 
-export function currentMilestone(badges: Pick<ChallengeBadge, "milestone_days">[] | number[]): Milestone | null {
-  const earned = milestoneSet(badges);
+export function currentMilestone(badges: BadgeLike[], day = Number.POSITIVE_INFINITY): Milestone | null {
+  const earned = milestoneSet(badges, day);
   return MILESTONES.find((milestone) => !earned.has(milestone)) ?? null;
 }
 
-export function milestoneProgress(day: number, badges: Pick<ChallengeBadge, "milestone_days">[] | number[]) {
-  const target = currentMilestone(badges);
+export function milestoneProgress(day: number, badges: BadgeLike[]) {
+  const target = currentMilestone(badges, day);
   if (!target) return { target: null, percent: 100, label: "OWL1000 완주" } as const;
   return {
     target,
@@ -39,6 +49,6 @@ export function milestoneProgress(day: number, badges: Pick<ChallengeBadge, "mil
   } as const;
 }
 
-export function hasCompletionBadge(badges: Pick<ChallengeBadge, "milestone_days">[] | number[]) {
-  return milestoneSet(badges).has(1000);
+export function hasCompletionBadge(badges: BadgeLike[], day = Number.POSITIVE_INFINITY) {
+  return milestoneSet(badges, day).has(1000);
 }

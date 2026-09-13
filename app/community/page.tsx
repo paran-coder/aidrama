@@ -24,9 +24,9 @@ export default async function CommunityPage() {
         ) : (
           <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {rows.map(({ challenge, profile: participant, badges }, index) => {
-              const levelIndex = creatorLevelIndex(badges);
-              const level = CREATOR_LEVELS[levelIndex];
               const progress = challengeProgress(challenge);
+              const levelIndex = creatorLevelIndex(badges, progress.day);
+              const level = CREATOR_LEVELS[levelIndex];
               const me = challenge.user_id === user.id;
               return (
                 <Link href={`/community/${challenge.user_id}`} key={challenge.id} className={`card group rounded-[2rem] p-4 transition hover:-translate-y-1 ${me ? "ring-2 ring-[var(--accent)] ring-offset-2 ring-offset-[var(--bg)]" : ""}`}>
@@ -39,7 +39,7 @@ export default async function CommunityPage() {
                       <p className="display-number mt-3 text-2xl">{challenge.streak}<span className="ml-1 font-sans text-xs font-extrabold tracking-normal text-[var(--muted)]">주 연속</span></p>
                     </div>
                   </div>
-                  <div className="mt-4"><MilestoneBadges badges={badges} compact /></div>
+                  <div className="mt-4"><MilestoneBadges badges={badges} currentDay={progress.day} compact /></div>
                 </Link>
               );
             })}

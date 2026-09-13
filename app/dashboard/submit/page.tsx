@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { StatusBadge } from "@/components/status-badge";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
-import { deadlineParts, weekDeadlineFromKey } from "@/lib/challenge";
+import { challengeProgress, deadlineParts, weekDeadlineFromKey } from "@/lib/challenge";
 import { submitLinkAction } from "@/lib/actions/challenge";
 import { currentChallengeWeek, getChallengeBadges, getWeeklyResultWithSubmission, processMissedWeeks } from "@/lib/challenge-service";
 import { hasCompletionBadge } from "@/lib/growth";
@@ -15,7 +15,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
   const challenge = await processMissedWeeks(user.id);
   if (!challenge) redirect("/onboarding");
   const badges = await getChallengeBadges(challenge.id);
-  if (hasCompletionBadge(badges)) redirect(`/complete/${user.id}`);
+  if (hasCompletionBadge(badges, challengeProgress(challenge).day)) redirect(`/complete/${user.id}`);
 
   const weekStart = currentChallengeWeek(challenge);
   const q = await searchParams;

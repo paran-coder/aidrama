@@ -43,7 +43,7 @@ export default async function AdminParticipantPage({
 
   const { profile, email, challenge, results, submissions, auditLogs, badges } = data;
   const progress = challenge ? challengeProgress(challenge) : null;
-  const level = CREATOR_LEVELS[creatorLevelIndex(badges)];
+  const level = CREATOR_LEVELS[creatorLevelIndex(badges, progress?.day ?? 0)];
   const attemptsByWeek = new Map<string, typeof submissions>();
   submissions.forEach((submission) => {
     const list = attemptsByWeek.get(submission.week_start) ?? [];
@@ -72,7 +72,7 @@ export default async function AdminParticipantPage({
         {error && <div role="alert" className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-[var(--danger)]">{error}</div>}
 
         {profile.role !== "admin" && (
-          <section className="card mt-8 rounded-[2rem] p-5 sm:p-7">
+          <section id="access" className="card mt-8 scroll-mt-24 rounded-[2rem] p-5 sm:p-7">
             <p className="eyebrow">Account access</p>
             <h2 className="mt-2 text-xl font-black">사용자 접근 관리</h2>
             <p className="mt-2 text-sm leading-6 text-[var(--muted)]">초대 코드와 별개의 계정 권한입니다. 이용 정지해도 가입 정보, 챌린지, 제출 이력은 삭제되지 않으며 다시 활성화하면 기존 기록에서 이어집니다.</p>
@@ -104,7 +104,7 @@ export default async function AdminParticipantPage({
             <section className="card mt-6 rounded-[2rem] p-5 sm:p-7">
               <p className="eyebrow">Creator growth</p>
               <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="mt-2 text-xl font-black">Lv.{level.level} · {level.label}</h2><p className="mt-1 text-sm text-[var(--muted)]">{level.subtitle}</p></div></div>
-              <div className="mt-5"><MilestoneBadges badges={badges} /></div>
+              <div className="mt-5"><MilestoneBadges badges={badges} currentDay={progress?.day ?? 0} /></div>
             </section>
 
             <section className="card mt-6 rounded-[2rem] p-5 sm:p-7">

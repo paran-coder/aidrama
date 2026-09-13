@@ -2,7 +2,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { CopyButton } from "@/components/copy-button";
 import { PendingSubmitButton } from "@/components/pending-submit-button";
-import { createInviteCodeAction, revokeInviteCodeAction } from "@/lib/actions/admin";
+import { createInviteCodeAction, revokeInviteCodeAction, syncParticipantStatesAction } from "@/lib/actions/admin";
 import { getAdminOverview, type InviteCodeRow } from "@/lib/admin-service";
 import { requireAdmin } from "@/lib/auth";
 import { challengeProgress } from "@/lib/challenge";
@@ -33,7 +33,10 @@ export default async function AdminPage({
   const created = typeof q.created === "string" ? q.created : "";
   const revoked = typeof q.revoked === "string" ? q.revoked : "";
   const error = typeof q.error === "string" ? q.error : "";
+  const synced = q.synced === "1";
   const { codes, participants } = await getAdminOverview();
+  const currentCodes = codes.filter((code) => !code.revoked_at);
+  const revokedCodes = codes.filter((code) => Boolean(code.revoked_at));
 
   return (
     <AppShell displayName={profile.display_name} isAdmin>
@@ -56,11 +59,15 @@ export default async function AdminPage({
         )}
         {revoked && <div role="status" className="mt-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 font-bold text-[var(--warning)]">{revoked} 코드의 발급을 취소했습니다. 기존 가입 사용자에게는 영향이 없습니다.</div>}
         {error && <div role="alert" className="mt-6 rounded-2xl border border-red-200 bg-red-50 p-4 font-bold text-[var(--danger)]">{error}</div>}
+        {synced && <div role="status" className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 font-bold text-[var(--success)]">모든 참여자의 마감 주차 상태를 한 번 동기화했습니다.</div>}
 
         <section className="mt-9">
-          <div className="flex items-end justify-between gap-4">
+          <div className="flex flex-wrap items-end justify-between gap-4">
             <div><p className="eyebrow">Participants</p><h2 className="mt-2 text-2xl font-black">참여자 현황</h2></div>
-            <p className="text-sm font-bold text-[var(--muted)]">{participants.length}명</p>
+            <div className="flex items-center gap-3">
+              <p className="text-sm font-bold text-[var(--muted)]">{participants.length}명</p>
+              <form action={syncParticipantStatesAction}><PendingSubmitButton className="secondary-button min-h-0 px-4 py-2 text-xs" pendingLabel="동기화 중...">진행상태 동기화</PendingSubmitButton></form>
+            </div>
           </div>
           <div className="mt-4 overflow-hidden rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)]">
             <div className="overflow-x-auto">
@@ -71,7 +78,7 @@ export default async function AdminPage({
                 <tbody>
                   {participants.map(({ profile: participant, email, challenge, badges }) => {
                     const progress = challenge ? challengeProgress(challenge) : null;
-                    const level = CREATOR_LEVELS[creatorLevelIndex(badges)];
+                    const level = CREATOR_LEVELS[creatorLevelIndex(badges, progress?.day ?? 0)];
                     return (
                       <tr key={participant.id} className="border-t border-[var(--line)]">
                         <td className="px-5 py-4"><p className="font-black">{participant.display_name}</p><p className="mt-1 text-xs text-[var(--muted)]">{email ?? "이메일 없음"} · {participant.role === "admin" ? "관리자" : "참여자"}</p></td>
@@ -80,7 +87,7 @@ export default async function AdminPage({
                         <td className="px-5 py-4 font-bold">{progress ? `${progress.day}일` : "시작 전"}</td>
                         <td className="px-5 py-4 font-bold">{challenge ? `${challenge.streak} / ${challenge.longest_streak}` : "—"}</td>
                         <td className="px-5 py-4 font-bold">{challenge ? `${challenge.success_count} / ${challenge.failure_count}` : "—"}</td>
-                        <td className="px-5 py-4"><Link className="secondary-button min-h-0 px-4 py-2 text-xs" href={`/admin/participants/${participant.id}`}>운영 상세</Link></td>
+                        <td className="px-5 py-4"><Link className="secondary-button min-h-0 px-4 py-2 text-xs" href={`/admin/participants/${participant.id}#access`}>접근 관리</Link></td>
                       </tr>
                     );
                   })}
@@ -93,12 +100,13 @@ export default async function AdminPage({
 
         <section className="mt-10">
           <div className="flex items-end justify-between gap-4"><div><p className="eyebrow">Invitations</p><h2 className="mt-2 text-2xl font-black">초대 코드</h2></div><p className="text-sm font-bold text-[var(--muted)]">{codes.length}개 발급</p></div>
+          <p className="mt-2 text-sm font-bold leading-6 text-[var(--muted)]">발급 취소는 <strong>아직 사용하지 않은 코드</strong>만 막습니다. 이미 가입한 사용자의 접근을 중지하려면 위 참여자 목록의 <strong>접근 관리</strong>에서 계정을 정지하세요.</p>
           <div className="mt-4 overflow-hidden rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)]">
             <div className="overflow-x-auto">
               <table className="w-full min-w-[1100px] text-left text-sm">
                 <thead className="bg-[var(--surface-2)] text-xs uppercase tracking-wider text-[var(--muted)]"><tr><th className="px-5 py-4">코드</th><th className="px-5 py-4">상태</th><th className="px-5 py-4">사용자</th><th className="px-5 py-4">발급일</th><th className="px-5 py-4">사용/취소일</th><th className="px-5 py-4">관리</th></tr></thead>
                 <tbody>
-                  {codes.map((code) => {
+                  {currentCodes.map((code) => {
                     const state = inviteState(code);
                     return (
                       <tr key={code.code} className="border-t border-[var(--line)] align-top">
@@ -122,8 +130,21 @@ export default async function AdminPage({
                 </tbody>
               </table>
             </div>
-            {codes.length === 0 && <p className="p-8 text-center font-bold text-[var(--muted)]">발급된 코드가 없습니다.</p>}
+            {currentCodes.length === 0 && <p className="p-8 text-center font-bold text-[var(--muted)]">현재 사용 가능하거나 사용 완료된 코드가 없습니다.</p>}
           </div>
+          {revokedCodes.length > 0 && (
+            <details className="mt-4 rounded-[1.5rem] border border-[var(--line)] bg-white/45 p-4">
+              <summary className="cursor-pointer text-sm font-black">취소된 코드 이력 {revokedCodes.length}개 보기</summary>
+              <div className="mt-4 space-y-2">
+                {revokedCodes.map((code) => (
+                  <div key={code.code} className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[var(--line)] bg-[var(--surface)] px-4 py-3 text-xs">
+                    <div><p className="font-black tracking-wider">{code.code}</p><p className="mt-1 text-[var(--muted)]">{code.revoke_reason ?? "관리자 발급 취소"}</p></div>
+                    <p className="font-bold text-[var(--muted)]">{code.revoked_at ? kstDateTime(code.revoked_at) : "—"}</p>
+                  </div>
+                ))}
+              </div>
+            </details>
+          )}
         </section>
       </div>
     </AppShell>
