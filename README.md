@@ -1,4 +1,4 @@
-# AI Drama Challenge v1.2.1
+# AI Drama Challenge v1.2.2
 
 100일을 첫 목표로 시작해 300 / 600 / 900 / 1000일로 성장하는 초대제 AI 드라마 크리에이터 챌린지입니다.
 
@@ -17,23 +17,24 @@
 
 배지는 목표 날짜를 지난 뒤 정상 주간 인증 성공 시 순서대로 하나씩 획득하며, 한번 획득한 레벨/배지는 실패해도 하락하지 않습니다.
 
-## v1.2.1 highlights
-- 랜딩 Hero/썸네일 크롭 수정
-- 잘못된 선행 마일스톤 배지 정리 및 날짜 기반 UI 방어
-- 관리자/커뮤니티 자동 전체 동기화 제거
-- 관리자 이메일 캐시로 Auth `listUsers` 제거
-- 관리자 참여자 `접근 관리` 개선
-- 관리자 사용자 화면 미리보기 안정화
-- 세션 일시 오류 재시도 + 프록시/화면 오류 방어
+## v1.2.2 highlights
+- 상단 메뉴에 `이번 주 제출` 진입점을 항상 노출
+- 준비기간에도 비활성 제출 CTA를 보여 제출 위치를 명확히 안내
+- 제출 가능 시간을 `월요일 00:00 ~ 일요일 23:59 KST`로 명시
+- 준비기간 `/dashboard/submit`에서 첫 제출 가능 날짜와 비활성 URL 입력 상태를 안내
+- 기존 서버측 제출 가능 판정과 DB 구조는 변경하지 않음
 
-## Existing production migration
-이미 v1.2.0 DB를 사용 중이면 다음 SQL **하나만** 실행합니다.
+## Database migration
+v1.2.1 DB를 이미 사용 중이라면 **추가 SQL은 없습니다.**
+
+기존 migration은 그대로 유지합니다.
 
 ```text
-supabase/migrations/004_v1_2_1_hotfix.sql
+001_init.sql
+002_v1_1_2_ops.sql
+003_v1_2_0_growth.sql
+004_v1_2_1_hotfix.sql
 ```
-
-자세한 내용은 `MIGRATION-GUIDE.md`를 확인하십시오.
 
 ## Environment variables
 ```env
@@ -51,6 +52,7 @@ npm run test:rules
 npm run test:ops
 npm run test:growth
 npm run test:hotfix
+npm run test:submit-ux
 npm run typecheck
 npm run build
 ```

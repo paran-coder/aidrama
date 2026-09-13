@@ -23,6 +23,13 @@ export function formatDateKey(date: Date): string {
   return `${p.year}-${String(p.month + 1).padStart(2, "0")}-${String(p.date).padStart(2, "0")}`;
 }
 
+
+export function formatKoreanDateKey(key: string): string {
+  const [year, month, date] = key.split("-").map(Number);
+  if (!year || !month || !date) return key;
+  return `${year}년 ${month}월 ${date}일`;
+}
+
 export function dateKeyToKstStart(key: string): Date {
   const [year, month, date] = key.split("-").map(Number);
   return utcFromKstParts(year, month - 1, date);

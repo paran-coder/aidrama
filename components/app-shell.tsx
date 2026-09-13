@@ -18,6 +18,7 @@ export function AppShell({ children, displayName, isAdmin = false }: { children:
             ) : (
               <>
                 <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/dashboard">내 챌린지</Link>
+                <Link className="rounded-full bg-[var(--accent-strong)] px-4 py-2 text-sm font-bold text-white transition hover:-translate-y-0.5" href="/dashboard/submit">이번 주 제출</Link>
                 <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/community">전체 현황</Link>
                 <Link className="rounded-full px-4 py-2 text-sm font-bold hover:bg-white/60" href="/mypage">마이페이지</Link>
               </>
@@ -30,7 +31,7 @@ export function AppShell({ children, displayName, isAdmin = false }: { children:
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-8 pb-28 sm:px-6 sm:py-10 md:pb-12">{children}</main>
-      <nav aria-label="모바일 메뉴" className={`fixed inset-x-0 bottom-0 z-40 grid ${isAdmin ? "grid-cols-3" : "grid-cols-3"} border-t border-[var(--line)] bg-[rgba(255,253,248,.96)] p-2 backdrop-blur-xl md:hidden`}>
+      <nav aria-label="모바일 메뉴" className={`fixed inset-x-0 bottom-0 z-40 grid ${isAdmin ? "grid-cols-3" : "grid-cols-4"} border-t border-[var(--line)] bg-[rgba(255,253,248,.96)] p-2 backdrop-blur-xl md:hidden`}>
         {isAdmin ? (
           <>
             <Link href="/admin" className="rounded-xl px-2 py-3 text-center text-xs font-extrabold">운영 관리</Link>
@@ -39,9 +40,10 @@ export function AppShell({ children, displayName, isAdmin = false }: { children:
           </>
         ) : (
           <>
-            <Link href="/dashboard" className="rounded-xl px-2 py-3 text-center text-xs font-extrabold">내 챌린지</Link>
-            <Link href="/community" className="rounded-xl px-2 py-3 text-center text-xs font-extrabold">전체 현황</Link>
-            <Link href="/mypage" className="rounded-xl px-2 py-3 text-center text-xs font-extrabold">마이페이지</Link>
+            <Link href="/dashboard" className="rounded-xl px-1 py-3 text-center text-[11px] font-extrabold">내 챌린지</Link>
+            <Link href="/dashboard/submit" className="rounded-xl bg-[var(--accent-strong)] px-1 py-3 text-center text-[11px] font-extrabold text-white">이번 주 제출</Link>
+            <Link href="/community" className="rounded-xl px-1 py-3 text-center text-[11px] font-extrabold">전체 현황</Link>
+            <Link href="/mypage" className="rounded-xl px-1 py-3 text-center text-[11px] font-extrabold">마이페이지</Link>
           </>
         )}
       </nav>

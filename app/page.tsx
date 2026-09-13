@@ -12,7 +12,7 @@ export default async function LandingPage() {
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-6 sm:px-6">
       <header className="flex items-center justify-between"><BrandLogo href="/"/><Link href="/login" className="secondary-button !min-h-0 !px-4 !py-2 text-sm">로그인</Link></header>
 
-      <section className="grid min-h-[78vh] items-center gap-10 py-14 lg:grid-cols-[1.02fr_.98fr] lg:py-16">
+      <section className="grid min-h-[78vh] items-center gap-10 py-14 lg:grid-cols-[.94fr_1.06fr] lg:py-16">
         <div>
           <p className="eyebrow">Invitation-only · Start with 100 days</p>
           <h1 className="mt-5 max-w-3xl text-5xl font-black leading-[.98] tracking-[-0.065em] sm:text-7xl">

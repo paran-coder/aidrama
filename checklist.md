@@ -1,31 +1,23 @@
-# v1.2.1 Checklist
+# v1.2.2 Checklist
 
 ## Completed
-- [x] Hero owl crop fix
-- [x] Compact owl crop review
-- [x] Invalid early badge defensive UI
-- [x] Invalid badge DB cleanup migration
-- [x] Remove automatic global missed-week sync from admin reads
-- [x] Remove automatic global missed-week sync from community reads
-- [x] Remove Auth Admin listUsers from admin overview
-- [x] Cache profile email for operations
-- [x] Expose participant access-management entry point
-- [x] Separate invite revocation semantics from user suspension
-- [x] Collapse revoked invite history
-- [x] Admin preview opens separately and starts at Lv.1
-- [x] Auth session transient retry
-- [x] Proxy session refresh error guard
-- [x] Error/global-error retry UI
+- [x] Dashboard shows disabled submit CTA during preparation period
+- [x] Dashboard shows first submission opening date
+- [x] Dashboard shows Monday 00:00–Sunday 23:59 KST window
+- [x] Header always exposes `이번 주 제출`
+- [x] Mobile navigation exposes submission entry point
+- [x] Submit page explains preparation/unavailable state
+- [x] Submit page shows KST submission window
+- [x] Existing server-side submission eligibility rules unchanged
+- [x] DB schema unchanged
 - [x] 8,190 challenge rule sequences PASS
-- [x] Ops/growth/hotfix structure checks PASS
-- [x] 52 TS/TSX syntax/transpile check PASS
+- [x] v1.1.2 / v1.2.0 / v1.2.1 regression structure checks PASS
+- [x] v1.2.2 submission UX structure check PASS
 
 ## Deployment checks
-- [ ] Apply 004_v1_2_1_hotfix.sql
-- [ ] Push v1.2.1 to GitHub
-- [ ] Vercel production build PASS
-- [ ] roent Day 0 shows Lv.1
-- [ ] Landing Hero full owl visible
-- [ ] Admin/community perceived latency improved
-- [ ] User suspension/restore smoke test
-- [ ] Admin preview does not alter session
+- [ ] Push v1.2.2 to GitHub
+- [ ] Vercel Production build PASS
+- [ ] Preparation-period dashboard shows disabled CTA
+- [ ] Header `이번 주 제출` opens `/dashboard/submit`
+- [ ] Active week shows URL input
+- [ ] Already-submitted week shows completed state

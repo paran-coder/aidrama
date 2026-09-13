@@ -7,7 +7,7 @@ import { OwlVisual } from "@/components/owl-visual";
 import { ProgressBar } from "@/components/progress-bar";
 import { StatusBadge } from "@/components/status-badge";
 import { WarningDialog } from "@/components/warning-dialog";
-import { challengeProgress } from "@/lib/challenge";
+import { challengeProgress, formatKoreanDateKey } from "@/lib/challenge";
 import { currentChallengeWeek, getChallengeBadges, getWeeklyResult, processMissedWeeks } from "@/lib/challenge-service";
 import { CREATOR_LEVELS, MILESTONES, creatorLevelIndex, hasCompletionBadge, milestoneProgress, type Milestone } from "@/lib/growth";
 import { getAppContext } from "@/lib/page-context";
@@ -100,8 +100,15 @@ export default async function DashboardPage({
               <Link className="primary-button mt-6" href="/dashboard/submit">이번 주 업로드 제출하기</Link>
             )
           ) : (
-            <div className="mt-6 rounded-2xl border border-[var(--line)] bg-white/60 p-4 text-sm font-bold leading-6 text-[var(--muted)]">
-              첫 판정은 {challenge.first_judgement_week_start} 월요일부터 시작됩니다. 이번 주는 준비 기간입니다.
+            <div className="mt-6 space-y-3">
+              <div className="rounded-2xl border border-[var(--line)] bg-white/60 p-4 text-sm font-bold leading-6 text-[var(--muted)]">
+                <p>첫 제출은 <strong className="text-[var(--ink)]">{formatKoreanDateKey(challenge.first_judgement_week_start)} 월요일 00:00 KST</strong>부터 가능합니다. 이번 주는 준비 기간입니다.</p>
+                <p className="mt-2 text-xs leading-5">제출 가능 시간 · 매주 월요일 00:00 ~ 일요일 23:59 KST</p>
+              </div>
+              <button type="button" className="primary-button w-full" disabled aria-disabled="true">
+                {formatKoreanDateKey(challenge.first_judgement_week_start)}부터 업로드 제출 가능
+              </button>
+              <p className="text-center text-xs font-bold text-[var(--muted)]">상단의 ‘이번 주 제출’ 메뉴에서도 제출 일정과 입력 화면을 언제든 확인할 수 있습니다.</p>
             </div>
           )}
         </section>
