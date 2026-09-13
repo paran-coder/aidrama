@@ -1,23 +1,14 @@
-# Checklist — v1.2.4
+# Checklist — v1.2.5
 
-- [x] context-notes.md 생성
-- [x] checklist.md 생성
-- [x] README.md 버전 메모 추가
-- [x] User manual.md 버전 메모 추가
-- [x] 관리자 overview 부분 실패 격리
-- [x] profiles.email 호환 폴백
-- [x] 관리자 warning UI
-- [x] 관리자 participant detail 자동 상태처리 제거
-- [x] 현재 경로 기반 데스크톱 활성 탭
-- [x] 현재 경로 기반 모바일 활성 탭
-- [x] 전체현황 `연속 인증 N주` 표기
-- [x] 대시보드 스트릭 단위 `주` 명시
-- [x] 관리자 표 스트릭 단위 명시
-- [x] 기존 규칙 8,190 조합 회귀 테스트
-- [x] v1.1.2~v1.2.3 구조 회귀 테스트
-- [x] v1.2.4 전용 구조 테스트
-- [x] TS/TSX 53개 구문 검사
-- [x] QA-report.md 갱신
-- [x] RELEASE-NOTES.md 갱신
-- [x] DB migration 없음 확인
-- [x] zip 패키징
+- [x] Create v1.2.5 working copy
+- [x] Create/update context-notes.md
+- [x] Create/update checklist.md
+- [x] Create/update README.md
+- [x] Create/update User manual.md
+- [x] Inspect current active navigation implementation
+- [x] Apply active-state font-weight/color fix
+- [x] Verify desktop navigation
+- [x] Verify mobile navigation
+- [x] Run structure/syntax/regression tests
+- [x] Update QA/release notes
+- [x] Package zip

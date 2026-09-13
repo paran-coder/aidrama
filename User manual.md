@@ -1,4 +1,4 @@
-# v1.2.4 사용자 안내
+# v1.2.5 사용자 안내
 
 상단 메뉴는 현재 보고 있는 화면에 맞춰 자동으로 강조됩니다. 스트릭은 매주 인증하는 서비스 구조이므로 `연속 인증 N주`로 표시합니다. 관리자 화면은 일부 운영 데이터 조회가 실패해도 가능한 영역을 계속 표시합니다.
 
@@ -22,3 +22,8 @@
 - 연한 녹색: 성공/완료
 - 연한 황갈색: 주의/마감 임박
 - 연한 적갈색: 실패/오류/정지
+
+## v1.2.5 UI Hotfix
+- Active navigation tab uses a stronger 900 font weight and dark ink text for consistent visual hierarchy.
+- Existing sage active background/border remains unchanged.
+- No database migration is required.

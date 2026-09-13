@@ -1,17 +1,16 @@
-# Context Notes — v1.2.4
+# Context Notes — v1.2.5
 
-## 목표
-- 관리자 `/admin` 페이지가 일부 운영 조회 실패 때문에 전체 오류 화면으로 떨어지는 문제를 복구한다.
-- 현재 URL에 맞는 상단/모바일 활성 메뉴를 표시한다.
-- 커뮤니티 스트릭 표기를 주간 인증 모델에 맞게 `연속 인증 N주`로 명확하게 표시한다.
+## Goal
+Small UI hotfix for navigation active-state typography.
 
-## 확인된 실환경 증상
-- 관리자 페이지 진입 시 `잠시 연결이 불안정합니다.` 오류가 반복되고 다시 불러오기로도 복구되지 않음.
-- 일반 사용자 화면에서는 어느 메뉴에 있어도 `이번 주 제출`이 항상 강조됨.
-- 전체현황 카드의 `0주 연속` 문구가 의미상 모호함.
+## Scope
+- Active navigation tab must not look lighter than inactive tabs.
+- Active tab text uses stronger weight (900) and normal dark ink color.
+- Keep existing active sage background/border treatment.
+- Apply consistently to desktop and mobile navigation.
+- No DB, auth, challenge, or submission logic changes.
 
-## 원칙
-- DB migration 추가 없이 현재 001~004 스키마와 호환한다.
-- 관리자 데이터의 일부 부가 조회가 실패해도 페이지 전체를 중단하지 않는다.
-- 사용자 챌린지 판정 규칙과 제출 규칙은 변경하지 않는다.
-- 주간 제출 모델이므로 스트릭 단위는 `주`를 유지한다.
+## Regression focus
+- Current route still controls exactly one active menu item.
+- Admin navigation remains unaffected except shared visual safety.
+- Existing v1.2.4 admin recovery behavior remains intact.

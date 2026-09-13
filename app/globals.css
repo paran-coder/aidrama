@@ -249,7 +249,8 @@ textarea:focus-visible {
 .nav-link-active {
   border-color: var(--nav-active-line);
   background: var(--nav-active-bg);
-  color: var(--nav-active-ink);
+  color: var(--ink);
+  font-weight: 900;
 }
 .nav-link-active:hover { background: var(--nav-active-bg); }
 
@@ -268,5 +269,6 @@ textarea:focus-visible {
 .mobile-nav-link-active {
   border-color: var(--nav-active-line);
   background: var(--nav-active-bg);
-  color: var(--nav-active-ink);
+  color: var(--ink);
+  font-weight: 900;
 }

@@ -1,4 +1,4 @@
-# AI Drama Challenge v1.2.4
+# AI Drama Challenge v1.2.5
 
 이번 버전은 관리자 화면 복구 안정성, 현재 경로 기반 활성 메뉴, 주간 스트릭 문구 정리를 포함합니다. DB migration은 추가하지 않습니다.
 
@@ -25,3 +25,12 @@ v1.2.3은 DB migration이 없습니다. 기존 001~004가 적용된 DB를 그대
 
 ## 기존 기능 보존
 인증, 초대코드, 사용자 정지, 제출 판정, 마일스톤/배지 규칙은 v1.2.2와 동일합니다.
+
+## v1.2.5 UI Hotfix
+- Active navigation tab uses a stronger 900 font weight and dark ink text for consistent visual hierarchy.
+- Existing sage active background/border remains unchanged.
+- No database migration is required.
+
+
+## v1.2.5 deployment
+No Supabase migration is required. Replace code, push to GitHub, and let Vercel redeploy.
