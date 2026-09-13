@@ -33,6 +33,6 @@ assert(!adminService.includes("processMissedWeeks"), "admin participant detail s
 const adminPage = read("app/admin/page.tsx");
 assert(adminPage.includes("warnings, health"), "admin page must receive partial-read health information");
 assert(adminPage.includes("일부 운영 정보를 호환 모드로 불러왔습니다."), "admin compatibility warning UI missing");
-assert(adminPage.includes("현재/최장 인증(주)"), "admin weekly streak unit label missing");
+assert(adminPage.includes("인증 현황") && adminPage.includes("현재/최장") && adminPage.includes("주"), "admin weekly streak unit labeling missing");
 
 console.log("v1.2.4 navigation/admin resilience checks passed");

@@ -1,18 +1,16 @@
-# OWL1000 v1.3.2 Migration Guide
+# OWL1000 v1.3.3 Migration Guide
 
-## Required migration
-Run `supabase/migrations/008_v1_3_2_rolling_weeks.sql` once after 007.
+## Database
+No new migration is required.
 
-Do not rerun 001-007 if they have already been applied.
+Do not rerun migrations 001-008.
 
-## What 008 does
-- Changes the canonical weekly window from Monday-Sunday to participant-specific 7-day windows anchored on the KST challenge start date.
-- Remaps existing `submissions.week_start`, `weekly_results.week_start`, `audit_logs.week_start`, `challenges.first_judgement_week_start`, and `challenges.last_processed_week_start` to the new anchor while preserving records.
-- Updates submission, missed-window, admin-correction, and batch-sync functions to use the participant anchor.
-- Keeps milestone eligibility on KST calendar-day rules.
+## Deploy
+1. Replace the current source with v1.3.3.
+2. Commit/push to GitHub.
+3. Confirm the Vercel build succeeds.
+4. Open Admin > 운영 관리.
+5. Verify the participant overview fits within the card at your normal desktop width and the right-side action buttons are fully visible.
 
-## Verification after deployment
-- Existing submitted URLs are still present.
-- Existing streaks/results are preserved after reconciliation.
-- A participant's current proof window begins on their challenge start weekday, not Monday.
-- The admin participant page shows the same period and deadline as the participant dashboard.
+## Data safety
+This release changes presentation only. Participant accounts, submissions, streaks, rolling 7-day windows, milestones, badges, and historical data are untouched.

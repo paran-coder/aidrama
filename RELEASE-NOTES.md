@@ -1,15 +1,12 @@
-# OWL1000 v1.3.2 Release Notes
+# OWL1000 v1.3.3 Release Notes
 
-## Changed
-- Weekly proof periods are now personalized 7-day windows anchored to each participant's KST challenge start date.
-- Dashboard and submission pages show the exact current proof period and personal deadline.
-- Admin participant views show current proof period and next deadline.
+## Admin participant table polish
+- Expanded admin shell max width on desktop without changing participant pages.
+- Reduced the participant overview from nine wide columns to seven grouped columns.
+- Grouped current/longest streak and success/failure counts under `인증 현황`.
+- Grouped current proof range and next deadline under `인증 기간`.
+- Kept nickname/email in a stable two-line identity cell with truncation protection.
+- Stacked `제출 내역` and `접근 관리` actions so the last column stays inside the rounded card.
+- Kept horizontal scrolling only as a fallback for narrower screens.
 
-## Preserved
-- KST calendar-day elapsed progress.
-- 100/300/600/900/1000 milestone rules and permanent badges.
-- Existing user, submission, weekly result, streak, and badge data.
-- Admin submission-link review from v1.3.1.
-
-## Database
-- Requires one new migration: `008_v1_3_2_rolling_weeks.sql`.
+No DB, auth, submission, streak, badge, or rolling-week logic changes.

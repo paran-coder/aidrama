@@ -51,10 +51,27 @@ export default async function AdminPage({
             </div>
           </div>
           <div className="mt-4 overflow-hidden rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)]">
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[1220px] text-left text-sm">
+            <div className="overflow-x-auto pb-1">
+              <table className="w-full min-w-[980px] table-fixed text-left text-sm">
+                <colgroup>
+                  <col className="w-[20%]" />
+                  <col className="w-[8%]" />
+                  <col className="w-[12%]" />
+                  <col className="w-[7%]" />
+                  <col className="w-[15%]" />
+                  <col className="w-[23%]" />
+                  <col className="w-[15%]" />
+                </colgroup>
                 <thead className="bg-[var(--surface-2)] text-xs uppercase tracking-wider text-[var(--muted)]">
-                  <tr><th className="px-5 py-4">톡방 닉네임 / 이메일</th><th className="px-5 py-4">계정 상태</th><th className="px-5 py-4">레벨</th><th className="px-5 py-4">경과일</th><th className="px-5 py-4">현재/최장 인증(주)</th><th className="px-5 py-4">이번 인증 기간</th><th className="px-5 py-4">다음 마감</th><th className="px-5 py-4">성공/실패</th><th className="px-5 py-4"></th></tr>
+                  <tr>
+                    <th className="px-5 py-4">톡방 닉네임 / 이메일</th>
+                    <th className="px-4 py-4 whitespace-nowrap">계정 상태</th>
+                    <th className="px-4 py-4">레벨</th>
+                    <th className="px-4 py-4 whitespace-nowrap">경과일</th>
+                    <th className="px-4 py-4">인증 현황</th>
+                    <th className="px-4 py-4">인증 기간</th>
+                    <th className="px-4 py-4 pr-6">관리</th>
+                  </tr>
                 </thead>
                 <tbody>
                   {participants.map(({ profile: participant, email, challenge, badges }) => {
@@ -62,16 +79,26 @@ export default async function AdminPage({
                     const level = CREATOR_LEVELS[creatorLevelIndex(badges, progress?.day ?? 0)];
                     const proofPeriod = challenge ? proofPeriodForAnchor(challenge.first_judgement_week_start) : null;
                     return (
-                      <tr key={participant.id} className="border-t border-[var(--line)]">
-                        <td className="px-5 py-4"><p className="font-black">{participant.display_name}</p><p className="mt-1 text-xs text-[var(--muted)]">{email ?? "이메일 없음"}</p></td>
-                        <td className="px-5 py-4"><span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${participant.status === "active" ? "ui-success border" : "ui-danger border"}`}>{participant.status === "active" ? "활성" : "정지"}</span></td>
-                        <td className="px-5 py-4 font-bold">{challenge ? `Lv.${level.level} ${level.label}` : "—"}</td>
-                        <td className="px-5 py-4 font-bold">{progress ? `${progress.day}일` : "시작 전"}</td>
-                        <td className="px-5 py-4 font-bold">{challenge ? `${challenge.streak} / ${challenge.longest_streak}` : "—"}</td>
-                        <td className="px-5 py-4 font-bold">{proofPeriod ? formatProofPeriod(proofPeriod.startKey) : "—"}</td>
-                        <td className="px-5 py-4 font-bold">{proofPeriod ? `${formatShortKoreanDateKey(proofPeriod.endKey)} 23:59` : "—"}</td>
-                        <td className="px-5 py-4 font-bold">{challenge ? `${challenge.success_count} / ${challenge.failure_count}` : "—"}</td>
-                        <td className="px-5 py-4"><div className="flex flex-wrap gap-2">{challenge && <Link className="secondary-button min-h-0 px-4 py-2 text-xs" href={`/admin/participants/${participant.id}#submissions`}>제출 내역</Link>}<Link className="secondary-button min-h-0 px-4 py-2 text-xs" href={`/admin/participants/${participant.id}#access`}>접근 관리</Link></div></td>
+                      <tr key={participant.id} className="border-t border-[var(--line)] align-middle">
+                        <td className="px-5 py-4">
+                          <p className="truncate font-black" title={participant.display_name}>{participant.display_name}</p>
+                          <p className="mt-1 truncate text-xs text-[var(--muted)]" title={email ?? "이메일 없음"}>{email ?? "이메일 없음"}</p>
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap"><span className={`rounded-full px-2.5 py-1 text-xs font-extrabold ${participant.status === "active" ? "ui-success border" : "ui-danger border"}`}>{participant.status === "active" ? "활성" : "정지"}</span></td>
+                        <td className="px-4 py-4 font-bold leading-5">{challenge ? <><span className="whitespace-nowrap">Lv.{level.level}</span><span className="block text-xs text-[var(--muted)]">{level.label}</span></> : "—"}</td>
+                        <td className="px-4 py-4 whitespace-nowrap font-bold">{progress ? `${progress.day}일` : "시작 전"}</td>
+                        <td className="px-4 py-4 font-bold leading-5">
+                          {challenge ? <><p><span className="text-[var(--muted)]">현재/최장</span> {challenge.streak} / {challenge.longest_streak}주</p><p className="mt-1 text-xs text-[var(--muted)]">성공/실패 {challenge.success_count} / {challenge.failure_count}</p></> : "—"}
+                        </td>
+                        <td className="px-4 py-4 font-bold leading-5">
+                          {proofPeriod ? <><p className="whitespace-nowrap">{formatProofPeriod(proofPeriod.startKey)}</p><p className="mt-1 whitespace-nowrap text-xs text-[var(--muted)]">마감 {formatShortKoreanDateKey(proofPeriod.endKey)} 23:59</p></> : "—"}
+                        </td>
+                        <td className="px-4 py-4 pr-6">
+                          <div className="flex flex-col items-stretch gap-2">
+                            {challenge && <Link className="secondary-button min-h-0 whitespace-nowrap px-3 py-2 text-xs" href={`/admin/participants/${participant.id}#submissions`}>제출 내역</Link>}
+                            <Link className="secondary-button min-h-0 whitespace-nowrap px-3 py-2 text-xs" href={`/admin/participants/${participant.id}#access`}>접근 관리</Link>
+                          </div>
+                        </td>
                       </tr>
                     );
                   })}

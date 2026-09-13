@@ -1,17 +1,19 @@
-# OWL1000 v1.3.2
+# OWL1000 v1.3.3
 
-OWL1000 is a 1000-day creator challenge web app. v1.3.2 changes the weekly proof cadence from a shared Monday-Sunday calendar week to a participant-specific 7-day proof window anchored on each participant's challenge start date.
+OWL1000 is a private creator challenge web app. v1.3.3 is a UI-only admin table layout patch on top of v1.3.2.
 
-## v1.3.2 highlights
-- Personal 7-day proof windows starting on the participant's KST challenge start date.
-- KST calendar-day elapsed progress and 100/300/600/900/1000 milestones remain unchanged.
-- Participant UI shows the exact current proof period and deadline.
-- Admin views show each participant's current proof period and next deadline.
-- Existing submissions/results are preserved by migration 008 and remapped to the new personal window keys.
+## What changed
+- Admin participant overview uses a wider desktop shell.
+- Participant table is compacted so the right-side actions stay visible on common desktop widths.
+- Proof period + deadline and streak + success/failure are grouped into clearer columns.
+- Nickname/email remain easy to scan.
+- No DB or challenge-rule changes.
 
 ## Deployment
-1. Apply migrations through `008_v1_3_2_rolling_weeks.sql` in order. If 001-007 are already applied, run only 008.
-2. Deploy this project to Vercel with the existing Supabase environment variables.
-3. Verify one existing participant's current period, existing submitted link, streak, and admin detail view.
+1. Replace the current app code with v1.3.3.
+2. Push to GitHub.
+3. Let Vercel build and deploy.
+4. Open Admin > 운영 관리 and verify the participant table at your usual desktop width.
 
-See `MIGRATION-GUIDE.md` and `QA-report.md` for details.
+## Database
+No new SQL. Do not rerun migrations 001-008.
