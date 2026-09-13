@@ -146,6 +146,28 @@ textarea:focus-visible {
 }
 .secondary-button:hover { background: #faf7f0; border-color: #c9c0b2; transform: translateY(-1px); }
 
+.admin-table-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.2rem;
+  border: 0;
+  border-radius: .7rem;
+  padding: .45rem .65rem;
+  background: transparent;
+  color: var(--ink);
+  font-size: .875rem;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  transition: background .18s ease, transform .18s ease;
+}
+.admin-table-action:hover {
+  background: var(--surface-2);
+  transform: translateY(-1px);
+}
+
+
 
 .grid-paper {
   background-image:
