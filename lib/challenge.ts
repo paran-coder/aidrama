@@ -1,18 +1,5 @@
-import type { Challenge } from "@/lib/types";
-
 export const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
 export const DAY_MS = 24 * 60 * 60 * 1000;
-
-export const OWL_STAGES = [
-  { minDay: 0, label: "알", subtitle: "가능성을 품은 시작" },
-  { minDay: 30, label: "새끼 부엉이", subtitle: "꾸준함이 형태를 갖추는 중" },
-  { minDay: 100, label: "어린 부엉이", subtitle: "리듬을 익힌 창작자" },
-  { minDay: 200, label: "탐험가", subtitle: "자신만의 문법을 찾는 중" },
-  { minDay: 365, label: "창작자", subtitle: "1년의 루틴을 만든 단계" },
-  { minDay: 550, label: "수호자", subtitle: "꾸준함이 실력이 된 단계" },
-  { minDay: 730, label: "현자", subtitle: "두 해를 넘어선 창작자" },
-  { minDay: 900, label: "마스터", subtitle: "1000일 완주를 눈앞에 둔 단계" },
-] as const;
 
 function kstDateParts(date: Date) {
   const shifted = new Date(date.getTime() + KST_OFFSET_MS);
@@ -74,23 +61,13 @@ export function elapsedDays(startedAt: string | Date, now = new Date()): number 
   return Math.min(1000, Math.max(0, Math.floor((now.getTime() - start.getTime()) / DAY_MS)));
 }
 
-export function baseStageForDay(day: number): number {
-  let index = 0;
-  OWL_STAGES.forEach((stage, i) => {
-    if (day >= stage.minDay) index = i;
-  });
-  return index;
-}
-
-export function effectiveStage(challenge: Pick<Challenge, "started_at" | "stage_override">, now = new Date()): number {
-  const base = baseStageForDay(elapsedDays(challenge.started_at, now));
-  if (challenge.stage_override === null) return base;
-  return Math.min(base, Math.max(0, challenge.stage_override));
-}
-
-export function challengeProgress(challenge: Pick<Challenge, "started_at">, now = new Date()) {
+export function challengeProgress(challenge: { started_at: string }, now = new Date()) {
   const day = elapsedDays(challenge.started_at, now);
-  return { day, percent: Math.min(100, (day / 1000) * 100), completed: day >= 1000 };
+  return {
+    day,
+    percent: Math.min(100, (day / 1000) * 100),
+    calendarReached1000: day >= 1000,
+  };
 }
 
 export function daysUntilNextMonday(now = new Date()) {

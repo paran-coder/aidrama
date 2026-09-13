@@ -127,3 +127,31 @@ textarea:focus-visible {
     animation-iteration-count: 1 !important;
   }
 }
+
+@keyframes milestone-pop {
+  0% { opacity: 0; transform: translateY(22px) scale(.96); }
+  70% { opacity: 1; transform: translateY(-2px) scale(1.01); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes milestone-float {
+  0% { opacity: 0; transform: translateY(10px) rotate(-8deg) scale(.8); }
+  25% { opacity: .9; }
+  100% { opacity: 0; transform: translateY(-42px) rotate(10deg) scale(1.08); }
+}
+
+.milestone-celebration { animation: milestone-pop .46s cubic-bezier(.2,.8,.2,1) both; }
+.milestone-sparkles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.milestone-sparkles span { position: absolute; color: #b48d56; opacity: 0; animation: milestone-float 2.2s ease-out both; }
+.milestone-sparkles span:nth-child(1) { left: 7%; bottom: 8%; animation-delay: .05s; }
+.milestone-sparkles span:nth-child(2) { left: 30%; bottom: 3%; animation-delay: .2s; }
+.milestone-sparkles span:nth-child(3) { right: 28%; bottom: 7%; animation-delay: .12s; }
+.milestone-sparkles span:nth-child(4) { right: 8%; bottom: 10%; animation-delay: .3s; }
+.milestone-sparkles span:nth-child(5) { left: 52%; bottom: 2%; animation-delay: .4s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .milestone-celebration,
+  .milestone-sparkles span {
+    animation: none !important;
+  }
+}

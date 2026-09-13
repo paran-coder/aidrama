@@ -25,12 +25,13 @@ export async function signupAction(formData: FormData) {
   const admin = createAdminClient();
   const { data: invite } = await admin
     .from("invite_codes")
-    .select("code, used_by, used_at, expires_at")
+    .select("code, used_by, used_at, revoked_at, expires_at")
     .eq("code", inviteCode)
     .maybeSingle();
 
   if (!invite) redirect(authError("존재하지 않는 초대 코드입니다."));
   if (invite.used_at) redirect(authError("이미 사용된 초대 코드입니다."));
+  if (invite.revoked_at) redirect(authError("발급이 취소된 초대 코드입니다."));
   if (invite.expires_at && new Date(invite.expires_at) < new Date()) redirect(authError("만료된 초대 코드입니다."));
 
   const { data: created, error: createError } = await admin.auth.admin.createUser({
@@ -56,7 +57,11 @@ export async function signupAction(formData: FormData) {
   if (claimError) {
     await admin.auth.admin.deleteUser(created.user.id);
     const raw = claimError.message ?? "";
-    const message = raw.includes("ALREADY_USED") ? "방금 다른 사용자가 사용한 초대 코드입니다." : "초대 코드를 사용할 수 없습니다.";
+    const message = raw.includes("ALREADY_USED")
+      ? "방금 다른 사용자가 사용한 초대 코드입니다."
+      : raw.includes("REVOKED")
+        ? "발급이 취소된 초대 코드입니다."
+        : "초대 코드를 사용할 수 없습니다.";
     redirect(authError(message));
   }
 
@@ -70,9 +75,29 @@ export async function loginAction(formData: FormData) {
   const email = text(formData, "email").toLowerCase();
   const password = text(formData, "password");
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-  if (error) redirect(`/login?error=${encodeURIComponent("이메일 또는 비밀번호가 올바르지 않습니다.")}`);
-  redirect("/dashboard");
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error || !data.user) redirect(`/login?error=${encodeURIComponent("이메일 또는 비밀번호가 올바르지 않습니다.")}`);
+
+  const admin = createAdminClient();
+  const { data: profile } = await admin
+    .from("profiles")
+    .select("role,status")
+    .eq("id", data.user.id)
+    .maybeSingle();
+  const envAdmin = Boolean(process.env.ADMIN_EMAIL && email === process.env.ADMIN_EMAIL.toLowerCase());
+  const isAdmin = envAdmin || profile?.role === "admin";
+
+  if (!profile && !isAdmin) {
+    await supabase.auth.signOut();
+    redirect(`/login?error=${encodeURIComponent("서비스에 등록되지 않은 계정입니다. 초대 코드로 가입해 주세요.")}`);
+  }
+
+  if (profile?.status === "suspended" && !isAdmin) {
+    await supabase.auth.signOut();
+    redirect(`/login?error=${encodeURIComponent("이용이 일시 중지된 계정입니다. 운영자에게 문의해 주세요.")}`);
+  }
+
+  redirect(isAdmin ? "/admin" : "/dashboard");
 }
 
 export async function logoutAction() {
@@ -95,7 +120,13 @@ export async function resetPasswordAction(formData: FormData) {
   const password = text(formData, "password");
   if (password.length < 8) redirect(`/reset-password?error=${encodeURIComponent("비밀번호는 8자 이상이어야 합니다.")}`);
   const supabase = await createClient();
-  const { error } = await supabase.auth.updateUser({ password });
+  const { data, error } = await supabase.auth.updateUser({ password });
   if (error) redirect(`/reset-password?error=${encodeURIComponent("비밀번호를 변경하지 못했습니다.")}`);
-  redirect(`/dashboard?message=${encodeURIComponent("비밀번호가 변경되었습니다.")}`);
+
+  if (!data.user) redirect(`/login?message=${encodeURIComponent("비밀번호가 변경되었습니다. 다시 로그인해 주세요.")}`);
+  const admin = createAdminClient();
+  const { data: profile } = await admin.from("profiles").select("role,status").eq("id", data.user.id).maybeSingle();
+  const envAdmin = Boolean(data.user.email && process.env.ADMIN_EMAIL && data.user.email.toLowerCase() === process.env.ADMIN_EMAIL.toLowerCase());
+  if (profile?.status === "suspended" && !envAdmin && profile?.role !== "admin") redirect("/account-suspended");
+  redirect(envAdmin || profile?.role === "admin" ? "/admin" : `/dashboard?message=${encodeURIComponent("비밀번호가 변경되었습니다.")}`);
 }

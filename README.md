@@ -1,22 +1,59 @@
-# AI Drama Challenge v1.1.1
+# AI Drama Challenge v1.2.0
 
-A 1000-day weekly AI-drama creator challenge web app built with Next.js, Vercel and Supabase.
+OWL1000 is one continuous 1000-day creator journey with a believable first promise: **100 days**. Participants begin as creators on day zero, earn permanent milestone badges, and level up through five creator identities. Weekly failures affect the current streak, never identity already earned.
 
-## What v1.1.1 changes
-v1.1.1 keeps the v1.0.1 user product intact and includes the v1.1.0 persistence redesign and reorganizes the persistence layer for long-running operations. Submission attempts and official weekly outcomes are separated, unnecessary first-party analytics storage is removed, and meaningful administrator corrections are auditable and recoverable.
+## Product model
 
-## User-facing compatibility
-Invitation-code signup, email/password login, onboarding, weekly submissions, streak/failure rules, owl growth, history, community, mypage and completion screens are intentionally unchanged from v1.0.1.
+- Milestones: `100 → 300 → 600 → 900 → 1000`
+- A milestone is awarded only after its threshold is reached **and a later qualifying weekly success is recorded**.
+- At most one next milestone is awarded per successful weekly proof. Long-inactive users cannot unlock several badges with one submission.
+- Levels are badge-driven and permanent:
+  1. Lv.1 Creator
+  2. Lv.2 Routine Creator — after 100 badge
+  3. Lv.3 Story Creator — after 300 badge
+  4. Lv.4 Signature Creator — after 600 badge
+  5. Lv.5 Master Creator — after 900 badge
+- 1000 is the permanent OWL1000 completion badge, not Lv.6.
+- New badge acquisition triggers a small accessible level-up celebration. Reduced-motion users receive the same message without animation.
 
-## Recommended architecture
-- Next.js 16 / React 19 / TypeScript
-- Vercel deployment
-- Supabase Auth
-- Supabase PostgreSQL
-- Operational tables: `profiles`, `challenges`, `weekly_results`, `submissions`, `invite_codes`, `audit_logs`
+## Operational model
+
+The v1.1.2 stabilization features remain intact:
+- admin login goes directly to `/admin`
+- invite issuance, revocation and permanent usage history
+- participant email/usage visibility for administrators
+- participant suspension/reactivation independent from invite codes
+- administrator corrections + audit logs
+- batch missed-week synchronization for admin/community lists
+- pending/loading states for long-running form actions
+
+## Database migrations
+
+### Your current live project (v1.1.0/v1.1.1 code with only `001_init.sql` applied)
+Run these **once, in this order**, in Supabase SQL Editor:
+
+```text
+supabase/migrations/002_v1_1_2_ops.sql
+supabase/migrations/003_v1_2_0_growth.sql
+```
+
+Then push the v1.2.0 code to GitHub and let Vercel redeploy.
+
+### If 002 is already applied
+Run only:
+
+```text
+supabase/migrations/003_v1_2_0_growth.sql
+```
+
+### Fresh project
+Run `001 → 002 → 003` in numeric order.
+
+Do not rerun a migration that has already completed successfully.
 
 ## Environment variables
-Create these in Vercel Production (and Preview if needed):
+
+Unchanged from v1.1.x:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=
@@ -26,47 +63,21 @@ NEXT_PUBLIC_SITE_URL=https://your-project.vercel.app
 ADMIN_EMAIL=admin@example.com
 ```
 
-`SUPABASE_SERVICE_ROLE_KEY` must remain server-only and must never use a `NEXT_PUBLIC_` prefix.
+`SUPABASE_SERVICE_ROLE_KEY` is server-only. Never expose it in browser code or commit `.env.local`.
 
-## Fresh Supabase setup
-Use **this v1.1.1 repository's** `supabase/migrations/001_init.sql`. Do not mix it with the v1.0.x schema. If an older schema already contains real production data, migrate it deliberately instead of re-running this fresh initializer.
+## Performance deployment note
 
-1. Create a Supabase project.
-2. Open Supabase SQL Editor.
-3. Run `supabase/migrations/001_init.sql` in full.
-4. Add the environment variables above to Vercel.
-5. Set Supabase Authentication Site URL to your production Vercel URL.
-6. Add `https://your-project.vercel.app/auth/callback` to allowed redirect URLs.
-7. Run the admin bootstrap script locally with production credentials or promote the intended first account to admin using the documented bootstrap flow.
-8. Redeploy the Vercel project after environment variables are saved.
+For lowest latency, set the Vercel Function Region as close as possible to the Supabase database region. The code also removes participant-by-participant synchronization from admin/community list rendering and uses one batch RPC instead.
 
-## One-time admin bootstrap
-Create a local `.env.local` from `.env.example`, fill in the production Supabase values and the `BOOTSTRAP_*` values, then run:
+## Verification
 
-```bash
-npm run bootstrap:admin
-```
-
-The npm script explicitly loads `.env.local`. After a successful bootstrap, remove `BOOTSTRAP_ADMIN_EMAIL`, `BOOTSTRAP_ADMIN_PASSWORD`, and `BOOTSTRAP_ADMIN_NAME` from your real `.env.local`. Keep the Supabase connection values only if you still use the local app or administration scripts. Never commit `.env.local`.
-
-## Local commands
 ```bash
 npm install
 npm run test:rules
+npm run test:ops
+npm run test:growth
 npm run typecheck
 npm run build
-npm run dev
 ```
 
-## Operational model
-- `weekly_results` is the official weekly outcome history.
-- `submissions` preserves actual submission attempts and the official result points to the accepted attempt.
-- `challenges` stores current summary values for fast dashboard/community rendering.
-- Summary values can be reconciled from weekly history after an administrator correction.
-- `audit_logs` stores important corrections, not page-view analytics.
-
-## Deployment
-Push the repository to GitHub and import it into Vercel. Every production environment-variable change requires a new deployment/redeploy before it is guaranteed to affect runtime code.
-
-## Release verification
-See `checklist.md` and `QA-report.md`. GitHub CI runs the rule-parity test, official TypeScript check and production build after dependencies are installed.
+GitHub CI runs the same verification flow. See `QA-report.md` and `MIGRATION-GUIDE.md` before production deployment.

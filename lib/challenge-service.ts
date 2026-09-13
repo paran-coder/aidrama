@@ -3,7 +3,7 @@ import {
   currentWeekStartKey,
   previousWeekStartKey,
 } from "@/lib/challenge";
-import type { Challenge, Profile, Submission, WeeklyResult } from "@/lib/types";
+import type { Challenge, ChallengeBadge, Profile, Submission, WeeklyResult } from "@/lib/types";
 
 export type ChallengeHistory = {
   results: WeeklyResult[];
@@ -13,6 +13,7 @@ export type ChallengeHistory = {
 export type CommunityRow = {
   challenge: Challenge;
   profile: Pick<Profile, "id" | "display_name">;
+  badges: ChallengeBadge[];
 };
 
 export async function processMissedWeeks(userId: string, now = new Date()): Promise<Challenge | null> {
@@ -28,13 +29,14 @@ export async function processMissedWeeks(userId: string, now = new Date()): Prom
 
   const typed = challenge as Challenge;
   const lastClosed = previousWeekStartKey(now);
-  if (lastClosed >= typed.first_judgement_week_start) {
-    const { error: processingError } = await admin.rpc("process_missed_weeks", {
-      p_user_id: userId,
-      p_last_closed_week: lastClosed,
-    });
-    if (processingError) throw processingError;
-  }
+  if (lastClosed < typed.first_judgement_week_start) return typed;
+  if (typed.last_processed_week_start && typed.last_processed_week_start >= lastClosed) return typed;
+
+  const { error: processingError } = await admin.rpc("process_missed_weeks", {
+    p_user_id: userId,
+    p_last_closed_week: lastClosed,
+  });
+  if (processingError) throw processingError;
 
   const { data: refreshed, error: refreshedError } = await admin
     .from("challenges")
@@ -43,6 +45,14 @@ export async function processMissedWeeks(userId: string, now = new Date()): Prom
     .single();
   if (refreshedError) throw refreshedError;
   return refreshed as Challenge;
+}
+
+export async function syncAllMissedWeeks(now = new Date()) {
+  const admin = createAdminClient();
+  const { error } = await admin.rpc("process_all_missed_weeks", {
+    p_last_closed_week: previousWeekStartKey(now),
+  });
+  if (error) throw error;
 }
 
 export async function getChallenge(userId: string, process = true): Promise<Challenge | null> {
@@ -114,39 +124,65 @@ export async function getChallengeHistory(challengeId: string): Promise<Challeng
   };
 }
 
+export async function getChallengeBadges(challengeId: string): Promise<ChallengeBadge[]> {
+  const admin = createAdminClient();
+  const { data, error } = await admin
+    .from("challenge_badges")
+    .select("id,challenge_id,user_id,milestone_days,awarded_at,trigger_weekly_result_id,trigger_submission_id,created_at")
+    .eq("challenge_id", challengeId)
+    .order("milestone_days", { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as ChallengeBadge[];
+}
+
 export async function getCommunityRows(): Promise<CommunityRow[]> {
   const admin = createAdminClient();
-  const [{ data: profiles, error: profilesError }, { data: challenges, error: challengesError }] = await Promise.all([
-    admin.from("profiles").select("id,display_name"),
+  await syncAllMissedWeeks();
+  const [
+    { data: profiles, error: profilesError },
+    { data: challenges, error: challengesError },
+    { data: badges, error: badgesError },
+  ] = await Promise.all([
+    admin.from("profiles").select("id,display_name").eq("status", "active").eq("role", "user"),
     admin.from("challenges").select("*"),
+    admin.from("challenge_badges").select("id,challenge_id,user_id,milestone_days,awarded_at,trigger_weekly_result_id,trigger_submission_id,created_at"),
   ]);
   if (profilesError) throw profilesError;
   if (challengesError) throw challengesError;
+  if (badgesError) throw badgesError;
 
   const typedProfiles = (profiles ?? []) as Pick<Profile, "id" | "display_name">[];
   const typedChallenges = (challenges ?? []) as Challenge[];
-  const refreshed = (await Promise.all(typedChallenges.map((challenge) => processMissedWeeks(challenge.user_id))))
-    .filter((challenge): challenge is Challenge => Boolean(challenge));
+  const typedBadges = (badges ?? []) as ChallengeBadge[];
   const profileMap = new Map(typedProfiles.map((profile) => [profile.id, profile]));
+  const badgeMap = new Map<string, ChallengeBadge[]>();
+  for (const badge of typedBadges) {
+    const list = badgeMap.get(badge.challenge_id) ?? [];
+    list.push(badge);
+    badgeMap.set(badge.challenge_id, list);
+  }
 
-  return refreshed
+  return typedChallenges
     .flatMap((challenge) => {
       const profile = profileMap.get(challenge.user_id);
-      return profile ? [{ challenge, profile }] : [];
+      return profile ? [{ challenge, profile, badges: badgeMap.get(challenge.id) ?? [] }] : [];
     })
     .sort((a, b) => b.challenge.longest_streak - a.challenge.longest_streak || b.challenge.streak - a.challenge.streak);
 }
 
-export async function getPublicParticipant(userId: string): Promise<{ profile: Pick<Profile, "id" | "display_name">; challenge: Challenge } | null> {
+export async function getPublicParticipant(userId: string): Promise<{ profile: Pick<Profile, "id" | "display_name">; challenge: Challenge; badges: ChallengeBadge[] } | null> {
   const admin = createAdminClient();
   const { data: profile, error } = await admin
     .from("profiles")
     .select("id,display_name")
     .eq("id", userId)
+    .eq("status", "active")
+    .eq("role", "user")
     .maybeSingle();
   if (error) throw error;
   if (!profile) return null;
   const challenge = await processMissedWeeks(userId);
   if (!challenge) return null;
-  return { profile: profile as Pick<Profile, "id" | "display_name">, challenge };
+  const badges = await getChallengeBadges(challenge.id);
+  return { profile: profile as Pick<Profile, "id" | "display_name">, challenge, badges };
 }

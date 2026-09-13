@@ -1,48 +1,55 @@
-# AI Drama Challenge v1.1.0 — Context Notes
+# Context Notes — AI Drama Challenge v1.2.0
 
 ## Release intent
-v1.1.0 is an operations-oriented data refactor. The user-facing product, routes, UI, invitation flow, challenge rules, owl growth experience, and completion experience are frozen to v1.0.1 unless a bug must be fixed to preserve existing behavior.
+v1.2.0 changes the motivation model while preserving the single continuous OWL1000 journey. The product no longer asks a new participant to psychologically commit to 1000 days at once. The first visible target is 100 days, followed by 300, 600, 900 and 1000.
 
-## Non-negotiable compatibility contract
-- Invitation-code signup remains mandatory and one-time.
-- Email/password authentication remains Supabase Auth.
-- Onboarding and challenge start flow remain unchanged.
-- Challenge duration remains 1000 days.
-- Weekly judging remains Monday–Sunday in Asia/Seoul (KST).
-- The first judged week begins on the first Monday after challenge start.
-- Weekly submission, verification fallback, streak, consecutive-failure penalties, reset/recovery rules, owl growth, history, community, mypage, completion, and admin invite-code flows must retain v1.0.1 behavior.
-- Existing public routes remain stable.
+## Confirmed product decisions
+- One continuous challenge; milestones do not create new challenge records.
+- Current targets: 100 → 300 → 600 → 900 → 1000 days.
+- Badge is awarded only after its day threshold has been reached and a qualifying weekly success is recorded.
+- **One successful weekly proof can award at most the next unearned milestone.** Long inactivity never causes mass-unlock.
+- Earned badges are permanent.
+- User identity starts at **Lv.1 Creator** on day zero. Nobody waits until day 1000 to become a creator.
+- Levels are badge-driven: no badge = Lv.1, 100 = Lv.2, 300 = Lv.3, 600 = Lv.4, 900 = Lv.5. The 1000 badge is completion, not Lv.6.
+- Weekly failure never lowers creator level or mascot stage.
+- A failure still breaks the current streak and increments consecutive-failure status. 2 failures show a warning; 3 failures show a restart prompt, but earned identity/progress is never removed.
+- Existing historical v1.1 stage-drop/reset columns remain for schema compatibility only. v1.2 canonical reconciliation clears active stage overrides and reset counts.
 
-## v1.1.0 data architecture
-Supabase Auth remains the identity/session source. Public data is organized by responsibility:
-1. `profiles`: user-facing identity metadata and role.
-2. `challenges`: current challenge state/cache.
-3. `weekly_results`: authoritative weekly outcome history.
-4. `submissions`: immutable-ish submission attempts; re-submission history is possible.
-5. `invite_codes`: one-time signup authorization.
-6. `audit_logs`: important administrator/system corrections only.
+## Approved owl direction
+Five-stage warm floral owl mascot, same character growing in confidence and visual richness. No egg stage.
+1. Lv.1 Creator — small complete young owl.
+2. Lv.2 Routine Creator — notebook/pencil, stable habit cues.
+3. Lv.3 Story Creator — expressive storytelling/book cues.
+4. Lv.4 Signature Creator — refined personal style, signature detail.
+5. Lv.5 Master Creator — premium hero form with richest floral treatment.
 
-`analytics_events` and first-party page/click analytics storage are removed from the operational database.
+Approved concept reference: `spec/owl-v1.2-concept.png`.
+Production assets are cropped for app readability, with separate stage and compact thumbnail files.
 
-## Source-of-truth rules
-- Authentication truth: Supabase Auth.
-- User metadata truth: `profiles`.
-- Historical challenge truth: `weekly_results` + `submissions`.
-- Current challenge summary/cache: `challenges`.
-- Signup authorization truth: `invite_codes`.
-- Administrative correction trace: `audit_logs`.
-- Derived values such as visual owl stage and challenge completion date should be calculated where practical rather than redundantly persisted.
+## UI direction
+- Landing leads with "already a creator" + first 100-day promise.
+- Dashboard makes the current milestone the primary progress bar and keeps full 1000-day progress secondary.
+- When threshold is reached before the qualifying success, progress stays visually complete at target rather than showing values such as 120/100.
+- Newly earned milestone shows a small non-blocking celebration; animation is disabled under reduced-motion preferences.
+- Community card shows level, compact owl, streak and earned badges.
+- My Page shows permanent creator identity and milestone badges.
+- Completion remains a distinct 1000-day archive state.
 
-## Operational principles
-- A weekly official result is unique per `(challenge_id, week_start)`.
-- Submission attempts are separate from weekly official results so incorrect/replaced submissions can be traced.
-- Important state changes occur transactionally in database functions using row locks where needed.
-- Challenge summary values must be rebuildable from weekly history.
-- Client users have read access only where product behavior requires it; state-changing challenge operations are server/service-role only.
-- Audit logs do not collect routine page views or button clicks.
+## Operations carried forward from v1.1.2
+- Admin defaults to `/admin`; participant challenge routes redirect admins away from mutation flows.
+- Invite revocation is separate from participant suspension.
+- Used invite codes are historical records, not deletable access switches.
+- Participant status supports active/suspended and is audited.
+- Admin/community list synchronization uses one batch missed-week RPC instead of per-participant RPC calls.
 
-## Release policy
-Semantic version: 1.1.0 (minor release because internal data behavior and admin capabilities expand while user product behavior is intentionally preserved).
+## Database approach
+- `challenge_badges` is the milestone source-of-truth: one row per challenge + milestone.
+- Do not store mutable current-goal or current-level columns; derive them from earned badges.
+- `challenges` remains a current summary cache for streak/count rendering; official history remains in `weekly_results`.
 
-## v1.1.1 patch note
-The admin bootstrap command now explicitly loads `.env.local`. The previous command used plain Node, which does not inherit Next.js `.env.local` loading behavior. Real secret values remain local-only and are excluded by `.gitignore`.
+## Migration strategy for the current live project
+The user's live Supabase project was initialized with `001_init.sql` and has not yet applied v1.1.2/v1.2 migrations. Apply:
+1. `002_v1_1_2_ops.sql`
+2. `003_v1_2_0_growth.sql`
+
+Then deploy v1.2.0 code. Fresh projects run 001 → 002 → 003.

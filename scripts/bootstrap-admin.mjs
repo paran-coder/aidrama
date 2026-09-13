@@ -23,6 +23,14 @@ if (createError) {
   user = created.user;
 }
 
-const { error: profileError } = await supabase.from("profiles").upsert({ id: user.id, display_name: displayName, role: "admin" }, { onConflict: "id" });
+const { error: profileError } = await supabase.from("profiles").upsert({
+  id: user.id,
+  display_name: displayName,
+  role: "admin",
+  status: "active",
+  suspended_at: null,
+  suspended_by: null,
+  suspension_reason: null,
+}, { onConflict: "id" });
 if (profileError) throw profileError;
 console.log(`Admin ready: ${email}`);

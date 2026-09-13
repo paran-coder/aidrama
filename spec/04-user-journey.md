@@ -1,3 +1,5 @@
+> **v1.2 supersession note:** This file preserves the original v1.0 planning history. Any egg-stage, stage-drop/reset, 1000-day-first-goal, or old admin-flow guidance is superseded by `spec/10-v1.1-operations-addendum.md`, `spec/11-v1.2-product-growth-plan.md`, and `context-notes.md`.
+
 # 사용자 여정과 핵심 흐름
 
 ## 핵심 흐름 (Mermaid)

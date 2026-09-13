@@ -2,14 +2,16 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { requireUser } from "@/lib/auth";
+import { requireAppContext } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { challengeProgress, formatDateKey, nextMondayAfterStart, weekDeadlineFromKey } from "@/lib/challenge";
-import { currentChallengeWeek, getChallenge, processMissedWeeks } from "@/lib/challenge-service";
+import { formatDateKey, nextMondayAfterStart, weekDeadlineFromKey } from "@/lib/challenge";
+import { currentChallengeWeek, getChallenge, getChallengeBadges, processMissedWeeks } from "@/lib/challenge-service";
 import { inspectSubmissionUrl } from "@/lib/urls";
+import { hasCompletionBadge, MILESTONES, type Milestone } from "@/lib/growth";
 
 export async function startChallengeAction() {
-  const user = await requireUser();
+  const { user, isAdmin } = await requireAppContext();
+  if (isAdmin) redirect("/admin");
   const existing = await getChallenge(user.id, false);
   if (existing) redirect("/dashboard");
 
@@ -25,15 +27,20 @@ export async function startChallengeAction() {
 }
 
 export async function submitLinkAction(formData: FormData) {
-  const user = await requireUser();
+  const { user, isAdmin } = await requireAppContext();
+  if (isAdmin) redirect("/admin");
   const url = String(formData.get("url") ?? "").trim();
   const requestedWeekStart = String(formData.get("weekStart") ?? "").trim();
   const inspected = inspectSubmissionUrl(url);
   if (!inspected.valid) redirect(`/dashboard/submit?error=${encodeURIComponent("올바른 http/https 링크를 입력해 주세요.")}`);
 
   const challenge = await processMissedWeeks(user.id);
-  if (!challenge) redirect("/onboarding");
-  if (challengeProgress(challenge).completed) redirect(`/complete/${user.id}`);
+  if (!challenge) {
+    redirect("/onboarding");
+    throw new Error("UNREACHABLE_AFTER_REDIRECT");
+  }
+  const badgesBefore = await getChallengeBadges(challenge.id);
+  if (hasCompletionBadge(badgesBefore)) redirect(`/complete/${user.id}`);
   const weekStart = currentChallengeWeek(challenge);
   if (!weekStart) redirect(`/dashboard/submit?error=${encodeURIComponent("첫 주간 챌린지는 다음 월요일부터 시작됩니다.")}`);
   if (!requestedWeekStart || requestedWeekStart !== weekStart) {
@@ -59,7 +66,15 @@ export async function submitLinkAction(formData: FormData) {
     redirect(`/dashboard/submit?error=${encodeURIComponent(duplicate ? "이번 주 제출은 이미 완료되었습니다." : "제출을 저장하지 못했습니다.")}`);
   }
 
+  const badgesAfter = await getChallengeBadges(challenge.id);
+  const beforeMilestones = new Set(badgesBefore.map((badge) => badge.milestone_days));
+  const awarded = badgesAfter
+    .map((badge) => badge.milestone_days)
+    .find((milestone): milestone is Milestone => MILESTONES.includes(milestone as Milestone) && !beforeMilestones.has(milestone));
+
   revalidatePath("/dashboard");
   revalidatePath("/dashboard/history");
-  redirect(`/dashboard?submitted=${verification}`);
+  revalidatePath("/community");
+  const milestoneQuery = awarded ? `&milestone=${awarded}` : "";
+  redirect(`/dashboard?submitted=${verification}${milestoneQuery}`);
 }

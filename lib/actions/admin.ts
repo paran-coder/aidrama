@@ -7,7 +7,7 @@ import { requireAdmin } from "@/lib/auth";
 import { currentWeekStartKey } from "@/lib/challenge";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { inspectSubmissionUrl } from "@/lib/urls";
-import type { WeeklyStatus } from "@/lib/types";
+import type { AccountStatus, WeeklyStatus } from "@/lib/types";
 
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 function makeCode() {
@@ -18,7 +18,7 @@ function makeCode() {
 }
 
 export async function createInviteCodeAction() {
-  const user = await requireAdmin();
+  const { user } = await requireAdmin();
   const admin = createAdminClient();
 
   for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -32,8 +32,64 @@ export async function createInviteCodeAction() {
   redirect(`/admin?error=${encodeURIComponent("초대 코드를 발급하지 못했습니다.")}`);
 }
 
+export async function revokeInviteCodeAction(formData: FormData) {
+  const { user } = await requireAdmin();
+  const code = String(formData.get("code") ?? "").trim().toUpperCase();
+  const reason = String(formData.get("reason") ?? "관리자 발급 취소").trim();
+  if (!code) redirect(`/admin?error=${encodeURIComponent("취소할 초대 코드를 확인해 주세요.")}`);
+
+  const admin = createAdminClient();
+  const { error } = await admin.rpc("admin_revoke_invite_code", {
+    p_actor_user_id: user.id,
+    p_code: code,
+    p_reason: reason || "관리자 발급 취소",
+  });
+  if (error) {
+    const message = error.message.includes("INVITE_ALREADY_USED")
+      ? "이미 사용된 초대 코드는 취소할 수 없습니다. 사용 이력으로 보존됩니다."
+      : "초대 코드 발급을 취소하지 못했습니다.";
+    redirect(`/admin?error=${encodeURIComponent(message)}`);
+  }
+
+  revalidatePath("/admin");
+  redirect(`/admin?revoked=${encodeURIComponent(code)}`);
+}
+
+export async function setParticipantStatusAction(formData: FormData) {
+  const { user } = await requireAdmin();
+  const targetUserId = String(formData.get("targetUserId") ?? "").trim();
+  const status = String(formData.get("status") ?? "") as AccountStatus;
+  const reason = String(formData.get("reason") ?? "").trim();
+  const back = `/admin/participants/${targetUserId}`;
+
+  if (!targetUserId || (status !== "active" && status !== "suspended")) {
+    redirect(`${back}?error=${encodeURIComponent("사용자 상태 변경 정보를 확인해 주세요.")}`);
+  }
+  if (reason.length < 3) redirect(`${back}?error=${encodeURIComponent("상태 변경 사유를 3자 이상 입력해 주세요.")}`);
+
+  const admin = createAdminClient();
+  const { error } = await admin.rpc("admin_set_user_status", {
+    p_actor_user_id: user.id,
+    p_target_user_id: targetUserId,
+    p_status: status,
+    p_reason: reason,
+  });
+
+  if (error) {
+    const message = error.message.includes("ADMIN_ACCOUNT_PROTECTED") || error.message.includes("SELF_STATUS_CHANGE_NOT_ALLOWED")
+      ? "관리자 계정은 이 화면에서 정지할 수 없습니다."
+      : "사용자 상태를 변경하지 못했습니다.";
+    redirect(`${back}?error=${encodeURIComponent(message)}`);
+  }
+
+  revalidatePath("/admin");
+  revalidatePath(back);
+  revalidatePath("/community");
+  redirect(`${back}?statusChanged=${encodeURIComponent(status)}`);
+}
+
 export async function correctWeeklyResultAction(formData: FormData) {
-  const actor = await requireAdmin();
+  const { user: actor } = await requireAdmin();
   const admin = createAdminClient();
   const targetUserId = String(formData.get("targetUserId") ?? "").trim();
   const challengeId = String(formData.get("challengeId") ?? "").trim();

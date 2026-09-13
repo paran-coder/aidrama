@@ -1,88 +1,59 @@
-// Regression guard for the v1.0.1 -> v1.1.0 state model.
-// It exhaustively compares the legacy incremental transition semantics with the
-// v1.1 reconciliation semantics for success/failure sequences and stage inputs.
+// v1.2.0 regression guard: failures may break the current streak, but creator
+// identity never regresses. Compare incremental and full-reconciliation models.
 
-function legacyRun(sequence, baseStages) {
+function incrementalRun(sequence) {
   let streak = 0;
   let longest = 0;
   let failures = 0;
-  let stageOverride = null;
-  let resetCount = 0;
+  let successCount = 0;
+  let failureCount = 0;
   const snapshots = [];
 
-  sequence.forEach((action, index) => {
-    const baseStage = baseStages[index];
+  for (const action of sequence) {
+    let effect = "none";
     if (action === "S") {
-      const hadPenalty = stageOverride !== null;
       streak += 1;
       longest = Math.max(longest, streak);
       failures = 0;
-      stageOverride = null;
-      snapshots.push([streak, longest, failures, stageOverride, resetCount, hadPenalty ? "recovery" : "none"]);
-      return;
+      successCount += 1;
+    } else {
+      const previousFailures = failures;
+      streak = 0;
+      failures = Math.min(failures + 1, 3);
+      failureCount += 1;
+      if (failures === 2) effect = "warning";
+      else if (failures === 3 && previousFailures < 3) effect = "reset"; // restart prompt only
     }
-
-    const previousFailures = failures;
-    failures = Math.min(failures + 1, 3);
-    const currentStage = stageOverride ?? baseStage;
-    streak = 0;
-    let effect = "none";
-    if (failures === 1) {
-      stageOverride = Math.max(currentStage - 1, 0);
-      effect = "stage_drop";
-    } else if (failures === 2) {
-      effect = "warning";
-    } else if (failures === 3) {
-      stageOverride = 0;
-      if (previousFailures < 3) {
-        resetCount += 1;
-        effect = "reset";
-      }
-    }
-    snapshots.push([streak, longest, failures, stageOverride, resetCount, effect]);
-  });
-
+    snapshots.push([streak, longest, failures, successCount, failureCount, effect, null, 0]);
+  }
   return snapshots;
 }
 
-function reconciledRun(sequence, baseStages) {
+function reconciledRun(sequence) {
   let streak = 0;
   let longest = 0;
   let failures = 0;
-  let stageOverride = null;
-  let resetCount = 0;
+  let successCount = 0;
+  let failureCount = 0;
   const snapshots = [];
 
-  sequence.forEach((action, index) => {
-    const baseStage = baseStages[index];
+  sequence.forEach((action) => {
     let effect = "none";
     if (action === "S") {
-      effect = stageOverride !== null ? "recovery" : "none";
       streak += 1;
       longest = Math.max(longest, streak);
       failures = 0;
-      stageOverride = null;
+      successCount += 1;
     } else {
-      streak = 0;
-      const currentStage = stageOverride ?? baseStage;
       const previousFailures = failures;
+      failureCount += 1;
+      streak = 0;
       failures = Math.min(failures + 1, 3);
-      if (failures === 1) {
-        stageOverride = Math.max(currentStage - 1, 0);
-        effect = "stage_drop";
-      } else if (failures === 2) {
-        effect = "warning";
-      } else if (failures === 3) {
-        if (previousFailures < 3) {
-          resetCount += 1;
-          effect = "reset";
-        }
-        stageOverride = 0;
-      }
+      if (failures === 2) effect = "warning";
+      else if (failures === 3 && previousFailures < 3) effect = "reset";
     }
-    snapshots.push([streak, longest, failures, stageOverride, resetCount, effect]);
+    snapshots.push([streak, longest, failures, successCount, failureCount, effect, null, 0]);
   });
-
   return snapshots;
 }
 
@@ -92,26 +63,16 @@ function sequences(length, prefix = []) {
 }
 
 let checked = 0;
-for (let length = 1; length <= 10; length += 1) {
-  const basePatterns = [
-    Array(length).fill(0),
-    Array(length).fill(1),
-    Array(length).fill(7),
-    Array.from({ length }, (_, i) => Math.min(7, Math.floor(i / 2))),
-    Array.from({ length }, (_, i) => Math.min(7, 3 + Math.floor(i / 3))),
-  ];
-
+for (let length = 1; length <= 12; length += 1) {
   for (const sequence of sequences(length)) {
-    for (const bases of basePatterns) {
-      checked += 1;
-      const legacy = JSON.stringify(legacyRun(sequence, bases));
-      const reconciled = JSON.stringify(reconciledRun(sequence, bases));
-      if (legacy !== reconciled) {
-        console.error("Rule parity mismatch", { sequence, bases, legacy, reconciled });
-        process.exit(1);
-      }
+    checked += 1;
+    const incremental = JSON.stringify(incrementalRun(sequence));
+    const reconciled = JSON.stringify(reconciledRun(sequence));
+    if (incremental !== reconciled) {
+      console.error("v1.2 rule parity mismatch", { sequence, incremental, reconciled });
+      process.exit(1);
     }
   }
 }
 
-console.log(`Challenge rule parity passed: ${checked.toLocaleString()} cases`);
+console.log(`v1.2 challenge rule parity passed: ${checked.toLocaleString()} sequences`);

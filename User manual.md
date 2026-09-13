@@ -1,30 +1,33 @@
-# AI Drama Challenge v1.1.0 — User Manual
+# User Manual — v1.2.0
 
-## Participant
-1. Open the service and choose signup.
-2. Enter the one-time invitation code issued by the administrator, display name, email and password.
-3. Sign in and complete onboarding.
-4. Start the 1000-day challenge.
-5. From the first Monday after starting, submit one qualifying work link each week by the weekly deadline.
-6. Use Dashboard to see current progress, streak and owl growth.
-7. Use History to review weekly outcomes and accepted links.
-8. Use Community to view other participants' public challenge progress.
-9. At 1000 days, use the completion/archive screen.
+## Participant journey
 
-## Weekly rules
-- The service judges weeks Monday through Sunday in Asia/Seoul time.
-- The first judged week starts on the next Monday after challenge start.
-- A valid http/https link may be submitted; known-platform verification is attempted, and an unverified link can still be recorded under the existing product rule.
-- Missed closed weeks are processed as failures according to the challenge rules.
+You start immediately as **Lv.1 Creator**. The first target is 100 days. The same OWL1000 journey then continues through 300, 600, 900 and 1000 days; milestones do not create separate challenges.
+
+### Milestones and levels
+
+- 100-day threshold + next qualifying weekly success → 100 badge + **Lv.2 Routine Creator**
+- 300-day threshold + next qualifying weekly success → 300 badge + **Lv.3 Story Creator**
+- 600-day threshold + next qualifying weekly success → 600 badge + **Lv.4 Signature Creator**
+- 900-day threshold + next qualifying weekly success → 900 badge + **Lv.5 Master Creator**
+- 1000-day threshold + next qualifying weekly success → **OWL1000 completion badge**
+
+Only the participant's next unearned milestone can be awarded by one successful week. If someone returns after a long absence, milestones are still earned one successful weekly proof at a time.
+
+Earned badges and creator levels are permanent. A failed week resets the current streak and affects recent status only. Two consecutive failures show a warning; three show a restart prompt, but the owl level and earned badges stay intact.
+
+When a new milestone is earned, the dashboard displays a short celebration with the new creator level. The celebration is non-blocking and respects reduced-motion accessibility settings.
 
 ## Administrator
-- `/admin` remains the operational entry point.
-- Issue invitation codes and copy them for participants.
-- v1.1.0 additionally supports operational inspection/correction workflows for weekly outcomes and submission history.
-- Corrections must include a reason and are written to the audit log.
-- Corrections rebuild the participant's current challenge summary so dashboard/community values stay consistent with official weekly history.
 
-## Data and privacy
-- Authentication credentials are managed by Supabase Auth.
-- The app stores challenge metadata and submitted URLs; it does not upload or store the user's video file itself.
-- Routine page-view/click analytics are not stored in the operational database in v1.1.0.
+The administrator can:
+- issue invite codes
+- revoke unused codes without deleting history
+- see who used a code, including email and usage time
+- suspend/reactivate participant access independently from invite-code history
+- inspect submission attempts and official weekly outcomes
+- correct official weekly outcomes with a required reason
+- review audit logs
+- use a read-only participant UI preview
+
+Suspending a participant preserves all challenge history. Revoking an unused invite code does not affect existing users.
