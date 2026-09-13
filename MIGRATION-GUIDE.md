@@ -1,3 +1,11 @@
-# Migration Guide — v1.3.6
+# Migration Guide — v1.3.7
 
-No SQL migration. Do not rerun migrations 001–008. Deploy code only.
+## DB migration
+없습니다.
+
+`001`~`008` SQL은 다시 실행하지 마십시오.
+
+## 배포
+1. GitHub 코드를 v1.3.7로 교체합니다.
+2. Vercel 배포를 확인합니다.
+3. 관리자 > 참여자 현황에서 열 간격과 관리 액션 정렬을 확인합니다.

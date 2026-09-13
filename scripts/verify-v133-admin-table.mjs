@@ -15,7 +15,7 @@ const checks = [
   ['identity column remains present', admin.includes('톡방 닉네임 / 이메일')],
   ['proof metrics are grouped', admin.includes('인증 현황') && admin.includes('성공/실패')],
   ['proof period and deadline are grouped', admin.includes('인증 기간') && admin.includes('마감 {formatShortKoreanDateKey(proofPeriod.endKey)} 23:59')],
-  ['action column preserves symmetric outer spacing', admin.includes('gap-x-6') && admin.includes('px-5')],
+  ['action column preserves symmetric outer spacing', (admin.includes('gap-x-6') && admin.includes('px-5')) || (admin.includes('admin-participant-table') && read('app/globals.css').includes('padding-inline: 1.25rem'))],
   ['action buttons do not wrap', admin.includes('whitespace-nowrap')],
   ['submission and access actions remain', admin.includes('>제출 내역</Link>') && admin.includes('>접근 관리</Link>')],
   ['nickname/email are protected with truncation', admin.includes('truncate font-black') && admin.includes('truncate text-sm leading-5 text-[var(--muted)]')],

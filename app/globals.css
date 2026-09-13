@@ -294,3 +294,72 @@ textarea:focus-visible {
   color: var(--ink);
   font-weight: 900;
 }
+
+/* v1.3.7 — intrinsic-width admin participant table
+   Cells no longer stretch across fractional tracks. Every row shares the same
+   content-sized columns through CSS subgrid, and the remaining width is
+   distributed evenly between columns. */
+.admin-participant-table {
+  display: grid;
+  grid-template-columns: max-content max-content max-content max-content max-content max-content max-content;
+  justify-content: space-between;
+  align-items: stretch;
+  width: 100%;
+  padding-inline: 1.25rem;
+}
+
+.admin-participant-row {
+  display: grid;
+  grid-template-columns: subgrid;
+  grid-column: 1 / -1;
+  align-items: center;
+}
+
+.admin-participant-header {
+  background: var(--surface-2);
+  box-shadow: 1.25rem 0 0 var(--surface-2), -1.25rem 0 0 var(--surface-2);
+}
+
+.admin-participant-data-row {
+  position: relative;
+}
+
+.admin-participant-data-row::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -1.25rem;
+  right: -1.25rem;
+  border-top: 1px solid var(--line);
+  pointer-events: none;
+}
+
+.admin-participant-row > [role="columnheader"],
+.admin-participant-row > [role="cell"] {
+  width: max-content;
+  max-width: 100%;
+  justify-self: start;
+}
+
+.admin-participant-identity {
+  max-width: 15rem !important;
+}
+
+.admin-participant-identity > * {
+  max-width: 15rem;
+}
+
+.admin-participant-header > [role="columnheader"]:last-child {
+  justify-self: center;
+}
+
+.admin-participant-management {
+  justify-self: end !important;
+}
+
+@media (max-width: 1199px) {
+  .admin-participant-table {
+    justify-content: start;
+    column-gap: 2rem;
+  }
+}

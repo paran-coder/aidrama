@@ -15,7 +15,7 @@ const checks = [
   ['table body is larger than text-sm', admin.includes('min-w-[1160px] text-left text-[15px]')],
   ['table secondary copy uses text-sm', admin.includes('truncate text-sm leading-5 text-[var(--muted)]')],
   ['rows use tighter vertical padding', admin.includes('py-3.5')],
-  ['management actions are horizontal', admin.includes('flex items-center justify-center gap-3 whitespace-nowrap') || admin.includes('flex items-center justify-end gap-1.5 whitespace-nowrap')],
+  ['management actions are horizontal', admin.includes('flex items-center justify-center gap-3 whitespace-nowrap') || admin.includes('flex items-center justify-end gap-1.5 whitespace-nowrap') || admin.includes('flex items-center gap-3 whitespace-nowrap')],
   ['management actions use compact class', (admin.match(/admin-table-action/g) ?? []).length >= 2],
   ['compact action style has no border', css.includes('.admin-table-action {') && css.includes('border: 0;') && css.includes('min-height: 2.2rem;')],
   ['submission and access actions remain', admin.includes('>제출 내역</Link>') && admin.includes('>접근 관리</Link>')],

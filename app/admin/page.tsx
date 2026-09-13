@@ -55,10 +55,10 @@ export default async function AdminPage({
           </div>
           <div className="mt-4 overflow-hidden rounded-[1.8rem] border border-[var(--line)] bg-[var(--surface)]">
             <div className="overflow-x-auto pb-1">
-              <div role="table" aria-label="참여자 현황" className="min-w-[1160px] text-left text-[15px]">
+              <div role="table" aria-label="참여자 현황" className="admin-participant-table min-w-[1160px] text-left text-[15px]">
                 <div
                   role="row"
-                  className="grid grid-cols-[minmax(190px,1.3fr)_96px_112px_76px_minmax(170px,1fr)_minmax(190px,1.1fr)_190px] items-center gap-x-6 bg-[var(--surface-2)] px-5 py-3.5 text-[13px] uppercase tracking-[.04em] text-[var(--muted)]"
+                  className="admin-participant-row admin-participant-header py-3.5 text-[13px] uppercase tracking-[.04em] text-[var(--muted)]"
                 >
                   <div role="columnheader">톡방 닉네임 / 이메일</div>
                   <div role="columnheader" className="whitespace-nowrap">계정 상태</div>
@@ -76,9 +76,9 @@ export default async function AdminPage({
                     <div
                       role="row"
                       key={participant.id}
-                      className="grid grid-cols-[minmax(190px,1.3fr)_96px_112px_76px_minmax(170px,1fr)_minmax(190px,1.1fr)_190px] items-center gap-x-6 border-t border-[var(--line)] px-5 py-3.5"
+                      className="admin-participant-row admin-participant-data-row py-3.5"
                     >
-                      <div role="cell" className="min-w-0">
+                      <div role="cell" className="admin-participant-identity min-w-0">
                         <p className="truncate font-black" title={participant.display_name}>{participant.display_name}</p>
                         <p className="mt-1 truncate text-sm leading-5 text-[var(--muted)]" title={email ?? "이메일 없음"}>{email ?? "이메일 없음"}</p>
                       </div>
@@ -91,8 +91,8 @@ export default async function AdminPage({
                       <div role="cell" className="font-bold leading-5">
                         {proofPeriod ? <><p className="whitespace-nowrap">{formatProofPeriod(proofPeriod.startKey)}</p><p className="mt-1 whitespace-nowrap text-sm leading-5 text-[var(--muted)]">마감 {formatShortKoreanDateKey(proofPeriod.endKey)} 23:59</p></> : "—"}
                       </div>
-                      <div role="cell">
-                        <div className="flex items-center justify-center gap-3 whitespace-nowrap">
+                      <div role="cell" className="admin-participant-management">
+                        <div className="flex items-center gap-3 whitespace-nowrap">
                           {challenge && <Link className="admin-table-action" href={`/admin/participants/${participant.id}#submissions`}>제출 내역</Link>}
                           <Link className="admin-table-action" href={`/admin/participants/${participant.id}#access`}>접근 관리</Link>
                         </div>
