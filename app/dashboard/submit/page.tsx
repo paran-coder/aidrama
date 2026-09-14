@@ -21,6 +21,7 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
   const proofPeriod = proofPeriodForAnchor(challenge.first_judgement_week_start);
   const q = await searchParams;
   const error = typeof q.error === "string" ? q.error : "";
+  const added = typeof q.added === "string" ? q.added : "";
   const { result, submission } = weekStart ? await getWeeklyResultWithSubmission(challenge.id, weekStart) : { result: null, submission: null };
   const remaining = weekStart ? deadlineParts(weekDeadlineFromKey(weekStart)) : null;
 
@@ -40,10 +41,45 @@ export default async function SubmitPage({ searchParams }: { searchParams: Promi
           <div className="ui-warning copy-pretty mt-3 rounded-2xl border p-4 leading-7">현재 인증 기간을 계산하고 있습니다. 잠시 후 새로고침해 주세요.</div>
         )}
         {error && <div role="alert" className="ui-danger mt-6 rounded-2xl border p-4 text-sm font-bold">{error}</div>}
-        {result ? (
-          <div className="card mt-8 rounded-[2rem] p-6"><div className="flex items-center justify-between"><h2 className="text-xl font-black">현재 인증 기간에 이미 제출했습니다.</h2>{submission && <StatusBadge status={submission.verification_status} />}</div>{submission?.url && <p className="mt-3 break-all text-sm leading-6 text-[var(--muted)]">{submission.url}</p>}<Link href="/dashboard" className="secondary-button mt-6 w-full">대시보드로 돌아가기</Link></div>
+        {added && (
+          <div role="status" className="ui-success copy-pretty mt-6 rounded-2xl border p-4 text-sm font-bold leading-6">
+            추가 URL이 기록되었습니다. 이번 인증 기간의 공식 인정 링크와 스트릭은 처음 제출한 URL 기준으로 그대로 유지됩니다.
+          </div>
+        )}
+
+        {result?.status === "success" && (
+          <div className="card mt-8 rounded-[2rem] p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="eyebrow">Official submission</p>
+                <h2 className="mt-2 text-xl font-black">이번 인증 기간은 이미 인증되었습니다.</h2>
+              </div>
+              {submission && <StatusBadge status={submission.verification_status} />}
+            </div>
+            <p className="copy-pretty mt-3 text-sm font-bold leading-6 text-[var(--muted)]">첫 정상 제출 URL이 공식 인정 링크로 고정됩니다. 같은 인증 기간 안에서는 작업 URL을 추가로 기록할 수 있지만 스트릭과 성공 횟수는 더 올라가지 않습니다.</p>
+            {submission?.url && <a href={submission.url} target="_blank" rel="noreferrer" className="mt-3 block break-all text-sm font-bold text-[var(--accent)] underline underline-offset-4">{submission.url}</a>}
+          </div>
+        )}
+
+        {result?.status === "failure" ? (
+          <div className="ui-danger mt-8 rounded-[2rem] border p-6">
+            <p className="text-lg font-black">현재 인증 기간은 실패로 확정되었습니다.</p>
+            <p className="copy-pretty mt-2 text-sm font-bold leading-6">일반 제출로 결과를 되돌릴 수 없습니다. 판정에 문제가 있다면 운영자에게 문의해 주세요.</p>
+          </div>
         ) : weekStart ? (
-          <form action={submitLinkAction} className="card mt-8 rounded-[2rem] p-5 sm:p-7"><input type="hidden" name="weekStart" value={weekStart} /><label className="block text-sm font-extrabold">SNS 업로드 링크<input className="input-field mt-2" name="url" type="url" inputMode="url" placeholder="https://youtube.com/..." aria-describedby="link-help" required /></label><p id="link-help" className="mt-2 text-xs leading-5 text-[var(--muted)]">YouTube, Instagram, TikTok 등 알려진 플랫폼은 형식 검증됩니다. 그 외 정상 URL도 제출은 인정되며 ‘미검증’으로 표시됩니다.</p><p className="mt-3 text-xs font-bold leading-5 text-[var(--accent)]">마일스톤 날짜를 지난 뒤 정상 인증에 성공하면 해당 배지가 영구적으로 기록됩니다.</p><PendingSubmitButton className="primary-button mt-6 w-full" pendingLabel="제출 중...">링크 제출하기</PendingSubmitButton></form>
+          <form action={submitLinkAction} className="card mt-6 rounded-[2rem] p-5 sm:p-7">
+            <input type="hidden" name="weekStart" value={weekStart} />
+            <label className="block text-sm font-extrabold">{result?.status === "success" ? "추가 작업 URL" : "SNS 업로드 링크"}
+              <input className="input-field mt-2" name="url" type="url" inputMode="url" placeholder="https://youtube.com/..." aria-describedby="link-help" required />
+            </label>
+            <p id="link-help" className="mt-2 text-xs leading-5 text-[var(--muted)]">YouTube, Instagram, TikTok 등 알려진 플랫폼은 형식 검증됩니다. 그 외 정상 URL도 제출은 인정되며 ‘미검증’으로 표시됩니다.</p>
+            {result?.status === "success" ? (
+              <p className="copy-pretty mt-3 text-xs font-bold leading-5 text-[var(--accent)]">추가 URL은 제출 이력에만 저장됩니다. 공식 인정 링크, 스트릭, 성공 횟수, 배지는 처음 제출한 URL 기준으로 유지됩니다.</p>
+            ) : (
+              <p className="mt-3 text-xs font-bold leading-5 text-[var(--accent)]">이 인증 기간의 첫 정상 제출이 공식 인정 링크가 됩니다. 마일스톤 날짜를 지난 뒤 정상 인증에 성공하면 해당 배지가 영구적으로 기록됩니다.</p>
+            )}
+            <PendingSubmitButton className="primary-button mt-6 w-full" pendingLabel="제출 중...">{result?.status === "success" ? "추가 URL 기록하기" : "링크 제출하기"}</PendingSubmitButton>
+          </form>
         ) : (
           <div className="card mt-8 rounded-[2rem] p-6">
             <p className="text-lg font-black">인증 기간 정보를 불러오지 못했습니다.</p>

@@ -106,8 +106,13 @@ export default async function DashboardPage({
           {completed ? (
             <Link className="primary-button mt-6" href={`/complete/${user.id}`}>OWL1000 완주 기록 보기</Link>
           ) : weekStart ? (
-            weeklyResult ? (
-              <div className="ui-success mt-6 rounded-full border px-5 py-4 text-center font-extrabold">✓ 이번 인증 기간 제출 완료</div>
+            weeklyResult?.status === "success" ? (
+              <div className="mt-6 grid gap-3">
+                <div className="ui-success rounded-2xl border px-5 py-4 text-center font-extrabold">✓ 이번 인증 기간 공식 인증 완료</div>
+                <Link className="secondary-button" href="/dashboard/submit">추가 작업 URL 기록하기</Link>
+              </div>
+            ) : weeklyResult?.status === "failure" ? (
+              <div className="ui-danger mt-6 rounded-2xl border px-5 py-4 text-center font-extrabold">이번 인증 기간은 실패로 확정되었습니다.</div>
             ) : (
               <Link className="primary-button mt-6" href="/dashboard/submit">현재 인증 기간 업로드 제출하기</Link>
             )

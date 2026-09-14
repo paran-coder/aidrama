@@ -1,19 +1,13 @@
-# OWL1000 v1.3.3
+# OWL1000 v1.3.8
 
-OWL1000 is a private creator challenge web app. v1.3.3 is a UI-only admin table layout patch on top of v1.3.2.
+v1.3.7을 기준으로 같은 7일 인증 기간 안에서 여러 작업 URL을 기록할 수 있도록 확장한 운영 버전입니다.
 
-## What changed
-- Admin participant overview uses a wider desktop shell.
-- Participant table is compacted so the right-side actions stay visible on common desktop widths.
-- Proof period + deadline and streak + success/failure are grouped into clearer columns.
-- Nickname/email remain easy to scan.
-- No DB or challenge-rule changes.
+## 핵심 규칙
+- 첫 정상 제출 URL 1개만 해당 인증 기간의 `공식 인정` 링크입니다.
+- 같은 기간의 두 번째 이후 URL은 모두 제출 이력에 보존됩니다.
+- 추가 URL은 스트릭, 성공 횟수, 배지 판정을 추가로 올리지 않습니다.
+- 관리자 참여자 상세의 `참여자 제출 링크`에서 모든 URL을 확인할 수 있습니다.
+- 개인별 시작일 기준 7일 인증 기간과 KST 날짜 계산은 v1.3.7과 동일합니다.
 
-## Deployment
-1. Replace the current app code with v1.3.3.
-2. Push to GitHub.
-3. Let Vercel build and deploy.
-4. Open Admin > 운영 관리 and verify the participant table at your usual desktop width.
-
-## Database
-No new SQL. Do not rerun migrations 001-008.
+## DB
+`009_v1_3_8_multi_submissions.sql`을 한 번 실행해야 합니다. 테이블/컬럼 추가 없이 `record_submission_success` 함수의 동작만 업데이트합니다.

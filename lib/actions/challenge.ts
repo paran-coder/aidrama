@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { requireAppContext } from "@/lib/auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { challengeProgress, formatDateKey, weekDeadlineFromKey } from "@/lib/challenge";
-import { currentChallengeWeek, getChallenge, getChallengeBadges, processMissedWeeks } from "@/lib/challenge-service";
+import { currentChallengeWeek, getChallenge, getChallengeBadges, getWeeklyResult, processMissedWeeks } from "@/lib/challenge-service";
 import { inspectSubmissionUrl } from "@/lib/urls";
 import { hasCompletionBadge, MILESTONES, type Milestone } from "@/lib/growth";
 
@@ -53,7 +53,7 @@ export async function submitLinkAction(formData: FormData) {
 
   const admin = createAdminClient();
   const verification = inspected.verified ? "verified" : "unverified";
-  const { error } = await admin.rpc("record_submission_success", {
+  const { data: submissionId, error } = await admin.rpc("record_submission_success", {
     p_user_id: user.id,
     p_week_start: requestedWeekStart,
     p_url: url,
@@ -62,10 +62,12 @@ export async function submitLinkAction(formData: FormData) {
   });
 
   if (error) {
-    const duplicate = error.message.includes("WEEK_ALREADY_PROCESSED") || error.message.toLowerCase().includes("duplicate");
-    redirect(`/dashboard/submit?error=${encodeURIComponent(duplicate ? "현재 인증 기간의 제출은 이미 완료되었습니다." : "제출을 저장하지 못했습니다.")}`);
+    const finalizedFailure = error.message.includes("WEEK_ALREADY_FINALIZED_FAILURE");
+    redirect(`/dashboard/submit?error=${encodeURIComponent(finalizedFailure ? "현재 인증 기간은 이미 실패로 확정되어 추가 제출할 수 없습니다. 관리자에게 문의해 주세요." : "제출을 저장하지 못했습니다.")}`);
   }
 
+  const officialResult = await getWeeklyResult(challenge.id, requestedWeekStart);
+  const isOfficialSubmission = Boolean(submissionId && officialResult?.final_submission_id === submissionId);
   const badgesAfter = await getChallengeBadges(challenge.id);
   const beforeMilestones = new Set(badgesBefore.map((badge) => badge.milestone_days));
   const awarded = badgesAfter
@@ -73,8 +75,15 @@ export async function submitLinkAction(formData: FormData) {
     .find((milestone): milestone is Milestone => MILESTONES.includes(milestone as Milestone) && !beforeMilestones.has(milestone));
 
   revalidatePath("/dashboard");
+  revalidatePath("/dashboard/submit");
   revalidatePath("/dashboard/history");
   revalidatePath("/community");
+  revalidatePath(`/admin/participants/${user.id}`);
+
+  if (!isOfficialSubmission) {
+    redirect(`/dashboard/submit?added=${verification}`);
+  }
+
   const milestoneQuery = awarded ? `&milestone=${awarded}` : "";
   redirect(`/dashboard?submitted=${verification}${milestoneQuery}`);
 }

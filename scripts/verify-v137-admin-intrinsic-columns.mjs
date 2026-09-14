@@ -8,7 +8,7 @@ const pkg = JSON.parse(fs.readFileSync(path.join(root, "package.json"), "utf8"))
 const version = fs.readFileSync(path.join(root, "VERSION"), "utf8").trim();
 
 const checks = [
-  ["version is 1.3.7", version === "1.3.7" && pkg.version === version],
+  ["v1.3.7+ intrinsic-column behavior retained", /^1\.3\.(?:7|8|9|[1-9]\d+)$/.test(version) && pkg.version === version],
   ["single shared participant table grid exists", admin.includes("admin-participant-table") && admin.includes("admin-participant-row")],
   ["fractional row grids removed", !admin.includes("grid-cols-[minmax(190px,1.3fr)")],
   ["columns size from actual content", css.includes("grid-template-columns: max-content max-content max-content max-content max-content max-content max-content")],
